@@ -1,8 +1,7 @@
 #ifndef CMF_CORE_H
 #define CMF_CORE_H
 
-#include <cinttypes>
-#include "sdkconfig.h"
+#include <sdkconfig.h>
 
 #ifndef __cplusplus
 	#error "CMF: Only C++ projects are supported"
