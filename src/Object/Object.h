@@ -35,7 +35,6 @@ private:
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
-	static_assert(!std::is_abstract<SuperObject>(), "Objects may not inherit abstract Object"); 							\
 	static_assert(std::derived_from<SuperObject, Object>, "Object must have and inherit a base Object class.");				\
 																															\
 private:																													\
@@ -127,6 +126,10 @@ class SecondExampleDerivedObject : public Object, public Interface1 {
 
 class DoubleDerivedObject : public SecondExampleDerivedObject {
 	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject);
+};
+
+class TestTemplateObject : public SecondExampleDerivedObject {
+	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject);
 };
 
 // ====================================================================================
