@@ -25,7 +25,7 @@ public:
 	}
 
 	template<typename T>
-	static inline constexpr bool Derives() noexcept {
+	static inline constexpr bool Implements() noexcept {
 		return false;
 	}
 
@@ -59,8 +59,8 @@ public:																														\
 	}																														\
 																															\
 	template<typename T>																									\
-	inline static constexpr bool Derives() noexcept {																		\
-		return staticClass->Derives<T>() || Super::Derives<T>();															\
+	inline static constexpr bool Implements() noexcept {																	\
+		return staticClass->Implements<T>() || Super::Implements<T>();														\
 	}                                                      																	\
 																															\
 private:																													\
@@ -74,7 +74,7 @@ private:																													\
 																															\
 	public:																													\
 		template<typename Type>																								\
-		inline static constexpr bool Derives() noexcept {																	\
+		inline static constexpr bool Implements() noexcept {																\
 			return std::is_same<Type, T>::value;																			\
 		}																													\
 																															\
@@ -91,7 +91,7 @@ private:																													\
 																															\
 	public:																													\
 		template<typename Type>																								\
-		inline static constexpr bool Derives() noexcept {																	\
+		inline static constexpr bool Implements() noexcept {																\
 			return std::is_same<Type, T>::value || Inherited::template Derives<Type>();										\
 		}																													\
 																															\
