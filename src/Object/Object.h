@@ -112,6 +112,9 @@ class Interface1 {
 
 class Interface2 {};
 
+template<typename T>
+class Interface3 {};
+
 class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
 	static_assert(!std::is_abstract<Object>());
 
@@ -128,8 +131,8 @@ class DoubleDerivedObject : public SecondExampleDerivedObject {
 	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject);
 };
 
-class TestTemplateObject : public SecondExampleDerivedObject {
-	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject);
+class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
+	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>);
 };
 
 // ====================================================================================

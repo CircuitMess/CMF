@@ -23,6 +23,11 @@ static T* CMFAppStart(){
 
 	printf("Derived is pure: %d\n", object->IsA(Object::StaticClass()));
 
+	printf("Test derives wrong template of right interface: %d\n", TestTemplateObject::Derives<Interface3<float>>());
+	printf("Test derives right template of right interface: %d\n", TestTemplateObject::Derives<Interface3<int>>());
+
+	printf("Done\n");
+
 	// TODO: init app, start ticking loop
 	return nullptr;
 }
