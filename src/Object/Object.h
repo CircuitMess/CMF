@@ -34,13 +34,10 @@ private:
 	inline static const ClassType* staticClass = new ClassType(STRING_HASH("Object"));
 };
 
-	// TODO
-	/*static_assert(std::derived_from<ObjectName, SuperObject>, "Object must derive from given base object class.");		\
-    static_assert(std::derived_from<SuperObject, Object>(), "Base object must be of type object.");							\
-    static_assert(sizeof(ObjectName) != 0, "Object is incomplete.");														\
-    static_assert(sizeof(SuperObject) != 0, "Base object is incomplete.");													\*/
-
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
+	static_assert(!std::is_abstract<SuperObject>(), "Objects may not inherit abstract Object"); 							\
+	static_assert(std::derived_from<SuperObject, Object>, "Object must have and inherit a base Object class.");				\
+																															\
 private:																													\
 	using Super = SuperObject;																								\
 																															\
@@ -117,7 +114,7 @@ class Interface1 {
 class Interface2 {};
 
 class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
-	static_assert(std::is_abstract<Interface1>());
+	static_assert(!std::is_abstract<Object>());
 
 	GENERATED_BODY(ExampleDerivedObject, Object, Interface1, Interface2)
 
