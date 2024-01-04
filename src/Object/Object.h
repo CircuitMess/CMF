@@ -129,11 +129,11 @@ class ThirdExampleDerivedObject : public Object, public Interface2 {
 };
 
 class DoubleDerivedObject : public SecondExampleDerivedObject {
-	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject);
+	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject)
 };
 
 class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
-	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>);
+	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>)
 };
 
 // ====================================================================================
