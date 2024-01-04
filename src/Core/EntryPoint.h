@@ -42,6 +42,5 @@ static void CMFAppStart(){
 	{ \
 		CMFAppStart<AppName>(); \
 	}
-#else
 
 #endif //CMF_ENTRYPOINT_H
