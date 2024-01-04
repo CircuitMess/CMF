@@ -69,10 +69,10 @@ public:																														\
 																															\
 private:																													\
 	template<typename... Types>																								\
-	class ObjectName_Class;																									\
+	class ObjectName##_Class;																								\
 																															\
 	template<typename T>																									\
-	class ObjectName_Class<T> : public Class {																				\
+	class ObjectName##_Class<T> : public Class {																			\
 	public:																													\
 		friend class ObjectName;																							\
 																															\
@@ -83,12 +83,12 @@ private:																													\
 		}																													\
 																															\
 	protected:                                             																	\
-		explicit inline ObjectName_Class(uint32_t ID) noexcept : Class(ID) {}												\
+		explicit inline ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}												\
 	};																														\
 																															\
 	template<typename T, typename... Types>																					\
-	class ObjectName_Class<T, Types...> : public ObjectName_Class<Types...> {												\
-		typedef ObjectName_Class<Types...> Inherited;																		\
+	class ObjectName##_Class<T, Types...> : public ObjectName##_Class<Types...> {											\
+		typedef ObjectName##_Class<Types...> Inherited;																		\
 																															\
 	public:																													\
 		friend class ObjectName;																							\
@@ -100,10 +100,10 @@ private:																													\
 		}																													\
 																															\
 	protected:																												\
-		explicit inline ObjectName_Class(uint32_t ID) noexcept : ObjectName_Class<Types...>(ID) {}							\
+		explicit inline ObjectName##_Class(uint32_t ID) noexcept : ObjectName##_Class<Types...>(ID) {}						\
 	};																														\
 																															\
-	using ClassType = ObjectName_Class<Super, ##__VA_ARGS__>;																\
+	using ClassType = ObjectName##_Class<Super, ##__VA_ARGS__>;																\
 	inline static const ClassType* staticClass = new ClassType(STRING_HASH(#ObjectName));									\
 
 
@@ -117,6 +117,8 @@ class Interface1 {
 class Interface2 {};
 
 class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
+	static_assert(std::is_abstract<Interface1>());
+
 	GENERATED_BODY(ExampleDerivedObject, Object, Interface1, Interface2)
 
 	virtual void test() override {}
