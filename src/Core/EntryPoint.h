@@ -7,7 +7,7 @@
 #include "Memory/Cast.h"
 
 template<typename T>
-static T* CMFAppStart(){
+static void CMFAppStart(){
 	ExampleDerivedObject* object = new ExampleDerivedObject();
 
 	printf("Derived is base: %d\n", ExampleDerivedObject::Implements<Object>());
@@ -33,7 +33,6 @@ static T* CMFAppStart(){
 	printf("Done\n");
 
 	// TODO: init app, start ticking loop
-	return nullptr;
 }
 
 #define CMF_MAIN(AppName) \
