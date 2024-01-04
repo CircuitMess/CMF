@@ -5,6 +5,7 @@
 #include "Misc/Djb.h"
 #include "Object/Object.h"
 #include "Memory/Cast.h"
+#include "Object/Interface.h"
 
 template<typename T>
 static void CMFAppStart(){
@@ -19,16 +20,17 @@ static void CMFAppStart(){
 
 	printf("Pure object is derived: %d\n", pureObject->IsA(ExampleDerivedObject::StaticClass()));
 
-	printf("Pure object derives pure object: %d\n", Object::Implements<Object>());
-	printf("Pure object derives interface 1: %d\n", Object::Implements<Interface1>());
-
-	printf("Derived is pure: %d\n", object->IsA(Object::StaticClass()));
-
 	printf("Test derives wrong template of right interface: %d\n", TestTemplateObject::Implements<Interface3<float>>());
 	printf("Test derives right template of right interface: %d\n", TestTemplateObject::Implements<Interface3<int>>());
 
 	printf("Good cast: %p\n", Cast<ExampleDerivedObject>(pureObject));
 	printf("Bad cast: %p\n", Cast<TestTemplateObject>(pureObject));
+
+	Interface<Interface1> testInterface(object);
+	printf("Good interface object: %p, interface: %p\n", testInterface.GetObject(), testInterface.GetInterface());
+
+	Interface<Interface1> secondTestInterface(new ThirdExampleDerivedObject());
+	printf("Bad interface object: %p, interface: %p\n", secondTestInterface.GetObject(), secondTestInterface.GetInterface());
 
 	printf("Done\n");
 

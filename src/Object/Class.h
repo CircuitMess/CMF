@@ -10,7 +10,7 @@ public:
 	uint32_t GetID() const noexcept;
 
 	template<typename Type>
-	static inline constexpr bool Derives() noexcept {
+	static inline constexpr bool Implements() noexcept {
 		return false;
 	}
 
