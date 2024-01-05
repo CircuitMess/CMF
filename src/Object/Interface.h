@@ -34,6 +34,12 @@ public:
 		if(!other){
 			return;
 		}
+
+		m_Object = other.GetObject();
+		m_Interface = other.GetInterface();
+
+		other.m_Object = nullptr;
+		other.m_Interface = nullptr;
 	}
 
 	virtual ~Interface() noexcept = default;
