@@ -9,7 +9,7 @@ class SyncEntity : public Entity {
 	GENERATED_BODY(SyncEntity, Entity)
 
 public:
-	SyncEntity(AsyncEntity* owner = nullptr) noexcept;
+	explicit SyncEntity(AsyncEntity* owner = nullptr) noexcept;
 	virtual ~SyncEntity() noexcept override;
 
 	void SetOwner(AsyncEntity* owner = nullptr) noexcept;
