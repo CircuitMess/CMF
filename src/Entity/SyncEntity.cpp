@@ -26,6 +26,10 @@ AsyncEntity* SyncEntity::GetOwner() const noexcept {
 	return m_Owner;
 }
 
+void SyncEntity::Tick(float deltaTime) noexcept {
+	Super::Tick(deltaTime);
+}
+
 void SyncEntity::PostInitProperties() noexcept {
 	Super::PostInitProperties();
 }
@@ -34,15 +38,11 @@ void SyncEntity::Begin() noexcept {
 	Super::Begin();
 }
 
-void SyncEntity::Tick(float deltaTime) noexcept {
-	Super::Tick(deltaTime);
-}
-
 void SyncEntity::End() noexcept {
 	Super::End();
 }
 
 void SyncEntity::OnOwnerChanged(AsyncEntity* oldOwner) noexcept {
-	// TODO: remove this from old owner tick
-	// TODO: register this for new owner tick
+	oldOwner->UnregisterSyncEntity(this);
+	m_Owner->RegisterSyncEntity(this);
 }
