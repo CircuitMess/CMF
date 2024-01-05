@@ -7,8 +7,11 @@
 
 class Object {
 public:
+	Object() noexcept = default;
+	virtual ~Object() noexcept = default;
+
 	inline static const Class* StaticClass() noexcept {
-		return staticClass;
+		return s_StaticClass;
 	}
 
 	inline virtual const Class* GetStaticClass() const noexcept {
@@ -31,7 +34,7 @@ public:
 
 private:
 	using ClassType = Class;
-	inline static const ClassType* staticClass = new ClassType(STRING_HASH("Object"));
+	inline static const ClassType* s_StaticClass = new ClassType(STRING_HASH("Object"));
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
@@ -75,11 +78,11 @@ private:																													\
 																															\
 	using Super = SuperObject;																								\
 	using ClassType = ObjectName##_Class<Super, ##__VA_ARGS__>;																\
-	inline static const ClassType* staticClass = new ClassType(STRING_HASH(#ObjectName));									\
+	inline static const ClassType* s_StaticClass = new ClassType(STRING_HASH(#ObjectName));									\
 																															\
 public:																														\
 	inline static const Class* StaticClass() noexcept {																		\
-		return staticClass;																									\
+		return s_StaticClass;																								\
 	}																														\
 																															\
 	inline virtual const Class* GetStaticClass() const noexcept override {													\
@@ -97,7 +100,7 @@ public:																														\
 																															\
 	template<typename T>																									\
 	inline static constexpr bool Implements() noexcept {																	\
-		return staticClass->Implements<T>() || Super::Implements<T>();														\
+		return s_StaticClass->Implements<T>() || Super::Implements<T>();													\
 	}                                                      																	\
 
 
