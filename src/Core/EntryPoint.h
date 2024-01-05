@@ -6,8 +6,9 @@
 #include "Object/Object.h"
 #include "Memory/Cast.h"
 #include "Object/Interface.h"
+#include "Application.h"
 
-template<typename T>
+template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 static void CMFAppStart(){
 	ExampleDerivedObject* object = new ExampleDerivedObject();
 
