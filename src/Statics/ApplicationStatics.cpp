@@ -2,5 +2,5 @@
 #include "Core/Application.h"
 
 Application* ApplicationStatics::GetApplication() noexcept {
-	return nullptr;
+	return Application::s_ApplicationInstance;
 }

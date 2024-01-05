@@ -6,6 +6,8 @@
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
 
+	friend class ApplicationStatics;
+
 public:
 	Application() noexcept;
 	Application(const Application&) = delete;
@@ -21,6 +23,9 @@ protected:
 	virtual void Begin() noexcept override;
 	virtual void Tick(float deltaTime) noexcept override;
 	virtual void End(/*TODO reason*/) noexcept override;
+
+private:
+	inline static Application* s_ApplicationInstance = nullptr;
 };
 
 #endif //CMF_APPLICATION_H
