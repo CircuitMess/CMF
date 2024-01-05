@@ -8,7 +8,7 @@ class Entity : public Object {
 
 public:
 	Entity() noexcept;
-	virtual ~Entity() noexcept;
+	virtual ~Entity() noexcept override;
 
 protected:
 	virtual void PostInitProperties() noexcept;
