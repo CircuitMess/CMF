@@ -101,13 +101,15 @@ void Threaded::loop() noexcept{
 
 void Threaded::threadFunction() noexcept{
 	while(state == State::Running){
-		if(millis() - lastLoop < loopInterval){
-			if(xSemaphoreTake(pauseSemaphore, millis() - lastLoop + 1) == pdTRUE){
-				stop(0);
-				paused = true;
-				return;
-			}
+		TickType_t semaphoreWait = 0;
 
+		if(millis() - lastLoop < loopInterval){
+			semaphoreWait = millis() - lastLoop + 1;
+		}
+
+		if(xSemaphoreTake(pauseSemaphore, semaphoreWait) == pdTRUE){
+			stop(0);
+			paused = true;
 			return;
 		}
 
