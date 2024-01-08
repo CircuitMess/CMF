@@ -29,6 +29,7 @@ private:
 private:
 	std::set<SyncEntity*> registeredSyncEntities; // TODO: replace these with weak ptrs
 	Threaded* thread; // TODO: replace with strong obj ptr
+	uint64_t lastTickTime;
 };
 
 #endif //CMF_ASYNCENTITY_H
