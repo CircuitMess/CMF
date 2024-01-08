@@ -1,12 +1,15 @@
 #include "AsyncEntity.h"
 #include "SyncEntity.h"
+#include "Thread/Threaded.h"
 
 AsyncEntity::AsyncEntity() noexcept : Super() {
-
+	thread = new Threaded([this]() { this->tickHandle();}, "AsyncEntityThread"); // TODO: relpace thread name with instance object name once that is implemented
+	thread->start();
 }
 
 AsyncEntity::~AsyncEntity() noexcept {
-
+	thread->stop(portMAX_DELAY);
+	delete thread;
 }
 
 void AsyncEntity::registerSyncEntity(SyncEntity* entity) noexcept{
@@ -14,7 +17,7 @@ void AsyncEntity::registerSyncEntity(SyncEntity* entity) noexcept{
 		entity->setOwner(this);
 	}
 
-	m_RegisteredSyncEntities.insert(entity);
+	registeredSyncEntities.insert(entity);
 }
 
 void AsyncEntity::unregisterSyncEntity(SyncEntity* entity) noexcept {
@@ -22,7 +25,7 @@ void AsyncEntity::unregisterSyncEntity(SyncEntity* entity) noexcept {
 		entity->setOwner(nullptr);
 	}
 
-	m_RegisteredSyncEntities.erase(entity);
+	registeredSyncEntities.erase(entity);
 }
 
 void AsyncEntity::postInitProperties() noexcept {
@@ -41,11 +44,13 @@ void AsyncEntity::end() noexcept {
 	Super::end();
 }
 
-void AsyncEntity::TickHandle() noexcept{
+void AsyncEntity::tickHandle() noexcept{
 	tick(0.0f); // TODO: delta time
 
-	for(SyncEntity* entity : m_RegisteredSyncEntities){
-		if(entity != nullptr){ // TODO: check ptr validity instead of nullptr
+	for(SyncEntity* entity : registeredSyncEntities){
+		if(entity == nullptr){ // TODO: check ptr validity instead of nullptr
+			registeredSyncEntities.erase(nullptr);
+		}else{
 			entity->tick(0.0f); // TODO: delta time
 		}
 	}

@@ -5,6 +5,7 @@
 #include <set>
 
 class SyncEntity;
+class Threaded;
 
 class AsyncEntity : public Entity {
 	GENERATED_BODY(AsyncEntity, Entity)
@@ -23,10 +24,11 @@ protected:
 	virtual void end(/*TODO reason*/) noexcept override;
 
 private:
-	void TickHandle() noexcept;
+	void tickHandle() noexcept;
 
 private:
-	std::set<SyncEntity*> m_RegisteredSyncEntities; // TODO: replace these with weak ptrs
+	std::set<SyncEntity*> registeredSyncEntities; // TODO: replace these with weak ptrs
+	Threaded* thread; // TODO: replace with strong obj ptr
 };
 
 #endif //CMF_ASYNCENTITY_H
