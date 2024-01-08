@@ -8,18 +8,18 @@ Entity::~Entity() noexcept{
 
 }
 
-void Entity::PostInitProperties() noexcept {
+void Entity::postInitProperties() noexcept {
 
 }
 
-void Entity::Begin() noexcept{
+void Entity::begin() noexcept{
 
 }
 
-void Entity::Tick(float deltaTime) noexcept{
+void Entity::tick(float deltaTime) noexcept{
 
 }
 
-void Entity::End() noexcept{
+void Entity::end() noexcept{
 
 }

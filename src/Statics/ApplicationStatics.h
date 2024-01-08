@@ -5,7 +5,7 @@ class Application;
 
 class ApplicationStatics {
 public:
-	static Application* GetApplication() noexcept;
+	static Application* getApplication() noexcept;
 };
 
 #endif //CMF_APPLICATIONSTATICS_H

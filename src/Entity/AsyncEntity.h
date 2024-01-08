@@ -13,14 +13,14 @@ public:
 	AsyncEntity() noexcept;
 	virtual ~AsyncEntity() noexcept override;
 
-	void RegisterSyncEntity(SyncEntity* entity) noexcept;
-	void UnregisterSyncEntity(SyncEntity* entity) noexcept;
+	void registerSyncEntity(SyncEntity* entity) noexcept;
+	void unregisterSyncEntity(SyncEntity* entity) noexcept;
 
 protected:
-	virtual void PostInitProperties() noexcept override;
-	virtual void Begin() noexcept override;
-	virtual void Tick(float deltaTime) noexcept override;
-	virtual void End(/*TODO reason*/) noexcept override;
+	virtual void postInitProperties() noexcept override;
+	virtual void begin() noexcept override;
+	virtual void tick(float deltaTime) noexcept override;
+	virtual void end(/*TODO reason*/) noexcept override;
 
 private:
 	void TickHandle() noexcept;

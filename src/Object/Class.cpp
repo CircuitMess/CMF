@@ -1,6 +1,6 @@
 #include "Class.h"
 
-uint32_t Class::GetID() const noexcept{
+uint32_t Class::getID() const noexcept{
 	return classID;
 }
 

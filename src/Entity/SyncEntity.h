@@ -12,17 +12,17 @@ public:
 	explicit SyncEntity(AsyncEntity* owner = nullptr) noexcept;
 	virtual ~SyncEntity() noexcept override;
 
-	void SetOwner(AsyncEntity* owner = nullptr) noexcept;
-	AsyncEntity* GetOwner() const noexcept;
+	void setOwner(AsyncEntity* owner = nullptr) noexcept;
+	AsyncEntity* getOwner() const noexcept;
 
-	virtual void Tick(float deltaTime) noexcept override;
+	virtual void tick(float deltaTime) noexcept override;
 
 protected:
-	virtual void PostInitProperties() noexcept override;
-	virtual void Begin() noexcept override;
-	virtual void End(/*TODO reason*/) noexcept override;
+	virtual void postInitProperties() noexcept override;
+	virtual void begin() noexcept override;
+	virtual void end(/*TODO reason*/) noexcept override;
 
-	virtual void OnOwnerChanged(AsyncEntity* oldOwner) noexcept;
+	virtual void onOwnerChanged(AsyncEntity* oldOwner) noexcept;
 
 private:
 	AsyncEntity* m_Owner = nullptr;

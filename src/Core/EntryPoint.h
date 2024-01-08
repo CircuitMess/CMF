@@ -12,29 +12,29 @@
 #include "Memory/Cast.h"
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
-static void CMFAppStart(){
+static void startCMF(){
 	ExampleDerivedObject* object = new ExampleDerivedObject();
 
-	printf("Derived is base: %d\n", ExampleDerivedObject::Implements<Object>());
+	printf("Derived is base: %d\n", ExampleDerivedObject::implements<Object>());
 
-	printf("Derived is interface 1: %d\n", ExampleDerivedObject::Implements<Interface1>());
-	printf("Derived is interface 2: %d\n", ExampleDerivedObject::Implements<Interface2>());
+	printf("Derived is interface 1: %d\n", ExampleDerivedObject::implements<Interface1>());
+	printf("Derived is interface 2: %d\n", ExampleDerivedObject::implements<Interface2>());
 
 	Object* pureObject = object;
 
-	printf("Pure object is derived: %d\n", pureObject->IsA(ExampleDerivedObject::StaticClass()));
+	printf("Pure object is derived: %d\n", pureObject->isA(ExampleDerivedObject::staticClass()));
 
-	printf("Test derives wrong template of right interface: %d\n", TestTemplateObject::Implements<Interface3<float>>());
-	printf("Test derives right template of right interface: %d\n", TestTemplateObject::Implements<Interface3<int>>());
+	printf("Test derives wrong template of right interface: %d\n", TestTemplateObject::implements<Interface3<float>>());
+	printf("Test derives right template of right interface: %d\n", TestTemplateObject::implements<Interface3<int>>());
 
-	printf("Good cast: %p\n", Cast<ExampleDerivedObject>(pureObject));
-	printf("Bad cast: %p\n", Cast<TestTemplateObject>(pureObject));
+	printf("Good cast: %p\n", cast<ExampleDerivedObject>(pureObject));
+	printf("Bad cast: %p\n", cast<TestTemplateObject>(pureObject));
 
 	Interface<Interface1> testInterface(object);
-	printf("Good interface object: %p, interface: %p\n", testInterface.GetObject(), testInterface.GetInterface());
+	printf("Good interface object: %p, interface: %p\n", testInterface.getObject(), testInterface.getInterface());
 
 	Interface<Interface1> secondTestInterface(new ThirdExampleDerivedObject());
-	printf("Bad interface object: %p, interface: %p\n", secondTestInterface.GetObject(), secondTestInterface.GetInterface());
+	printf("Bad interface object: %p, interface: %p\n", secondTestInterface.getObject(), secondTestInterface.getInterface());
 
 	printf("Done\n");
 
@@ -44,7 +44,7 @@ static void CMFAppStart(){
 #define CMF_MAIN(AppName) \
 	extern "C" void app_main() \
 	{ \
-		CMFAppStart<AppName>(); \
+		startCMF<AppName>(); \
 	}
 
 #endif //CMF_ENTRYPOINT_H

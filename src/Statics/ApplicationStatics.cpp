@@ -1,6 +1,6 @@
 #include "ApplicationStatics.h"
 #include "Core/Application.h"
 
-Application* ApplicationStatics::GetApplication() noexcept {
+Application* ApplicationStatics::getApplication() noexcept {
 	return Application::s_ApplicationInstance;
 }

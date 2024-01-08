@@ -9,44 +9,44 @@ AsyncEntity::~AsyncEntity() noexcept {
 
 }
 
-void AsyncEntity::RegisterSyncEntity(SyncEntity* entity) noexcept{
-	if(entity->GetOwner() != this){
-		entity->SetOwner(this);
+void AsyncEntity::registerSyncEntity(SyncEntity* entity) noexcept{
+	if(entity->getOwner() != this){
+		entity->setOwner(this);
 	}
 
 	m_RegisteredSyncEntities.insert(entity);
 }
 
-void AsyncEntity::UnregisterSyncEntity(SyncEntity* entity) noexcept {
-	if(entity->GetOwner() == this){
-		entity->SetOwner(nullptr);
+void AsyncEntity::unregisterSyncEntity(SyncEntity* entity) noexcept {
+	if(entity->getOwner() == this){
+		entity->setOwner(nullptr);
 	}
 
 	m_RegisteredSyncEntities.erase(entity);
 }
 
-void AsyncEntity::PostInitProperties() noexcept {
-	Super::PostInitProperties();
+void AsyncEntity::postInitProperties() noexcept {
+	Super::postInitProperties();
 }
 
-void AsyncEntity::Begin() noexcept {
-	Super::Begin();
+void AsyncEntity::begin() noexcept {
+	Super::begin();
 }
 
-void AsyncEntity::Tick(float deltaTime) noexcept {
-	Super::Tick(deltaTime);
+void AsyncEntity::tick(float deltaTime) noexcept {
+	Super::tick(deltaTime);
 }
 
-void AsyncEntity::End() noexcept {
-	Super::End();
+void AsyncEntity::end() noexcept {
+	Super::end();
 }
 
 void AsyncEntity::TickHandle() noexcept{
-	Tick(0.0f); // TODO: delta time
+	tick(0.0f); // TODO: delta time
 
 	for(SyncEntity* entity : m_RegisteredSyncEntities){
 		if(entity != nullptr){ // TODO: check ptr validity instead of nullptr
-			entity->Tick(0.0f); // TODO: delta time
+			entity->tick(0.0f); // TODO: delta time
 		}
 	}
 }

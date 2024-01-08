@@ -14,12 +14,12 @@ public:
 			return;
 		}
 
-		if(!object->template Implements<I>()){
+		if(!object->template implements<I>()){
 			return;
 		}
 
-		m_Object = Cast<Object>(object);
-		m_Interface = (I*) object;
+		this->object = cast<Object>(object);
+		this->interface = (I*) object;
 	}
 
 	inline constexpr Interface(const Interface& other) noexcept {
@@ -27,8 +27,8 @@ public:
 			return;
 		}
 
-		m_Object = other.GetObject();
-		m_Interface = other.GetInterface();
+		object = other.getObject();
+		interface = other.getInterface();
 	}
 
 	inline constexpr Interface(Interface&& other) noexcept {
@@ -36,39 +36,39 @@ public:
 			return;
 		}
 
-		m_Object = other.GetObject();
-		m_Interface = other.GetInterface();
+		object = other.getObject();
+		interface = other.getInterface();
 
-		other.m_Object = nullptr;
-		other.m_Interface = nullptr;
+		other.object = nullptr;
+		other.interface = nullptr;
 	}
 
 	virtual ~Interface() noexcept = default;
 
-	inline constexpr Object* GetObject() const noexcept {
+	inline constexpr Object* getObject() const noexcept {
 		// TODO: check validity of the object
-		return m_Object;
+		return object;
 	}
 
-	inline constexpr I* GetInterface() const noexcept {
-		return m_Interface;
+	inline constexpr I* getInterface() const noexcept {
+		return interface;
 	}
 
 	inline constexpr explicit operator bool() const noexcept {
-		return GetObject() != nullptr && GetInterface() != nullptr; // TODO: check for validity of object pointer instead of nullptr equivalence
+		return getObject() != nullptr && getInterface() != nullptr; // TODO: check for validity of object pointer instead of nullptr equivalence
 	}
 
 	inline constexpr I* operator *() const noexcept {
-		return GetInterface();
+		return getInterface();
 	}
 
 	inline constexpr I* operator ->() const noexcept {
-		return GetInterface();
+		return getInterface();
 	}
 
 private:
-	Object* m_Object = nullptr;
-	I* m_Interface = nullptr;
+	Object* object = nullptr;
+	I* interface = nullptr;
 };
 
 #endif //CMF_INTERFACE_H

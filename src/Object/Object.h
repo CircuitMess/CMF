@@ -11,31 +11,31 @@ public:
 	Object() noexcept = default;
 	virtual ~Object() noexcept = default;
 
-	inline static const Class* StaticClass() noexcept {
-		return s_StaticClass;
+	inline static const Class* staticClass() noexcept {
+		return objectStaticClass;
 	}
 
-	inline virtual const Class* GetStaticClass() const noexcept {
-		return StaticClass();
+	inline virtual const Class* getStaticClass() const noexcept {
+		return staticClass();
 	}
 
-	inline virtual bool IsA(const Class* other) const noexcept {
-		return other->GetID() == StaticClass()->GetID();
-	}
-
-	template<typename T>
-	inline bool IsA() const noexcept {
-		return IsA(T::StaticClass());
+	inline virtual bool isA(const Class* other) const noexcept {
+		return other->getID() == staticClass()->getID();
 	}
 
 	template<typename T>
-	static inline constexpr bool Implements() noexcept {
+	inline bool isA() const noexcept {
+		return isA(T::staticClass());
+	}
+
+	template<typename T>
+	static inline constexpr bool implements() noexcept {
 		return false;
 	}
 
 private:
 	using ClassType = Class;
-	inline static const ClassType* s_StaticClass = new ClassType(STRING_HASH("Object"));
+	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
@@ -52,7 +52,7 @@ private:																													\
 																															\
 	public:																													\
 		template<typename Type>																								\
-		inline static constexpr bool Implements() noexcept {                 												\
+		inline static constexpr bool implements() noexcept {                 												\
 			return std::is_same<Type, T>::value;																			\
 		}																													\
 																															\
@@ -69,8 +69,8 @@ private:																													\
 																															\
 	public:																													\
 		template<typename Type>																								\
-		inline static constexpr bool Implements() noexcept {                 												\
-			return std::is_same<Type, T>::value || Inherited::template Implements<Type>();									\
+		inline static constexpr bool implements() noexcept {                 												\
+			return std::is_same<Type, T>::value || Inherited::template implements<Type>();									\
 		}																													\
 																															\
 	protected:																												\
@@ -79,29 +79,29 @@ private:																													\
 																															\
 	using Super = SuperObject;																								\
 	using ClassType = ObjectName##_Class<Super, ##__VA_ARGS__>;																\
-	inline static const ClassType* s_StaticClass = new ClassType(STRING_HASH(#ObjectName));									\
+	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH(#ObjectName));								\
 																															\
 public:																														\
-	inline static const Class* StaticClass() noexcept {																		\
-		return s_StaticClass;																								\
+	inline static const Class* staticClass() noexcept {																		\
+		return objectStaticClass;																							\
 	}																														\
 																															\
-	inline virtual const Class* GetStaticClass() const noexcept override {													\
-		return StaticClass();																								\
+	inline virtual const Class* getStaticClass() const noexcept override {													\
+		return staticClass();																								\
 	}																														\
 																															\
-	inline virtual bool IsA(const Class* other) const noexcept override {													\
-		return other->GetID() == StaticClass()->GetID() || Super::IsA(other);												\
-	}																														\
-																															\
-	template<typename T>																									\
-	inline bool IsA() const noexcept {																						\
-		return IsA(T::StaticClass());																						\
+	inline virtual bool isA(const Class* other) const noexcept override {													\
+		return other->getID() == staticClass()->getID() || Super::isA(other);												\
 	}																														\
 																															\
 	template<typename T>																									\
-	inline static constexpr bool Implements() noexcept {																	\
-		return s_StaticClass->Implements<T>() || Super::Implements<T>();													\
+	inline bool isA() const noexcept {																						\
+		return isA(T::staticClass());																						\
+	}																														\
+																															\
+	template<typename T>																									\
+	inline static constexpr bool implements() noexcept {																	\
+		return objectStaticClass->implements<T>() || Super::implements<T>();												\
 	}                                                      																	\
 
 

@@ -11,10 +11,10 @@ public:
 	virtual ~Entity() noexcept override;
 
 protected:
-	virtual void PostInitProperties() noexcept;
-	virtual void Begin() noexcept;
-	virtual void Tick(float deltaTime) noexcept;
-	virtual void End(/*TODO reason*/) noexcept;
+	virtual void postInitProperties() noexcept;
+	virtual void begin() noexcept;
+	virtual void tick(float deltaTime) noexcept;
+	virtual void end(/*TODO reason*/) noexcept;
 };
 
 #endif //CMF_ENTITY_H

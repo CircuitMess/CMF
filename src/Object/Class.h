@@ -7,10 +7,10 @@ class Class {
 	friend class Object;
 
 public:
-	uint32_t GetID() const noexcept;
+	uint32_t getID() const noexcept;
 
 	template<typename Type>
-	static inline constexpr bool Implements() noexcept {
+	static inline constexpr bool implements() noexcept {
 		return false;
 	}
 

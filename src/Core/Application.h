@@ -19,10 +19,10 @@ public:
 	Application& operator =(Application&&) = delete;
 
 protected:
-	virtual void PostInitProperties() noexcept override;
-	virtual void Begin() noexcept override;
-	virtual void Tick(float deltaTime) noexcept override;
-	virtual void End(/*TODO reason*/) noexcept override;
+	virtual void postInitProperties() noexcept override;
+	virtual void begin() noexcept override;
+	virtual void tick(float deltaTime) noexcept override;
+	virtual void end(/*TODO reason*/) noexcept override;
 
 private:
 	inline static Application* s_ApplicationInstance = nullptr;

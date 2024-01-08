@@ -12,18 +12,18 @@ Application::~Application() noexcept {
 	}
 }
 
-void Application::PostInitProperties() noexcept {
-	Super::PostInitProperties();
+void Application::postInitProperties() noexcept {
+	Super::postInitProperties();
 }
 
-void Application::Begin() noexcept {
-	Super::Begin();
+void Application::begin() noexcept {
+	Super::begin();
 }
 
-void Application::Tick(float deltaTime) noexcept {
-	Super::Tick(deltaTime);
+void Application::tick(float deltaTime) noexcept {
+	Super::tick(deltaTime);
 }
 
-void Application::End() noexcept {
-	Super::End();
+void Application::end() noexcept {
+	Super::end();
 }

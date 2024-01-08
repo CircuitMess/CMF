@@ -3,46 +3,46 @@
 #include "Core/Application.h"
 
 SyncEntity::SyncEntity(AsyncEntity* owner/* = nullptr*/) noexcept : Super() {
-	SetOwner(owner);
+	setOwner(owner);
 }
 
 SyncEntity::~SyncEntity() noexcept {
 	m_Owner = nullptr;
 }
 
-void SyncEntity::SetOwner(AsyncEntity* owner) noexcept {
+void SyncEntity::setOwner(AsyncEntity* owner) noexcept {
 	AsyncEntity* oldOwner = m_Owner;
 
 	if(owner == nullptr){
-		m_Owner = ApplicationStatics::GetApplication();
+		m_Owner = ApplicationStatics::getApplication();
 	}else{
 		m_Owner = owner;
 	}
 
-	OnOwnerChanged(oldOwner);
+	onOwnerChanged(oldOwner);
 }
 
-AsyncEntity* SyncEntity::GetOwner() const noexcept {
+AsyncEntity* SyncEntity::getOwner() const noexcept {
 	return m_Owner;
 }
 
-void SyncEntity::Tick(float deltaTime) noexcept {
-	Super::Tick(deltaTime);
+void SyncEntity::tick(float deltaTime) noexcept {
+	Super::tick(deltaTime);
 }
 
-void SyncEntity::PostInitProperties() noexcept {
-	Super::PostInitProperties();
+void SyncEntity::postInitProperties() noexcept {
+	Super::postInitProperties();
 }
 
-void SyncEntity::Begin() noexcept {
-	Super::Begin();
+void SyncEntity::begin() noexcept {
+	Super::begin();
 }
 
-void SyncEntity::End() noexcept {
-	Super::End();
+void SyncEntity::end() noexcept {
+	Super::end();
 }
 
-void SyncEntity::OnOwnerChanged(AsyncEntity* oldOwner) noexcept {
-	oldOwner->UnregisterSyncEntity(this);
-	m_Owner->RegisterSyncEntity(this);
+void SyncEntity::onOwnerChanged(AsyncEntity* oldOwner) noexcept {
+	oldOwner->unregisterSyncEntity(this);
+	m_Owner->registerSyncEntity(this);
 }
