@@ -1,6 +1,7 @@
 #ifndef CMF_OBJECT_H
 #define CMF_OBJECT_H
 
+#include <concepts>
 #include <type_traits>
 #include "Class.h"
 #include "Misc/Djb.h"

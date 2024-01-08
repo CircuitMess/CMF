@@ -1,12 +1,15 @@
 #ifndef CMF_ENTRYPOINT_H
 #define CMF_ENTRYPOINT_H
 
+#include <cstdio>
+#include <concepts>
 #include "Core.h"
 #include "Misc/Djb.h"
 #include "Object/Object.h"
 #include "Memory/Cast.h"
 #include "Object/Interface.h"
 #include "Application.h"
+#include "Memory/Cast.h"
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 static void CMFAppStart(){

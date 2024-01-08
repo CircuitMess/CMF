@@ -2,7 +2,6 @@
 #define CMF_DJB_H
 
 #include <cinttypes>
-#include <string>
 
 #define DJB_SEED 5381
 

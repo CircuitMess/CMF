@@ -1,6 +1,7 @@
 #ifndef CMF_INTERFACE_H
 #define CMF_INTERFACE_H
 
+#include <concepts>
 #include "Object.h"
 #include "Memory/Cast.h"
 
