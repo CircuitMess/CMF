@@ -2,14 +2,14 @@
 #include "Util/stdafx.h"
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
-		name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore) {
+						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();
 	pauseSemaphore = xSemaphoreCreateBinary();
 }
 
 Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
-		name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), lambdaLoop(fn) {
+						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), lambdaLoop(fn) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();
 	pauseSemaphore = xSemaphoreCreateBinary();
