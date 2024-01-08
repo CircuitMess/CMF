@@ -51,7 +51,8 @@ void AsyncEntity::end() noexcept {
 }
 
 void AsyncEntity::tickHandle() noexcept{
-	const float deltaTime = (micros() - lastTickTime) / 1000000.0f;
+	const uint64_t currentTickTime = micros();
+	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
 
 	tick(deltaTime);
 
@@ -62,4 +63,6 @@ void AsyncEntity::tickHandle() noexcept{
 			entity->tick(deltaTime);
 		}
 	}
+
+	lastTickTime = currentTickTime;
 }
