@@ -248,7 +248,26 @@ private:
 	}
 
 	void destruct() noexcept {
-		// TODO: destroy all nodes
+		std::queue<Node*> nodeQueue;
+		nodeQueue.push(head);
+
+		for(const Node* current = nodeQueue.front(); !nodeQueue.empty(); current = nodeQueue.front()){
+			nodeQueue.pop();
+
+			if(current == nullptr){
+				continue;
+			}
+
+			if(current->leftNode != nullptr){
+				nodeQueue.push(current->leftNode);
+			}
+
+			if(current->rightNode != nullptr){
+				nodeQueue.push(current->rightNode);
+			}
+
+			delete current;
+		}
 
 		head = nullptr;
 		start = nullptr;
