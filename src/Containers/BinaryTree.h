@@ -70,7 +70,7 @@ public:
 	}
 
 	const V& operator [] (const K& key) const noexcept {
-		V* val = get(key);
+		const V* val = get(key);
 
 		if(val == nullptr){
 			static V defaultValue = V();
