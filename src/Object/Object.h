@@ -39,8 +39,9 @@ private:
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
-	static_assert(std::derived_from<SuperObject, Object>, "Object must have and inherit a base Object class.");				\
-                                                                       														\
+	static_assert(std::derived_from<SuperObject, Object>, "Object must have and inherit a base Object class."); 			\
+	static_assert(!std::is_abstract<Object>());																				\
+																															\
 private:																													\
 	template<typename... Types>																								\
 	class ObjectName##_Class;																								\
@@ -117,8 +118,6 @@ template<typename T>
 class Interface3 {};
 
 class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
-	static_assert(!std::is_abstract<Object>());
-
 	GENERATED_BODY(ExampleDerivedObject, Object, Interface2, Interface1)
 
 	virtual void test() override {}

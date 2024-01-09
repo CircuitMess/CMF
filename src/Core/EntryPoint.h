@@ -16,7 +16,7 @@ static void startCMF(){
 	// TODO: init app, start ticking loop
 
 	T* app = new T();
-	app->begin(); // TODO: doesnt work for now, will work when additional object memory management is done
+	//app->begin(); TODO: doesnt work for now, will work when additional object memory management is done
 }
 
 #define CMF_MAIN(AppName) 				\
