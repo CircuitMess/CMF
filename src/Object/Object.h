@@ -35,6 +35,8 @@ public:
 
 	virtual void postInitProperties() noexcept {}
 
+	virtual void onCreated() noexcept {}
+
 	inline void destroy() noexcept{
 		markedForDestroy = true;
 		onDestroy();

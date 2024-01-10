@@ -12,6 +12,7 @@ inline StrongObjectPtr<T> newObject(Args&&... args) noexcept {
 
 	if(Object* object = cast<Object>(newObject.get())){
 		object->postInitProperties();
+		object->onCreated();
 	}
 
 	return newObject;

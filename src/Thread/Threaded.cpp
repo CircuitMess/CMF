@@ -26,6 +26,12 @@ Threaded::~Threaded() noexcept{
 	vSemaphoreDelete(pauseSemaphore);
 }
 
+void Threaded::onCreated() noexcept{
+	Super::onCreated();
+
+	start();
+}
+
 void Threaded::start() noexcept{
 	if(state != State::Stopped){
 		return;
