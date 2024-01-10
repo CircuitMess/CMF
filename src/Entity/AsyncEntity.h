@@ -3,9 +3,10 @@
 
 #include "Entity.h"
 #include <set>
+#include "Memory/SmartPtr/StrongObjectPtr.h"
+#include "Thread/Threaded.h"
 
 class SyncEntity;
-class Threaded;
 
 class AsyncEntity : public Entity {
 	GENERATED_BODY(AsyncEntity, Entity)
@@ -28,7 +29,7 @@ private:
 
 private:
 	std::set<SyncEntity*> registeredSyncEntities; // TODO: replace these with weak ptrs
-	Threaded* thread; // TODO: replace with strong obj ptr
+	StrongObjectPtr<Threaded> thread; // TODO: replace with strong obj ptr
 	uint64_t lastTickTime;
 };
 
