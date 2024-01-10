@@ -11,7 +11,7 @@ public:
 	virtual ~Entity() noexcept override;
 
 protected:
-	virtual void postInitProperties() noexcept;
+	virtual void postInitProperties() noexcept override;
 	virtual void begin() noexcept;
 	virtual void tick(float deltaTime) noexcept;
 	virtual void end(/*TODO reason*/) noexcept;

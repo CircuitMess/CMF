@@ -3,26 +3,27 @@
 
 #include <set>
 #include <queue>
+#include <cstddef>
 #include "Util/stdafx.h"
 
 template<typename K, typename V>
 class BinaryTree {
 public:
-	BinaryTree() noexcept = default;
+	inline BinaryTree() noexcept = default;
 
-	BinaryTree(const BinaryTree& other) noexcept {
+	inline BinaryTree(const BinaryTree& other) noexcept {
 		*this = other;
 	}
 
-	BinaryTree(BinaryTree&& other) noexcept {
+	inline BinaryTree(BinaryTree&& other) noexcept {
 		*this = other;
 	}
 
-	virtual ~BinaryTree() noexcept {
+	inline virtual ~BinaryTree() noexcept {
 		destruct();
 	}
 
-	BinaryTree& operator = (const BinaryTree& other) noexcept {
+	inline BinaryTree& operator = (const BinaryTree& other) noexcept {
 		if(&other == this){
 			return *this;
 		}
@@ -36,7 +37,7 @@ public:
 		return *this;
 	}
 
-	BinaryTree& operator = (BinaryTree&& other) noexcept {
+	inline BinaryTree& operator = (BinaryTree&& other) noexcept {
 		if(&other == this){
 			return *this;
 		}
@@ -54,11 +55,11 @@ public:
 		return *this;
 	}
 
-	bool operator == (const BinaryTree& other) const noexcept {
+	inline bool operator == (const BinaryTree& other) const noexcept {
 		return other.head == head;
 	}
 
-	V& operator [] (const K& key) noexcept {
+	inline V& operator [] (const K& key) noexcept {
 		V* val = get(key);
 
 		if(val == nullptr){
@@ -69,7 +70,7 @@ public:
 		return *val;
 	}
 
-	const V& operator [] (const K& key) const noexcept {
+	inline const V& operator [] (const K& key) const noexcept {
 		const V* val = get(key);
 
 		if(val == nullptr){
@@ -80,7 +81,7 @@ public:
 		return *val;
 	}
 
-	void set(const K& key, const V& value = V()) noexcept {
+	inline void set(const K& key, const V& value = V()) noexcept {
 		if(head == nullptr){
 			head = new Node();
 			head->key = key;
@@ -131,7 +132,7 @@ public:
 		}
 	}
 
-	void remove(const K& key) noexcept {
+	inline void remove(const K& key) noexcept {
 		Node* foundNode = nullptr;
 		Node* replacementNode = nullptr;
 
@@ -181,7 +182,15 @@ public:
 		delete replacementNode;
 	}
 
-	std::set<K> keys() const noexcept {
+	inline bool contains(const K& key) const noexcept {
+		return keys().contains(key);
+	}
+
+	inline size_t size() const noexcept {
+		return keys().size();
+	}
+
+	inline std::set<K> keys() const noexcept {
 		std::set<K> keys;
 
 		if(head == nullptr){
@@ -229,7 +238,7 @@ private:
 	Node* end = nullptr;
 
 private:
-	V* get(const K& key) const noexcept {
+	inline V* get(const K& key) const noexcept {
 		if(head == nullptr){
 			return nullptr;
 		}
@@ -247,7 +256,7 @@ private:
 		return nullptr;
 	}
 
-	void destruct() noexcept {
+	inline void destruct() noexcept {
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 

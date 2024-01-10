@@ -33,9 +33,24 @@ public:
 		return false;
 	}
 
+	virtual void postInitProperties() noexcept {}
+
+	inline void destroy() noexcept{
+		markedForDestroy = true;
+		onDestroy();
+	}
+
+	inline constexpr bool isMarkedForDestroy() const noexcept{
+		return markedForDestroy;
+	}
+
+	inline virtual void onDestroy() noexcept {}
+
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
+
+	bool markedForDestroy = false;
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
