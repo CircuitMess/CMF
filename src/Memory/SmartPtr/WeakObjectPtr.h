@@ -10,11 +10,11 @@ public:
 
 	inline constexpr WeakObjectPtr(const WeakObjectPtr& other) noexcept : ObjectPtr<T, false>(other) {}
 
-	inline constexpr WeakObjectPtr(WeakObjectPtr&& other) noexcept : ObjectPtr<T, false>(other) {}
+	//inline constexpr WeakObjectPtr(WeakObjectPtr&& other) noexcept : ObjectPtr<T, false>(other) {}
 
 	inline constexpr WeakObjectPtr(const ObjectPtr<T, true>& other) noexcept : ObjectPtr<T, false>(other) {}
 
-	inline constexpr WeakObjectPtr(ObjectPtr<T, true>&& other) noexcept : ObjectPtr<T, false>(other) {}
+	//inline constexpr WeakObjectPtr(ObjectPtr<T, true>&& other) noexcept : ObjectPtr<T, false>(other) {}
 
 	inline constexpr WeakObjectPtr(Object* object) noexcept : ObjectPtr<T, false>(object) {}
 

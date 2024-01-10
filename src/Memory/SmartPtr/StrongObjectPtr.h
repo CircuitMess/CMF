@@ -10,11 +10,11 @@ public:
 
 	inline constexpr StrongObjectPtr(const StrongObjectPtr& other) noexcept : ObjectPtr<T, true>(other) {}
 
-	inline constexpr StrongObjectPtr(StrongObjectPtr&& other) noexcept : ObjectPtr<T, true>(other) {}
+	//inline constexpr StrongObjectPtr(StrongObjectPtr&& other) noexcept : ObjectPtr<T, true>(other) {}
 
 	inline constexpr StrongObjectPtr(const ObjectPtr<T, false>& other) noexcept : ObjectPtr<T, true>(other) {}
 
-	inline constexpr StrongObjectPtr(ObjectPtr<T, false>&& other) noexcept : ObjectPtr<T, true>(other) {}
+	//inline constexpr StrongObjectPtr(ObjectPtr<T, false>&& other) noexcept : ObjectPtr<T, true>(other) {}
 
 	inline constexpr StrongObjectPtr(Object* object) noexcept : ObjectPtr<T, true>(object) {}
 
