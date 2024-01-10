@@ -67,3 +67,19 @@ void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) const 
 		}
 	}
 }
+
+void ObjectManager::onObjectDeleted(Object* object) noexcept{
+	if(!objectReferenceTree.contains(object)){
+		return;
+	}
+
+	ObjectRefInfo& objectInfo = objectReferenceTree[object];
+
+	for(Object** ptr : objectInfo.objectPointers){
+		*ptr = nullptr;
+	}
+
+	objectInfo.count = 0;
+
+	objectReferenceTree.remove(object);
+}

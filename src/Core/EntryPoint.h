@@ -14,10 +14,13 @@
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Memory/ObjectMemory.h"
+#include "Memory/GarbageCollector.h"
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 static void startCMF(){
 	// TODO: init app, start ticking loop
+
+	StrongObjectPtr<GarbageCollector> garbageCollector = newObject<GarbageCollector>(); // TODO make sure this is static var in final version to ensure the Garbage collector does not delete itself
 
 	StrongObjectPtr<T> app = newObject<T>();
 }

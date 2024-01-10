@@ -21,6 +21,8 @@ public:
 
 	void forEachObject(const std::function<bool(Object*)>& fn) const noexcept;
 
+	void onObjectDeleted(Object* object) noexcept;
+
 private:
 	struct ObjectRefInfo {
 		uint32_t count = 0;
