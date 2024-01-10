@@ -56,8 +56,8 @@ private:
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
-	static_assert(std::derived_from<SuperObject, Object>, "Object must have and inherit a base Object class."); 			\
-	static_assert(!std::is_abstract<Object>());																				\
+	static_assert(std::derived_from<SuperObject, Object>, "CMF: Object must have and inherit a base Object class."); 		\
+	static_assert(!std::is_abstract<SuperObject>(), "CMF: Extended object cannot be abstract class.");						\
 																															\
 private:																													\
 	template<typename... Types>																								\
