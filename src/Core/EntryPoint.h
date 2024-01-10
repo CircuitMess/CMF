@@ -21,7 +21,7 @@ static void startCMF(){
 	// TODO: init app, start ticking loop
 
 	StrongObjectPtr<GarbageCollector> garbageCollector = newObject<GarbageCollector>(); // TODO make sure this is static var in final version to ensure the Garbage collector does not delete itself
-
+	// TODO: same goes for the app as for the garbage collector
 	StrongObjectPtr<T> app = newObject<T>();
 }
 
