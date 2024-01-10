@@ -16,7 +16,7 @@ public:
 
 	inline constexpr StrongObjectPtr(ObjectPtr<T, false>&& other) noexcept : ObjectPtr<T, true>(other) {}
 
-	inline constexpr StrongObjectPtr(T* object) noexcept : ObjectPtr<T, true>(object) {}
+	inline constexpr StrongObjectPtr(Object* object) noexcept : ObjectPtr<T, true>(object) {}
 
 	inline constexpr StrongObjectPtr(nullptr_t) noexcept : ObjectPtr<T, true>(nullptr) {}
 

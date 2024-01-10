@@ -16,7 +16,7 @@ public:
 
 	inline constexpr WeakObjectPtr(ObjectPtr<T, true>&& other) noexcept : ObjectPtr<T, false>(other) {}
 
-	inline constexpr WeakObjectPtr(T* object) noexcept : ObjectPtr<T, false>(object) {}
+	inline constexpr WeakObjectPtr(Object* object) noexcept : ObjectPtr<T, false>(object) {}
 
 	inline constexpr WeakObjectPtr(nullptr_t) noexcept : ObjectPtr<T, false>(nullptr) {}
 

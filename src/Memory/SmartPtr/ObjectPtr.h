@@ -37,7 +37,7 @@ public:
 		other = nullptr;
 	}
 
-	inline constexpr ObjectPtr(T* object) noexcept {
+	inline constexpr ObjectPtr(Object* object) noexcept {
 		ptr = object;
 		ObjectManager::get()->registerReference(&ptr, (*this)());
 	}
