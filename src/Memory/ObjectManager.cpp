@@ -55,3 +55,15 @@ void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = fals
 		}
 	}
 }
+
+void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) const noexcept{
+	if(fn == nullptr){
+		return;
+	}
+
+	for(Object* object : objectReferenceTree.keys()){
+		if(fn(object)){
+			break;
+		}
+	}
+}

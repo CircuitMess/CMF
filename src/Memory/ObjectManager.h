@@ -1,6 +1,7 @@
 #ifndef CMF_OBJECTMANAGER_H
 #define CMF_OBJECTMANAGER_H
 
+#include <functional>
 #include "Containers/BinaryTree.h"
 
 class Object;
@@ -17,6 +18,8 @@ public:
 
 	void registerReference(Object** object, bool keepAlive = false) noexcept;
 	void unregisterReference(Object** object, bool keepAlive = false) noexcept;
+
+	void forEachObject(const std::function<bool(Object*)>& fn) const noexcept;
 
 private:
 	struct ObjectRefInfo {
