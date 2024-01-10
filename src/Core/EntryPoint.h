@@ -11,8 +11,9 @@
 #include "Application.h"
 #include "Memory/Cast.h"
 #include "Containers/BinaryTree.h"
-#include "SmartPtr/WeakObjectPtr.h"
-#include "SmartPtr/StrongObjectPtr.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
+#include "Memory/SmartPtr/StrongObjectPtr.h"
+#include "Memory/ObjectMemory.h"
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 static void startCMF(){

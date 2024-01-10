@@ -12,36 +12,36 @@
 template<typename T, bool KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 class ObjectPtr : public std::integral_constant<bool, KeepAlive> {
 public:
-	inline ObjectPtr() noexcept = default;
+	inline constexpr ObjectPtr() noexcept = default;
 
-	inline ObjectPtr(const ObjectPtr& other) noexcept {
+	inline constexpr ObjectPtr(const ObjectPtr& other) noexcept {
 		ptr = *other;
 		ObjectManager::get()->registerReference(ptr, (*this)());
 	}
 
-	inline ObjectPtr(ObjectPtr&& other) noexcept {
-		ptr = *other;
-		ObjectManager::get()->registerReference(ptr, (*this)());
-		other = nullptr;
-	}
-
-	explicit inline ObjectPtr(const ObjectPtr<T, !KeepAlive>& other) noexcept {
-		ptr = *other;
-		ObjectManager::get()->registerReference(ptr, (*this)());
-	}
-
-	explicit inline ObjectPtr(ObjectPtr<T, !KeepAlive>&& other) noexcept {
+	inline constexpr ObjectPtr(ObjectPtr&& other) noexcept {
 		ptr = *other;
 		ObjectManager::get()->registerReference(ptr, (*this)());
 		other = nullptr;
 	}
 
-	explicit inline ObjectPtr(Object* object) noexcept {
+	explicit inline constexpr ObjectPtr(const ObjectPtr<T, !KeepAlive>& other) noexcept {
+		ptr = *other;
+		ObjectManager::get()->registerReference(ptr, (*this)());
+	}
+
+	explicit inline constexpr ObjectPtr(ObjectPtr<T, !KeepAlive>&& other) noexcept {
+		ptr = *other;
+		ObjectManager::get()->registerReference(ptr, (*this)());
+		other = nullptr;
+	}
+
+	explicit inline constexpr ObjectPtr(Object* object) noexcept {
 		ptr = object;
 		ObjectManager::get()->registerReference(ptr, (*this)());
 	}
 
-	explicit inline ObjectPtr(nullptr_t) noexcept {
+	explicit inline constexpr ObjectPtr(nullptr_t) noexcept {
 		if(ptr != nullptr){
 			ObjectManager::get()->unregisterReference(ptr, (*this)());
 		}
@@ -57,7 +57,7 @@ public:
 		ptr = nullptr;
 	}
 
-	inline ObjectPtr& operator = (const ObjectPtr& other) noexcept {
+	inline constexpr ObjectPtr& operator = (const ObjectPtr& other) noexcept {
 		if(&other == this){
 			return *this;
 		}
@@ -72,7 +72,7 @@ public:
 		return *this;
 	}
 
-	inline ObjectPtr& operator = (ObjectPtr&& other) noexcept {
+	inline constexpr ObjectPtr& operator = (ObjectPtr&& other) noexcept {
 		if(&other == this){
 			return *this;
 		}
@@ -89,7 +89,7 @@ public:
 		return *this;
 	}
 
-	inline ObjectPtr& operator = (const ObjectPtr<T, !KeepAlive>& other) noexcept {
+	inline constexpr ObjectPtr& operator = (const ObjectPtr<T, !KeepAlive>& other) noexcept {
 		if(ptr != nullptr){
 			ObjectManager::get()->unregisterReference(ptr, (*this)());
 		}
@@ -100,7 +100,7 @@ public:
 		return *this;
 	}
 
-	inline ObjectPtr& operator = (ObjectPtr<T, !KeepAlive>&& other) noexcept {
+	inline constexpr ObjectPtr& operator = (ObjectPtr<T, !KeepAlive>&& other) noexcept {
 		if(ptr != nullptr){
 			ObjectManager::get()->unregisterReference(ptr, (*this)());
 		}
@@ -113,7 +113,7 @@ public:
 		return *this;
 	}
 
-	inline ObjectPtr& operator = (Object* object) noexcept {
+	inline constexpr ObjectPtr& operator = (Object* object) noexcept {
 		if(ptr != nullptr){
 			ObjectManager::get()->unregisterReference(ptr, (*this)());
 		}
@@ -124,7 +124,7 @@ public:
 		return *this;
 	}
 
-	inline ObjectPtr& operator = (nullptr_t) noexcept {
+	inline constexpr ObjectPtr& operator = (nullptr_t) noexcept {
 		if(ptr != nullptr){
 			ObjectManager::get()->unregisterReference(ptr, (*this)());
 		}
@@ -134,23 +134,23 @@ public:
 		return *this;
 	}
 
-	inline T* operator * () const noexcept {
+	inline constexpr T* operator * () const noexcept {
 		return get();
 	}
 
-	inline T* operator -> () const noexcept {
+	inline constexpr T* operator -> () const noexcept {
 		return get();
 	}
 
-	inline explicit operator bool() const noexcept {
+	inline constexpr explicit operator bool() const noexcept {
 		return isValid();
 	}
 
-	inline T* get() const noexcept {
+	inline constexpr T* get() const noexcept {
 		return ptr;
 	}
 
-	inline bool isValid() const noexcept {
+	inline constexpr bool isValid() const noexcept {
 		if(ptr == nullptr){
 			return false;
 		}
@@ -159,7 +159,7 @@ public:
 	}
 
 private:
-	T* ptr;
+	T* ptr = nullptr;
 };
 
 #endif //CMF_OBJECTPTR_H
