@@ -19,8 +19,7 @@ template<typename T, typename = std::enable_if<std::derived_from<T, Application>
 static void startCMF(){
 	// TODO: init app, start ticking loop
 
-	T* app = new T();
-	//app->begin(); TODO: doesnt work for now, will work when additional object memory management is done
+	StrongObjectPtr<T> app = newObject<T>();
 }
 
 #define CMF_MAIN(AppName) 				\

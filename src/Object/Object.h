@@ -44,7 +44,7 @@ public:
 		return markedForDestroy;
 	}
 
-	inline virtual void onDestroy() noexcept {}
+	virtual void onDestroy() noexcept {}
 
 private:
 	using ClassType = Class;
@@ -70,7 +70,11 @@ private:																													\
 		template<typename Type>																								\
 		inline static constexpr bool implements() noexcept {                 												\
 			return std::is_same<Type, T>::value;																			\
-		}																													\
+		}                                                                    												\
+                                                                       														\
+        inline virtual Object* createDefaultObject() const noexcept override {  											\
+			return new ObjectName();																						\
+		}                                                               													\
 																															\
 	protected:                                             																	\
 		explicit inline ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}												\
@@ -124,7 +128,6 @@ public:																														\
 // ====================================================================================
 
 class Interface1 {
-	virtual void test() = 0;
 };
 
 class Interface2 {};
@@ -134,8 +137,6 @@ class Interface3 {};
 
 class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
 	GENERATED_BODY(ExampleDerivedObject, Object, Interface2, Interface1)
-
-	virtual void test() override {}
 };
 
 class SecondExampleDerivedObject : public Object, public Interface1 {

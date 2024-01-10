@@ -15,8 +15,8 @@ public:
 	uint32_t getReferenceCount(Object* object) const noexcept;
 	bool isValid(Object* object) const noexcept;
 
-	void registerReference(Object*& object, bool keepAlive = false) noexcept;
-	void unregisterReference(Object*& object, bool keepAlive = false) noexcept;
+	void registerReference(Object** object, bool keepAlive = false) noexcept;
+	void unregisterReference(Object** object, bool keepAlive = false) noexcept;
 
 private:
 	struct ObjectRefInfo {

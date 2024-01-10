@@ -3,8 +3,15 @@
 
 #include <cinttypes>
 
+class Object;
+
 class Class {
 	friend class Object;
+
+public:
+	virtual ~Class() = default;
+
+	virtual constexpr Object* createDefaultObject() const noexcept;
 
 public:
 	uint32_t getID() const noexcept;

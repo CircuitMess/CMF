@@ -26,32 +26,32 @@ bool ObjectManager::isValid(Object* object) const noexcept{
 	return !object->isMarkedForDestroy() && getReferenceCount(object) > 0;
 }
 
-void ObjectManager::registerReference(Object*& object, bool keepAlive/* = false*/) noexcept{
-	ObjectRefInfo& objectInfo = objectReferenceTree[object];
+void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*/) noexcept{
+	ObjectRefInfo& objectInfo = objectReferenceTree[*object];
 
-	objectInfo.objectPointers.insert(&object);
+	objectInfo.objectPointers.insert(object);
 
 	if(keepAlive){
 		objectInfo.count++;
 	}
 }
 
-void ObjectManager::unregisterReference(Object*& object, bool keepAlive/* = false*/) noexcept{
-	if(!objectReferenceTree.contains(object)){
+void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = false*/) noexcept{
+	if(!objectReferenceTree.contains(*object)){
 		return;
 	}
 
-	ObjectRefInfo& objectInfo = objectReferenceTree[object];
+	ObjectRefInfo& objectInfo = objectReferenceTree[*object];
 
-	objectInfo.objectPointers.erase(&object);
+	objectInfo.objectPointers.erase(object);
 
 	if(keepAlive){
 		if(objectInfo.count > 0){
 			objectInfo.count--;
 		}
 
-		if(!object->isMarkedForDestroy() && objectInfo.count == 0){
-			object->destroy();
+		if(!(*object)->isMarkedForDestroy() && objectInfo.count == 0){
+			(*object)->destroy();
 		}
 	}
 }
