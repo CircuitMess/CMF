@@ -28,14 +28,14 @@ public:
 		return *this;
 	}
 
-	template<typename _T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T>
 	inline constexpr WeakObjectPtr& operator = (const WeakObjectPtr<_T>& other) noexcept {
 		ObjectPtr<T, false>::template operator=<_T>(other);
 
 		return *this;
 	}
 
-	template<typename _T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T>
 	inline constexpr WeakObjectPtr& operator = (WeakObjectPtr<_T>&& other) noexcept {
 		ObjectPtr<T, false>::template operator=<_T>(std::move(other));
 

@@ -10,7 +10,7 @@
 // Spec: pointers are held to a object in memory as long as it exists in memory. After the object is destroyed, pointer will stop being valid but will still point to the
 // memory of the object until the object is deleted from memory, in which case, the pointer will change to nullptr
 
-template<typename T, bool KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+template<typename T, bool KeepAlive>
 class ObjectPtr : public std::integral_constant<bool, KeepAlive> {
 public:
 	inline constexpr ObjectPtr() noexcept = default;
@@ -37,7 +37,7 @@ public:
 		other = nullptr;
 	}
 
-	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T, bool _KeepAlive>
 	inline constexpr ObjectPtr(const ObjectPtr<_T, _KeepAlive>& other) noexcept {
 		if(cast<T>(*other) == nullptr){
 			return;
@@ -47,7 +47,7 @@ public:
 		ObjectManager::get()->registerReference(&ptr, (*this)());
 	}
 
-	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T, bool _KeepAlive>
 	inline constexpr ObjectPtr(ObjectPtr<_T, _KeepAlive>&& other) noexcept {
 		if(cast<T>(*other) == nullptr){
 			return;
@@ -135,7 +135,7 @@ public:
 		return *this;
 	}
 
-	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T, bool _KeepAlive>
 	inline constexpr ObjectPtr& operator = (const ObjectPtr<_T, _KeepAlive>& other) noexcept {
 		if(cast<T>(*other) == nullptr){
 			return *this;
@@ -147,7 +147,7 @@ public:
 		return *this;
 	}
 
-	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	template<typename _T, bool _KeepAlive>
 	inline constexpr ObjectPtr& operator = (ObjectPtr<_T, _KeepAlive>&& other) noexcept {
 		if(cast<T>(*other) == nullptr){
 			return *this;

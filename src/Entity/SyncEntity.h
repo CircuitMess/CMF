@@ -2,6 +2,7 @@
 #define CMF_SYNCENTITY_H
 
 #include "Entity.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
 
 class AsyncEntity;
 
@@ -25,7 +26,7 @@ protected:
 	virtual void onOwnerChanged(AsyncEntity* oldOwner) noexcept;
 
 private:
-	AsyncEntity* m_Owner = nullptr;
+	WeakObjectPtr<AsyncEntity> ownerEntity = nullptr;
 };
 
 #endif //CMF_SYNCENTITY_H
