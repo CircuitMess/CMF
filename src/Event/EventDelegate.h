@@ -1,7 +1,3 @@
-//
-// Created by jankr on 1/11/2024.
-//
-
 #ifndef CMF_EVENTDELEGATE_H
 #define CMF_EVENTDELEGATE_H
 
@@ -9,6 +5,5 @@
 class EventDelegate {
 
 };
-
 
 #endif //CMF_EVENTDELEGATE_H
