@@ -6,6 +6,8 @@
 #include <cstddef>
 #include "Util/stdafx.h"
 
+// TODO: iterators (const, non const)
+
 template<typename K, typename V>
 class BinaryTree {
 public:
