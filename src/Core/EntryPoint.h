@@ -22,14 +22,13 @@ public:
 	static void start(){
 		// TODO: init app, start ticking loop
 
-
-		// TODO: this causes type error with smart pointers, this should be addressed further and fixed so that assignment of different types silently casts the types in the background (if possible)
-		CMF::App = newObject<T>();
+		TrashCollector = newObject<::GarbageCollector>();
+		App = newObject<T>();
 	}
 
 private:
 	inline static StrongObjectPtr<Application> App = nullptr;
-	inline static StrongObjectPtr<GarbageCollector> TrashCollector = newObject<::GarbageCollector>();
+	inline static StrongObjectPtr<GarbageCollector> TrashCollector = nullptr;
 };
 
 #define CMF_MAIN(AppName) 				\

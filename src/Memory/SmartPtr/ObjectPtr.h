@@ -37,6 +37,27 @@ public:
 		other = nullptr;
 	}
 
+	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	inline constexpr ObjectPtr(const ObjectPtr<_T, _KeepAlive>& other) noexcept {
+		if(cast<T>(*other) == nullptr){
+			return;
+		}
+
+		ptr = *other;
+		ObjectManager::get()->registerReference(&ptr, (*this)());
+	}
+
+	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	inline constexpr ObjectPtr(ObjectPtr<_T, _KeepAlive>&& other) noexcept {
+		if(cast<T>(*other) == nullptr){
+			return;
+		}
+
+		ptr = *other;
+		ObjectManager::get()->registerReference(&ptr, (*this)());
+		other = nullptr;
+	}
+
 	inline constexpr ObjectPtr(Object* object) noexcept {
 		ptr = object;
 		ObjectManager::get()->registerReference(&ptr, (*this)());
@@ -95,7 +116,7 @@ public:
 			ObjectManager::get()->unregisterReference(&ptr, (*this)());
 		}
 
-		ptr = &other;
+		ptr = *other;
 		ObjectManager::get()->registerReference(&ptr, (*this)());
 
 		return *this;
@@ -106,7 +127,33 @@ public:
 			ObjectManager::get()->unregisterReference(&ptr, (*this)());
 		}
 
-		ptr = &other;
+		ptr = *other;
+		ObjectManager::get()->registerReference(&ptr, (*this)());
+
+		other = nullptr;
+
+		return *this;
+	}
+
+	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	inline constexpr ObjectPtr& operator = (const ObjectPtr<_T, _KeepAlive>& other) noexcept {
+		if(cast<T>(*other) == nullptr){
+			return *this;
+		}
+
+		ptr = *other;
+		ObjectManager::get()->registerReference(&ptr, (*this)());
+
+		return *this;
+	}
+
+	template<typename _T, bool _KeepAlive, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+	inline constexpr ObjectPtr& operator = (ObjectPtr<_T, _KeepAlive>&& other) noexcept {
+		if(cast<T>(*other) == nullptr){
+			return *this;
+		}
+
+		ptr = *other;
 		ObjectManager::get()->registerReference(&ptr, (*this)());
 
 		other = nullptr;
