@@ -19,7 +19,7 @@ inline StrongObjectPtr<T> newObject(Args&&... args) noexcept {
 }
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<Object> newObject(Class* cls) noexcept {
+inline StrongObjectPtr<T> newObject(Class* cls) noexcept {
 	if(cls == nullptr){
 		return nullptr;
 	}
