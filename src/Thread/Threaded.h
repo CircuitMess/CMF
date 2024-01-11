@@ -13,8 +13,8 @@ class Threaded : public Object {
 	GENERATED_BODY(Threaded, Object)
 
 public:
-	Threaded(const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
-	Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
+	explicit Threaded(const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
+	Threaded(const std::function<void(void)>& fn, const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 	virtual ~Threaded() noexcept;
 
 public:
