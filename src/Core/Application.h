@@ -25,7 +25,7 @@ protected:
 	virtual void end(/*TODO reason*/) noexcept override;
 
 private:
-	inline static Application* s_ApplicationInstance = nullptr;
+	inline static Application* ApplicationInstance = nullptr;
 };
 
 #endif //CMF_APPLICATION_H

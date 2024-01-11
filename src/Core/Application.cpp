@@ -1,14 +1,14 @@
 #include "Application.h"
 
 Application::Application() noexcept : Super() {
-	if(s_ApplicationInstance == nullptr){
-		s_ApplicationInstance = this;
+	if(ApplicationInstance == nullptr){
+		ApplicationInstance = this;
 	}
 }
 
 Application::~Application() noexcept {
-	if(s_ApplicationInstance == this){
-		s_ApplicationInstance = nullptr;
+	if(ApplicationInstance == this){
+		ApplicationInstance = nullptr;
 	}
 }
 
