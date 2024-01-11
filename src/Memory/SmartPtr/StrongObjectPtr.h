@@ -20,7 +20,7 @@ public:
 
 	inline constexpr StrongObjectPtr(nullptr_t) noexcept : ObjectPtr<T, true>(nullptr) {}
 
-	virtual ~StrongObjectPtr() noexcept = default;
+	virtual ~StrongObjectPtr() noexcept override = default;
 
 	inline constexpr StrongObjectPtr& operator = (StrongObjectPtr&& other) noexcept {
 		ObjectPtr<T, true>::operator=(std::move(other));
