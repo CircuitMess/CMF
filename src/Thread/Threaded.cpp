@@ -89,6 +89,14 @@ bool Threaded::running() const noexcept{
 	return state != State::Stopped;
 }
 
+void Threaded::setInterval(TickType_t value) noexcept{
+	loopInterval = value;
+}
+
+TickType_t Threaded::getInterval() const noexcept{
+	return loopInterval;
+}
+
 bool Threaded::onStart() noexcept{
 	return true;
 }

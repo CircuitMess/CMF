@@ -13,7 +13,7 @@ class Threaded : public Object {
 	GENERATED_BODY(Threaded, Object)
 
 public:
-	explicit Threaded(const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
+	Threaded(const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 	Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 	virtual ~Threaded() noexcept;
 
@@ -26,6 +26,9 @@ public:
 	void resume() noexcept;
 
 	bool running() const noexcept;
+
+	void setInterval(TickType_t value) noexcept;
+	TickType_t getInterval() const noexcept;
 
 public:
 	virtual bool onStart() noexcept;
@@ -41,7 +44,7 @@ private:
 
 private:
 	std::string name;
-	const TickType_t loopInterval;
+	TickType_t loopInterval;
 	size_t stackSize;
 	const uint8_t priority;
 	const int8_t core;
