@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include <set>
 #include "Memory/SmartPtr/StrongObjectPtr.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Thread/Threaded.h"
 
 class SyncEntity;
@@ -28,8 +29,8 @@ private:
 	void tickHandle() noexcept;
 
 private:
-	std::set<SyncEntity*> registeredSyncEntities; // TODO: replace these with weak ptrs
-	StrongObjectPtr<Threaded> thread; // TODO: replace with strong obj ptr
+	std::set<WeakObjectPtr<SyncEntity>> registeredSyncEntities;
+	StrongObjectPtr<Threaded> thread;
 	uint64_t lastTickTime;
 };
 

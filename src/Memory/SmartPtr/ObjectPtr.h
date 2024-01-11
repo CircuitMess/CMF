@@ -210,6 +210,30 @@ public:
 		return isValid();
 	}
 
+	inline constexpr bool operator > (const ObjectPtr&& other) const noexcept {
+		return ptr > *other;
+	}
+
+	inline constexpr bool operator > (const ObjectPtr<T, !KeepAlive>& other) const noexcept {
+		return ptr > *other;
+	}
+
+	inline constexpr bool operator > (const Object* object) const noexcept {
+		return ptr > object;
+	}
+
+	inline constexpr bool operator < (const ObjectPtr&& other) const noexcept {
+		return ptr < *other;
+	}
+
+	inline constexpr bool operator < (const ObjectPtr<T, !KeepAlive>& other) const noexcept {
+		return ptr < *other;
+	}
+
+	inline constexpr bool operator < (const Object* object) const noexcept {
+		return ptr < object;
+	}
+
 	inline constexpr T* operator * () const noexcept {
 		return get();
 	}

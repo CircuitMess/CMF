@@ -23,7 +23,7 @@ void AsyncEntity::registerSyncEntity(SyncEntity* entity) noexcept{
 		entity->setOwner(this);
 	}
 
-	registeredSyncEntities.insert(entity);
+	registeredSyncEntities.insert(WeakObjectPtr<SyncEntity>(entity));
 }
 
 void AsyncEntity::unregisterSyncEntity(SyncEntity* entity) noexcept {
@@ -56,9 +56,9 @@ void AsyncEntity::tickHandle() noexcept{
 
 	tick(deltaTime);
 
-	for(SyncEntity* entity : registeredSyncEntities){
-		if(entity == nullptr){ // TODO: check ptr validity instead of nullptr
-			registeredSyncEntities.erase(nullptr);
+	for(WeakObjectPtr<SyncEntity> entity : registeredSyncEntities){
+		if(!entity.isValid()){
+			registeredSyncEntities.erase(entity);
 		}else{
 			entity->tick(deltaTime);
 		}
