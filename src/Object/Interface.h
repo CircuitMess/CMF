@@ -4,6 +4,7 @@
 #include <concepts>
 #include "Object.h"
 #include "Memory/Cast.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
 
 template<typename I, typename = std::enable_if<!std::derived_from<I, Object>, I>::type>
 class Interface {
@@ -46,16 +47,23 @@ public:
 	virtual ~Interface() noexcept = default;
 
 	inline constexpr Object* getObject() const noexcept {
-		// TODO: check validity of the object
-		return object;
+		if(!object.isValid()){
+			return nullptr;
+		}
+
+		return *object;
 	}
 
 	inline constexpr I* getInterface() const noexcept {
+		if(!object.isValid()){
+			return nullptr;
+		}
+
 		return interface;
 	}
 
 	inline constexpr explicit operator bool() const noexcept {
-		return getObject() != nullptr && getInterface() != nullptr; // TODO: check for validity of object pointer instead of nullptr equivalence
+		return getObject() != nullptr && getInterface() != nullptr;
 	}
 
 	inline constexpr I* operator *() const noexcept {
@@ -67,7 +75,7 @@ public:
 	}
 
 private:
-	Object* object = nullptr;
+	WeakObjectPtr<Object> object = nullptr;
 	I* interface = nullptr;
 };
 
