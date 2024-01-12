@@ -7,6 +7,7 @@
 #include "Util/stdafx.h"
 
 // TODO: iterators (const, non const)
+// TODO: this has to be thread-safe, introduce semaphores into the mix
 
 template<typename K, typename V>
 class BinaryTree {
@@ -18,7 +19,7 @@ public:
 	}
 
 	inline BinaryTree(BinaryTree&& other) noexcept {
-		*this = other;
+		*this = std::move(other);
 	}
 
 	inline virtual ~BinaryTree() noexcept {
@@ -112,8 +113,8 @@ public:
 				updateEnd = false;
 			}
 
-			if(*next == nullptr){
-				newNode = *next = new Node();
+			if(next == nullptr){
+				newNode = new Node();
 				newNode->key = key;
 				newNode->value = value;
 				newNode->parent = current;
