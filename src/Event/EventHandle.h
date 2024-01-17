@@ -1311,7 +1311,7 @@ public:
 	}
 
 	template<typename O, typename F>
-	inline void bind(O* object, F&& function) noexcept {
+	inline EventHandle& bind(O* object, F&& function) noexcept {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
 		}
@@ -1322,9 +1322,11 @@ public:
 		if(owningObject.isValid()){
 			owningObject->registerEventHandle(this);
 		}
+
+		return *this;
 	}
 
-	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
+	inline EventHandle& bind(Object* object, const std::function<void(Args...)>& function) noexcept {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
 		}
@@ -1335,6 +1337,8 @@ public:
 		if(owningObject.isValid()){
 			owningObject->registerEventHandle(this);
 		}
+
+		return *this;
 	}
 
 	inline bool operator () (TickType_t wait, Args&&... args) noexcept {
