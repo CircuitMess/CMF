@@ -18,22 +18,6 @@ AsyncEntity::~AsyncEntity() noexcept {
 	thread->stop(portMAX_DELAY);
 }
 
-void AsyncEntity::registerSyncEntity(SyncEntity* entity) noexcept{
-	if(entity->getOwner() != this){
-		entity->setOwner(this);
-	}
-
-	registeredSyncEntities.insert(WeakObjectPtr<SyncEntity>(entity));
-}
-
-void AsyncEntity::unregisterSyncEntity(SyncEntity* entity) noexcept {
-	if(entity->getOwner() == this){
-		entity->setOwner(nullptr);
-	}
-
-	registeredSyncEntities.erase(entity);
-}
-
 void AsyncEntity::postInitProperties() noexcept {
 	Super::postInitProperties();
 }
@@ -56,13 +40,19 @@ void AsyncEntity::tickHandle() noexcept{
 
 	tick(deltaTime);
 
-	for(WeakObjectPtr<SyncEntity> entity : registeredSyncEntities){
-		if(!entity.isValid()){
-			registeredSyncEntities.erase(entity);
-		}else{
+	forEachChild([deltaTime](Object* child) {
+		if(child == nullptr){
+			return false;
+		}
+
+		child->scanEvents(); // TODO: time for blocked waiting etc.
+
+		if(SyncEntity* entity = cast<SyncEntity>(child)){
 			entity->tick(deltaTime);
 		}
-	}
+
+		return false;
+	});
 
 	lastTickTime = currentTickTime;
 }

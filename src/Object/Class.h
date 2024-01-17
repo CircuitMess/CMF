@@ -11,7 +11,7 @@ class Class {
 public:
 	virtual ~Class() = default;
 
-	virtual constexpr Object* createDefaultObject() const noexcept;
+	virtual Object* createDefaultObject() const noexcept;
 
 public:
 	uint32_t getID() const noexcept;

@@ -16,9 +16,6 @@ public:
 	AsyncEntity() noexcept;
 	virtual ~AsyncEntity() noexcept override;
 
-	void registerSyncEntity(SyncEntity* entity) noexcept;
-	void unregisterSyncEntity(SyncEntity* entity) noexcept;
-
 protected:
 	virtual void postInitProperties() noexcept override;
 	virtual void begin() noexcept override;
@@ -29,7 +26,6 @@ private:
 	void tickHandle() noexcept;
 
 private:
-	std::set<WeakObjectPtr<SyncEntity>> registeredSyncEntities;
 	StrongObjectPtr<Threaded> thread;
 	uint64_t lastTickTime;
 };

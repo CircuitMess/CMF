@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "Class.h"
 #include "Misc/Djb.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
 
 class Object {
 public:
@@ -48,11 +49,104 @@ public:
 
 	virtual void onDestroy() noexcept {}
 
+	inline void setOwner(Object* object) noexcept {
+		Object* oldOwner = owner.get();
+
+		if(owner.isValid()){
+			owner->removeChild(this);
+			owner = nullptr;
+		}
+
+		if(object != nullptr && object != this){
+			owner = object;
+			owner->registerChild(this);
+		}
+
+		onOwnerChanged(oldOwner);
+	}
+
+	inline Object* getOwner() const noexcept {
+		if(!owner.isValid()){
+			return nullptr;
+		}
+
+		return *owner;
+	}
+
+	inline void setInstigator(Object* object) noexcept {
+		Object* oldInstigator = instigator.get();
+		instigator = object;
+		onInstigatorChanged(oldInstigator);
+	}
+
+	inline Object* getInstigator() const noexcept {
+		return instigator.get();
+	}
+
+	virtual void onInstigatorChanged(Object* oldInstigator) noexcept {}
+
+	virtual void onOwnerChanged(Object* oldOwner) noexcept {}
+
+	virtual void onChildAdded(Object* child) noexcept {}
+
+	virtual void onChildRemoved(Object* child) noexcept {}
+
+	virtual void scanEvents() noexcept {
+		// TODO: scan this objects event handles
+
+		// WARNING: This will now work, or will create an infinite loop if abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
+		for(const WeakObjectPtr<Object>& child : childrenObjects){
+			if(!child.isValid()){
+				continue;
+			}
+
+			child->scanEvents();
+		}
+	}
+
+	void forEachChild(const std::function<bool(Object*)>& function) const noexcept {
+		for(const WeakObjectPtr<Object>& child : childrenObjects){
+			if(!child.isValid()){
+				continue;
+			}
+
+			if(function(child.get())){
+				return;
+			}
+		}
+	}
+
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
 
 	bool markedForDestroy = false;
+	WeakObjectPtr<Object> owner = nullptr;
+	std::set<WeakObjectPtr<Object>> childrenObjects;
+	WeakObjectPtr<Object> instigator = nullptr;
+
+private:
+	inline void registerChild(Object* child) noexcept {
+		WeakObjectPtr<Object> newChild = child;
+		if(!newChild.isValid()){
+			return;
+		}
+
+		childrenObjects.insert(newChild);
+		onChildAdded(child);
+	}
+
+	inline void removeChild(Object* child) noexcept {
+		if(child == nullptr){
+			return;
+		}
+
+		if(childrenObjects.erase(child) == 0){
+			return;
+		}
+
+		onChildRemoved(child);
+	}
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\

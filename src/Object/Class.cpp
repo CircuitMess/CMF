@@ -7,6 +7,6 @@ uint32_t Class::getID() const noexcept{
 
 Class::Class(uint32_t ID) noexcept : classID(ID) {}
 
-constexpr Object* Class::createDefaultObject()  const noexcept {
+Object* Class::createDefaultObject()  const noexcept {
 	return new Object();
 }

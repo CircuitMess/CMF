@@ -10,11 +10,8 @@ class SyncEntity : public Entity {
 	GENERATED_BODY(SyncEntity, Entity)
 
 public:
-	explicit SyncEntity(AsyncEntity* owner = nullptr) noexcept;
+	explicit SyncEntity(Object* owner = nullptr) noexcept;
 	virtual ~SyncEntity() noexcept override;
-
-	void setOwner(AsyncEntity* owner = nullptr) noexcept;
-	AsyncEntity* getOwner() const noexcept;
 
 	virtual void tick(float deltaTime) noexcept override;
 
@@ -22,8 +19,6 @@ protected:
 	virtual void postInitProperties() noexcept override;
 	virtual void begin() noexcept override;
 	virtual void end(/*TODO reason*/) noexcept override;
-
-	virtual void onOwnerChanged(AsyncEntity* oldOwner) noexcept;
 
 private:
 	WeakObjectPtr<AsyncEntity> ownerEntity = nullptr;

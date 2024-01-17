@@ -2,27 +2,15 @@
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
 
-SyncEntity::SyncEntity(AsyncEntity* owner/* = nullptr*/) noexcept : Super() {
-	setOwner(owner);
+SyncEntity::SyncEntity(Object* owner/* = nullptr*/) noexcept : Super() {
+	if(owner == nullptr){
+		setOwner(ApplicationStatics::getApplication());
+	}else {
+		setOwner(owner);
+	}
 }
 
 SyncEntity::~SyncEntity() noexcept = default;
-
-void SyncEntity::setOwner(AsyncEntity* owner) noexcept {
-	AsyncEntity* oldOwner = *ownerEntity;
-
-	if(owner == nullptr){
-		ownerEntity = ApplicationStatics::getApplication();
-	}else{
-		ownerEntity = owner;
-	}
-
-	onOwnerChanged(oldOwner);
-}
-
-AsyncEntity* SyncEntity::getOwner() const noexcept {
-	return *ownerEntity;
-}
 
 void SyncEntity::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
@@ -38,9 +26,4 @@ void SyncEntity::begin() noexcept {
 
 void SyncEntity::end() noexcept {
 	Super::end();
-}
-
-void SyncEntity::onOwnerChanged(AsyncEntity* oldOwner) noexcept {
-	oldOwner->unregisterSyncEntity(this);
-	ownerEntity->registerSyncEntity(this);
 }
