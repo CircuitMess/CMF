@@ -1304,15 +1304,37 @@ public:
 template<typename ...Args>
 class EventHandle : public EventHandleBase {
 public:
+	inline virtual ~EventHandle() noexcept {
+		if(owningObject.isValid()){
+			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+		}
+	}
+
 	template<typename O, typename F>
 	inline void bind(O* object, F&& function) noexcept {
+		if(owningObject.isValid()){
+			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+		}
+
 		owningObject = cast<Object>(object);
 		callback = BindHelper<Args...>::template get(object, function);
+
+		if(owningObject.isValid()){
+			owningObject->registerEventHandle(static_cast<EventHandleBase>(this));
+		}
 	}
 
 	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
+		if(owningObject.isValid()){
+			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+		}
+
 		owningObject = object;
 		callback = function;
+
+		if(owningObject.isValid()){
+			owningObject->registerEventHandle(static_cast<EventHandleBase>(this));
+		}
 	}
 
 	inline bool operator () (TickType_t wait, Args&&... args) noexcept {
@@ -1324,7 +1346,7 @@ public:
 			return;
 		}
 
-		if(callback != nullptr){
+		if(callback == nullptr){
 			return;
 		}
 
@@ -1343,8 +1365,8 @@ public:
 	}
 
 private:
-	WeakObjectPtr<Object> owningObject; // Object of which the callback is a member, in case this owning object
-	std::function<void(Args...)> callback;
+	WeakObjectPtr<Object> owningObject = nullptr; // Object of which the callback is a member, in case this owning object
+	std::function<void(Args...)> callback = nullptr;
 	Queue<std::tuple<Args...>> callQueue;
 };
 

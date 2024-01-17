@@ -6,6 +6,7 @@
 #include "Class.h"
 #include "Misc/Djb.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
+#include "Event/EventHandle.h"
 
 class Object {
 public:
@@ -92,9 +93,11 @@ public:
 	virtual void onChildRemoved(Object* child) noexcept {}
 
 	virtual void scanEvents() noexcept {
-		// TODO: scan this objects event handles
+		for(EventHandleBase* handle : ownedEventHandles){
+			handle->scan(0); // TODO: wait time
+		}
 
-		// WARNING: This will now work, or will create an infinite loop if abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
+		// WARNING: This will not work, or will create an infinite loop if owner system is abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
 		for(const WeakObjectPtr<Object>& child : childrenObjects){
 			if(!child.isValid()){
 				continue;
@@ -116,6 +119,18 @@ public:
 		}
 	}
 
+	void registerEventHandle(EventHandleBase* handle) noexcept {
+		if(handle == nullptr){
+			return;
+		}
+
+		ownedEventHandles.insert(handle);
+	}
+
+	void unregisterEventHandle(EventHandleBase* handle) noexcept {
+		ownedEventHandles.erase(handle);
+	}
+
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
@@ -124,6 +139,7 @@ private:
 	WeakObjectPtr<Object> owner = nullptr;
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator = nullptr;
+	std::set<EventHandleBase*> ownedEventHandles; // TODO: think about using smart pointers to manage these
 
 private:
 	inline void registerChild(Object* child) noexcept {
