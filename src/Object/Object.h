@@ -6,7 +6,6 @@
 #include "Class.h"
 #include "Misc/Djb.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
-#include "Event/EventHandle.h"
 
 class Object {
 public:
@@ -39,34 +38,20 @@ public:
 
 	virtual void onCreated() noexcept {}
 
-	inline void destroy() noexcept{
-		markedForDestroy = true;
-		onDestroy();
-	}
+	void destroy() noexcept;
+	virtual void onDestroy() noexcept;
 
 	inline constexpr bool isMarkedForDestroy() const noexcept{
 		return markedForDestroy;
 	}
 
-	virtual void onDestroy() noexcept {}
+	void setOwner(Object* object) noexcept;
+	virtual void onOwnerChanged(Object* oldOwner) noexcept;
+	virtual void onChildAdded(Object* child) noexcept;
+	virtual void onChildRemoved(Object* child) noexcept;
+	void forEachChild(const std::function<bool(Object*)>& function) const noexcept;
 
-	inline void setOwner(Object* object) noexcept {
-		Object* oldOwner = owner.get();
-
-		if(owner.isValid()){
-			owner->removeChild(this);
-			owner = nullptr;
-		}
-
-		if(object != nullptr && object != this){
-			owner = object;
-			owner->registerChild(this);
-		}
-
-		onOwnerChanged(oldOwner);
-	}
-
-	inline Object* getOwner() const noexcept {
+	inline constexpr Object* getOwner() const noexcept {
 		if(!owner.isValid()){
 			return nullptr;
 		}
@@ -74,62 +59,17 @@ public:
 		return *owner;
 	}
 
-	inline void setInstigator(Object* object) noexcept {
-		Object* oldInstigator = instigator.get();
-		instigator = object;
-		onInstigatorChanged(oldInstigator);
-	}
+	void setInstigator(Object* object) noexcept;
+	virtual void onInstigatorChanged(Object* oldInstigator) noexcept;
 
-	inline Object* getInstigator() const noexcept {
+	inline constexpr Object* getInstigator() const noexcept {
 		return instigator.get();
 	}
 
-	virtual void onInstigatorChanged(Object* oldInstigator) noexcept {}
 
-	virtual void onOwnerChanged(Object* oldOwner) noexcept {}
-
-	virtual void onChildAdded(Object* child) noexcept {}
-
-	virtual void onChildRemoved(Object* child) noexcept {}
-
-	virtual void scanEvents() noexcept {
-		for(EventHandleBase* handle : ownedEventHandles){
-			handle->scan(0); // TODO: wait time
-		}
-
-		// WARNING: This will not work, or will create an infinite loop if owner system is abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
-		for(const WeakObjectPtr<Object>& child : childrenObjects){
-			if(!child.isValid()){
-				continue;
-			}
-
-			child->scanEvents();
-		}
-	}
-
-	void forEachChild(const std::function<bool(Object*)>& function) const noexcept {
-		for(const WeakObjectPtr<Object>& child : childrenObjects){
-			if(!child.isValid()){
-				continue;
-			}
-
-			if(function(child.get())){
-				return;
-			}
-		}
-	}
-
-	void registerEventHandle(EventHandleBase* handle) noexcept {
-		if(handle == nullptr){
-			return;
-		}
-
-		ownedEventHandles.insert(handle);
-	}
-
-	void unregisterEventHandle(EventHandleBase* handle) noexcept {
-		ownedEventHandles.erase(handle);
-	}
+	virtual void scanEvents() noexcept;
+	void registerEventHandle(class EventHandleBase* handle) noexcept;
+	void unregisterEventHandle(EventHandleBase* handle) noexcept;
 
 private:
 	using ClassType = Class;
@@ -142,27 +82,8 @@ private:
 	std::set<EventHandleBase*> ownedEventHandles; // TODO: think about using smart pointers to manage these
 
 private:
-	inline void registerChild(Object* child) noexcept {
-		WeakObjectPtr<Object> newChild = child;
-		if(!newChild.isValid()){
-			return;
-		}
-
-		childrenObjects.insert(newChild);
-		onChildAdded(child);
-	}
-
-	inline void removeChild(Object* child) noexcept {
-		if(child == nullptr){
-			return;
-		}
-
-		if(childrenObjects.erase(child) == 0){
-			return;
-		}
-
-		onChildRemoved(child);
-	}
+	void registerChild(Object* child) noexcept;
+	void removeChild(Object* child) noexcept;
 };
 
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\

@@ -1306,34 +1306,34 @@ class EventHandle : public EventHandleBase {
 public:
 	inline virtual ~EventHandle() noexcept {
 		if(owningObject.isValid()){
-			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+			owningObject->unregisterEventHandle(this);
 		}
 	}
 
 	template<typename O, typename F>
 	inline void bind(O* object, F&& function) noexcept {
 		if(owningObject.isValid()){
-			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+			owningObject->unregisterEventHandle(this);
 		}
 
 		owningObject = cast<Object>(object);
 		callback = BindHelper<Args...>::template get(object, function);
 
 		if(owningObject.isValid()){
-			owningObject->registerEventHandle(static_cast<EventHandleBase>(this));
+			owningObject->registerEventHandle(this);
 		}
 	}
 
 	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
 		if(owningObject.isValid()){
-			owningObject->unregisterEventHandle(static_cast<EventHandleBase>(this));
+			owningObject->unregisterEventHandle(this);
 		}
 
 		owningObject = object;
 		callback = function;
 
 		if(owningObject.isValid()){
-			owningObject->registerEventHandle(static_cast<EventHandleBase>(this));
+			owningObject->registerEventHandle(this);
 		}
 	}
 
