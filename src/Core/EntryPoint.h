@@ -50,6 +50,7 @@ public:
 	}
 
 private:
+	// TODO: make it so that the app given by the user can provide classes used to create objects for garbage collector, singleton and such
 	inline static StrongObjectPtr<Application> App = nullptr;
 	inline static StrongObjectPtr<GarbageCollector> TrashCollector = nullptr;
 };
