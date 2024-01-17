@@ -12,552 +12,1309 @@
 #include "Object/Object.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Containers/Queue.h"
+#include "Util/stdafx.h"
 
 template<typename ...Args>
-class EventHandle {
-protected:
-	void bind(std::function<void(Args...)>&& function, Object* object) noexcept {
-		owningObject = object;
+struct BindHelper {
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept {
+		// TODO: log warning
+		return nullptr;
+	}
 
-		switch(sizeof...(Args)){
-			case 0: {
-				callback = std::bind(function, object);
-				break;
-			}
-			case 1: {
-				callback = std::bind(function, object, std::placeholders::_1);
-				break;
-			}
-			case 2: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2);
-				break;
-			}
-			case 3: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3);
-				break;
-			}
-			case 4: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4);
-				break;
-			}
-			case 5: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5);
-				break;
-			}
-			case 6: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6);
-				break;
-			}
-			case 7: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7);
-				break;
-			}
-			case 8: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8);
-				break;
-			}
-			case 9: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9);
-				break;
-			}
-			case 10: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10);
-				break;
-			}
-			case 11: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11);
-				break;
-			}
-			case 12: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12);
-				break;
-			}
-			case 13: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13);
-				break;
-			}
-			case 14: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14);
-				break;
-			}
-			case 15: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15);
-				break;
-			}
-			case 16: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16);
-				break;
-			}
-			case 17: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17);
-				break;
-			}
-			case 18: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18);
-				break;
-			}
-			case 19: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19);
-				break;
-			}
-			case 20: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20);
-				break;
-			}
-			case 21: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21);
-				break;
-			}
-			case 22: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22);
-				break;
-			}
-			case 23: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23);
-				break;
-			}
-			case 24: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24);
-				break;
-			}
-			case 25: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24,
-									 std::placeholders::_25);
-				break;
-			}
-			case 26: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24,
-									 std::placeholders::_25,
-									 std::placeholders::_26);
-				break;
-			}
-			case 27: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24,
-									 std::placeholders::_25,
-									 std::placeholders::_26,
-									 std::placeholders::_27);
-				break;
-			}
-			case 28: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24,
-									 std::placeholders::_25,
-									 std::placeholders::_26,
-									 std::placeholders::_27,
-									 std::placeholders::_28);
-				break;
-			}
-			case 29: {
-				callback = std::bind(function, object, std::placeholders::_1,
-									 std::placeholders::_2,
-									 std::placeholders::_3,
-									 std::placeholders::_4,
-									 std::placeholders::_5,
-									 std::placeholders::_6,
-									 std::placeholders::_7,
-									 std::placeholders::_8,
-									 std::placeholders::_9,
-									 std::placeholders::_10,
-									 std::placeholders::_11,
-									 std::placeholders::_12,
-									 std::placeholders::_13,
-									 std::placeholders::_14,
-									 std::placeholders::_15,
-									 std::placeholders::_16,
-									 std::placeholders::_17,
-									 std::placeholders::_18,
-									 std::placeholders::_19,
-									 std::placeholders::_20,
-									 std::placeholders::_21,
-									 std::placeholders::_22,
-									 std::placeholders::_23,
-									 std::placeholders::_24,
-									 std::placeholders::_25,
-									 std::placeholders::_26,
-									 std::placeholders::_27,
-									 std::placeholders::_28,
-									 std::placeholders::_29);
-				break;
-			}
-			default: {
-				static_assert(false, "CMF: Too many arguments for an event handle callback.");
-				break;
-			}
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 0) {
+		return std::bind(function, object);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 1) {
+		return std::bind(function, object, std::placeholders::_1);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 2) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 3) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 4) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 5) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 6) {
+		return std::bind(function, object, std::placeholders::_1,
+									std::placeholders::_2,
+									std::placeholders::_3,
+									std::placeholders::_4,
+									std::placeholders::_5,
+									std::placeholders::_6);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 7) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 8) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 9) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 10) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 11) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 12) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 13) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 14) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 15) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 16) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 17) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 18) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 19) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 20) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 21) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 22) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 23) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 24) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 25) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24,
+						 std::placeholders::_25);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 26) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24,
+						 std::placeholders::_25,
+						 std::placeholders::_26);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 27) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24,
+						 std::placeholders::_25,
+						 std::placeholders::_26,
+						 std::placeholders::_27);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 28) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24,
+						 std::placeholders::_25,
+						 std::placeholders::_26,
+						 std::placeholders::_27,
+						 std::placeholders::_28);
+	}
+
+	template<typename O, typename F>
+	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 29) {
+		return std::bind(function, object, std::placeholders::_1,
+						 std::placeholders::_2,
+						 std::placeholders::_3,
+						 std::placeholders::_4,
+						 std::placeholders::_5,
+						 std::placeholders::_6,
+						 std::placeholders::_7,
+						 std::placeholders::_8,
+						 std::placeholders::_9,
+						 std::placeholders::_10,
+						 std::placeholders::_11,
+						 std::placeholders::_12,
+						 std::placeholders::_13,
+						 std::placeholders::_14,
+						 std::placeholders::_15,
+						 std::placeholders::_16,
+						 std::placeholders::_17,
+						 std::placeholders::_18,
+						 std::placeholders::_19,
+						 std::placeholders::_20,
+						 std::placeholders::_21,
+						 std::placeholders::_22,
+						 std::placeholders::_23,
+						 std::placeholders::_24,
+						 std::placeholders::_25,
+						 std::placeholders::_26,
+						 std::placeholders::_27,
+						 std::placeholders::_28,
+						 std::placeholders::_29);
+	}
+};
+
+template<typename ...Args>
+struct CallHelper {
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept {
+		// TODO log warning
+		return false;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 0) {
+		if(function == nullptr){
+			return false;
 		}
+
+		function();
+
+		return true;
 	}
 
-	void operator () (Args&&... args) noexcept {
-		callQueue.push(std::tuple<Args&&...>(args));
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 1) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments));
+
+		return true;
 	}
 
-	void scan(TickType_t wait = 0) noecept {
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 2) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 3) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 4) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 5) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 6) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 7) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 8) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 9) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 10) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 11) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 12) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 13) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 14) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 15) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 16) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 17) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 18) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 19) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 20) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 21) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 22) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 23) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 24) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 25) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments),
+				 std::get<24>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 26) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments),
+				 std::get<24>(arguments),
+				 std::get<25>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 27) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments),
+				 std::get<24>(arguments),
+				 std::get<25>(arguments),
+				 std::get<26>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 28) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments),
+				 std::get<24>(arguments),
+				 std::get<25>(arguments),
+				 std::get<26>(arguments),
+				 std::get<27>(arguments));
+
+		return true;
+	}
+
+	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 29) {
+		if(function == nullptr){
+			return false;
+		}
+
+		function(std::get<0>(arguments),
+				 std::get<1>(arguments),
+				 std::get<2>(arguments),
+				 std::get<3>(arguments),
+				 std::get<4>(arguments),
+				 std::get<5>(arguments),
+				 std::get<6>(arguments),
+				 std::get<7>(arguments),
+				 std::get<8>(arguments),
+				 std::get<9>(arguments),
+				 std::get<10>(arguments),
+				 std::get<11>(arguments),
+				 std::get<12>(arguments),
+				 std::get<13>(arguments),
+				 std::get<14>(arguments),
+				 std::get<15>(arguments),
+				 std::get<16>(arguments),
+				 std::get<17>(arguments),
+				 std::get<18>(arguments),
+				 std::get<19>(arguments),
+				 std::get<20>(arguments),
+				 std::get<21>(arguments),
+				 std::get<22>(arguments),
+				 std::get<23>(arguments),
+				 std::get<24>(arguments),
+				 std::get<25>(arguments),
+				 std::get<26>(arguments),
+				 std::get<27>(arguments),
+				 std::get<28>(arguments));
+
+		return true;
+	}
+
+private:
+	inline CallHelper() noexcept = delete;
+};
+
+class EventHandleBase {
+public:
+	inline virtual void scan(TickType_t wait) noexcept = 0;
+};
+
+template<typename ...Args>
+class EventHandle : public EventHandleBase {
+public:
+	template<typename O, typename F>
+	inline void bind(O* object, F&& function) noexcept {
+		owningObject = cast<Object>(object);
+		callback = BindHelper<Args...>::template get(object, function);
+	}
+
+	inline bool operator () (TickType_t wait, Args&&... args) noexcept {
+		return callQueue.push(std::tuple<Args...>(args...), wait);
+	}
+
+	inline virtual void scan(TickType_t wait) noexcept override {
 		if(!owningObject.isValid()){
 			return;
 		}
@@ -566,144 +1323,24 @@ protected:
 			return;
 		}
 
-		std::tuple<Args&&...> arguments;
-		if(!callQueue.pop(arguments, wait)){
-			return;
-		}
+		while(!callQueue.empty()){
+			const uint64_t beginTime = millis();
 
-		// TODO: this is terrible, I would prefer not to do this this way
-		switch(sizeof...(Args)){
-			case 0: {
-
+			std::tuple<Args...> arguments;
+			if(!callQueue.pop(arguments, wait)){
 				break;
 			}
-			case 1: {
 
-				break;
-			}
-			case 2: {
+			CallHelper<Args...>::call(callback, arguments);
 
-				break;
-			}
-			case 3: {
-
-				break;
-			}
-			case 4: {
-
-				break;
-			}
-			case 5: {
-
-				break;
-			}
-			case 6: {
-
-				break;
-			}
-			case 7: {
-
-				break;
-			}
-			case 8: {
-
-				break;
-			}
-			case 9: {
-
-				break;
-			}
-			case 10: {
-
-				break;
-			}
-			case 11: {
-
-				break;
-			}
-			case 12: {
-
-				break;
-			}
-			case 13: {
-
-				break;
-			}
-			case 14: {
-
-				break;
-			}
-			case 15: {
-
-				break;
-			}
-			case 16: {
-
-				break;
-			}
-			case 17: {
-
-				break;
-			}
-			case 18: {
-
-				break;
-			}
-			case 19: {
-
-				break;
-			}
-			case 20: {
-
-				break;
-			}
-			case 21: {
-
-				break;
-			}
-			case 22: {
-
-				break;
-			}
-			case 23: {
-
-				break;
-			}
-			case 24: {
-
-				break;
-			}
-			case 25: {
-
-				break;
-			}
-			case 26: {
-
-				break;
-			}
-			case 27: {
-
-				break;
-			}
-			case 28: {
-
-				break;
-			}
-			case 29: {
-
-				break;
-			}
-			default: {
-				static_assert(false, "CMF: Too many arguments for an event handle callback.");
-				break;
-			}
+			wait = std::max((uint64_t)0, (uint64_t) (wait - (millis() - beginTime)));
 		}
 	}
 
 private:
 	WeakObjectPtr<Object> owningObject; // Object of which the callback is a member, in case this owning object
 	std::function<void(Args...)> callback;
-	Queue<std::tuple<Args&&...>> callQueue;
+	Queue<std::tuple<Args...>> callQueue;
 };
 
 #endif //CMF_EVENTHANDLE_H

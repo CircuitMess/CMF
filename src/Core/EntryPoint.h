@@ -16,6 +16,24 @@
 #include "Memory/ObjectMemory.h"
 #include "Memory/GarbageCollector.h"
 #include "Containers/Queue.h"
+#include "Event/EventHandle.h"
+
+class TestObject : public Object {
+	GENERATED_BODY(TestObject, Object)
+
+public:
+	void test() {
+		EventHandle<int, float, void*> testHandle;
+
+		testHandle.bind(this, &TestObject::testHandle);
+
+		testHandle.scan(0);
+	}
+
+	void testHandle(int i, float f, void* v) {
+
+	}
+};
 
 class CMF {
 public:
@@ -27,7 +45,7 @@ public:
 		int i;
 		testQ.front(i);
 
-		TrashCollector = newObject<::GarbageCollector>();
+		TrashCollector = newObject<GarbageCollector>();
 		App = newObject<T>();
 	}
 
