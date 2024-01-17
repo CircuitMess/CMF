@@ -1310,6 +1310,11 @@ public:
 		callback = BindHelper<Args...>::template get(object, function);
 	}
 
+	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
+		owningObject = object;
+		callback = function;
+	}
+
 	inline bool operator () (TickType_t wait, Args&&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...), wait);
 	}
