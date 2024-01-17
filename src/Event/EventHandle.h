@@ -1341,7 +1341,7 @@ public:
 		return *this;
 	}
 
-	inline bool operator () (TickType_t wait, Args&&... args) noexcept {
+	inline bool call(TickType_t wait, Args&&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...), wait);
 	}
 
