@@ -1341,11 +1341,15 @@ public:
 		return *this;
 	}
 
+	inline bool call(TickType_t wait, const Args&... args) noexcept {
+		return callQueue.push(std::tuple<Args...>(args...), wait);
+	}
+
 	inline bool call(TickType_t wait, Args&&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...), wait);
 	}
 
-	inline virtual void scan(TickType_t wait) noexcept override {
+	inline void scan(TickType_t wait = portMAX_DELAY) noexcept override {
 		if(!owningObject.isValid()){
 			return;
 		}

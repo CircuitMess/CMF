@@ -19,11 +19,11 @@ public:
 		}
 	}
 
-	inline virtual void bind(EventHandle<Args...>&& handle) noexcept {
+	inline void bind(EventHandle<Args...>&& handle) noexcept {
 		handles.insert({&handle, false});
 	}
 
-	inline virtual void bind(EventHandle<Args...>* handle) noexcept {
+	inline void bind(EventHandle<Args...>* handle) noexcept {
 		if(handle == nullptr){
 			return;
 		}
@@ -57,23 +57,46 @@ public:
 	}
 
 protected:
-	struct HandleContainer {
-		EventHandle<Args...>* handle = nullptr;
-		bool owned = true;
-	};
+	inline bool broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
+		bool succeeded = true;
 
-	std::set<HandleContainer> handles;
-
-protected:
-	inline virtual bool broadcast(TickType_t wait, Args&&... args) noexcept {
 		for(const HandleContainer& container : handles){
 			if(container.handle == nullptr){
 				continue;
 			}
 
-			container.handle->call(wait, args...);
+			succeeded &= container.handle->call(wait, args...);
 		}
+
+		return succeeded;
 	}
+
+	inline bool broadcast(Args&&... args, TickType_t wait = portMAX_DELAY) noexcept {
+		bool succeeded = true;
+
+		for(const HandleContainer& container : handles){
+			if(container.handle == nullptr){
+				continue;
+			}
+
+			succeeded &= container.handle->call(wait, args...);
+		}
+
+		return succeeded;
+	}
+
+private:
+	struct HandleContainer {
+		EventHandle<Args...>* handle = nullptr;
+		bool owned = true;
+
+		// This is only needed for std::set to work
+		bool operator < (const HandleContainer& other) const noexcept {
+			return (uint32_t) handle < (uint32_t) other.handle;
+		}
+	};
+
+	std::set<HandleContainer> handles;
 };
 
 #endif //CMF_EVENT_H

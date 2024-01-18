@@ -17,9 +17,14 @@
 #include "Memory/GarbageCollector.h"
 #include "Containers/Queue.h"
 #include "Event/EventHandle.h"
+#include "Event/EventDelegate.h"
+#include "Event/EventBroadcaster.h"
 
 class TestObject : public Object {
 	GENERATED_BODY(TestObject, Object)
+public:
+	DECLARE_EVENT(TestEvent, TestObject, int)
+	TestEvent testEvent;
 
 public:
 	void test() {
@@ -31,7 +36,7 @@ public:
 	}
 
 	void testHandle(int i, float f, void* v) {
-
+		testEvent.broadcast(0);
 	}
 };
 

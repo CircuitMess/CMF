@@ -61,7 +61,7 @@ public:
 		return end - begin;
 	}
 
-	inline bool reserve(size_t newSize, TickType_t wait = 0) noexcept {
+	inline bool reserve(size_t newSize, TickType_t wait = portMAX_DELAY) noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
@@ -88,9 +88,11 @@ public:
 		bufferSize = newSize;
 
 		xSemaphoreGive(accessMutex);
+
+		return false;
 	}
 
-	inline bool front(T& value, TickType_t wait = 0) const noexcept {
+	inline bool front(T& value, TickType_t wait = portMAX_DELAY) const noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
@@ -110,7 +112,7 @@ public:
 		return true;
 	}
 
-	inline bool pop(T& value, TickType_t wait = 0) noexcept {
+	inline bool pop(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
@@ -133,7 +135,7 @@ public:
 		return true;
 	}
 
-	inline bool push(const T& value, TickType_t wait = 0) noexcept {
+	inline bool push(const T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
@@ -155,7 +157,7 @@ public:
 		return true;
 	}
 
-	inline bool push(T&& value, TickType_t wait = 0) noexcept {
+	inline bool push(T&& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
@@ -177,7 +179,7 @@ public:
 		return true;
 	}
 
-	inline bool clear(TickType_t wait = 0) noexcept {
+	inline bool clear(TickType_t wait = portMAX_DELAY) noexcept {
 		if(accessMutex == nullptr){
 			return false;
 		}
