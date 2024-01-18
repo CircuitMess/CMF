@@ -34,7 +34,7 @@ protected:
 	}
 };
 
-#define broadcast(...) blockingBroadcast(__VA_ARGS__, portMAX_DELAY, this)
+#define broadcastObject(...) blockingBroadcast(__VA_ARGS__, portMAX_DELAY, this)
 
 #define waitBroadcast(wait, ...) blockingBroadcast(__VA_ARGS__, wait, this)
 

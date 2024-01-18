@@ -20,26 +20,6 @@
 #include "Event/EventDelegate.h"
 #include "Event/EventBroadcaster.h"
 
-class TestObject : public Object {
-	GENERATED_BODY(TestObject, Object)
-public:
-	DECLARE_EVENT(TestEvent, TestObject, int)
-	TestEvent testEvent;
-
-public:
-	void test() {
-		EventHandle<int, float, void*> testHandle;
-
-		testHandle.bind(this, &TestObject::testHandle);
-
-		testHandle.scan(0);
-	}
-
-	void testHandle(int i, float f, void* v) {
-		testEvent.broadcast(0);
-	}
-};
-
 class CMF {
 public:
 	template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
