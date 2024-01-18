@@ -32,13 +32,7 @@ inline StrongObjectPtr<T> newObject(Class* cls, Object* owner = nullptr) noexcep
 		return nullptr;
 	}
 
-	Object* newObject = cls->createDefaultObject();
-
-	if(newObject == nullptr){
-		return nullptr;
-	}
-
-	StrongObjectPtr<T> newObjectPtr = cast<T>(newObject);
+	StrongObjectPtr<T> newObjectPtr = cast<T>(cls->createDefaultObject());
 	if(!newObjectPtr.isValid()){
 		return nullptr;
 	}
