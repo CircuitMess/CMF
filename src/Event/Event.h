@@ -19,6 +19,10 @@ public:
 		}
 	}
 
+	inline virtual void bind(EventHandle<Args...>&& handle) noexcept {
+		handles.insert({&handle, false});
+	}
+
 	inline virtual void bind(EventHandle<Args...>* handle) noexcept {
 		if(handle == nullptr){
 			return;

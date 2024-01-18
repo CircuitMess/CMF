@@ -5,12 +5,20 @@
 #include "Cast.h"
 #include "Object/Object.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
+#include "Statics/ApplicationStatics.h"
+#include "Core/Application.h"
 
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> newObject(Args&&... args) noexcept {
+inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept {
 	StrongObjectPtr<T> newObject = new T(args...);
 
 	if(Object* object = cast<Object>(newObject.get())){
+		if(owner != nullptr){
+			object->setOwner(owner);
+		}else{
+			object->setOwner(ApplicationStatics::getApplication());
+		}
+
 		object->postInitProperties();
 		object->onCreated();
 	}
@@ -19,7 +27,7 @@ inline StrongObjectPtr<T> newObject(Args&&... args) noexcept {
 }
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> newObject(Class* cls) noexcept {
+inline StrongObjectPtr<T> newObject(Class* cls, Object* owner = nullptr) noexcept {
 	if(cls == nullptr){
 		return nullptr;
 	}
@@ -36,6 +44,13 @@ inline StrongObjectPtr<T> newObject(Class* cls) noexcept {
 	}
 
 	newObjectPtr->postInitProperties();
+	newObjectPtr->onCreated();
+
+	if(owner != nullptr){
+		newObjectPtr->setOwner(owner);
+	}else{
+		newObjectPtr->setOwner(ApplicationStatics::getApplication());
+	}
 
 	return newObjectPtr;
 }
