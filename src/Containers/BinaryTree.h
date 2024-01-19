@@ -238,6 +238,37 @@ public:
 		return keys;
 	}
 
+	inline std::set<K> keys() const noexcept {
+		std::set<K> keys;
+
+		if(head == nullptr){
+			return keys;
+		}
+
+		std::queue<Node*> nodeQueue;
+		nodeQueue.push(head);
+
+		for(const Node* current = nodeQueue.front(); !nodeQueue.empty(); current = nodeQueue.front()){
+			nodeQueue.pop();
+
+			if(current == nullptr){
+				continue;
+			}
+
+			if(current->leftNode != nullptr){
+				nodeQueue.push(current->leftNode);
+			}
+
+			if(current->rightNode != nullptr){
+				nodeQueue.push(current->rightNode);
+			}
+
+			keys.insert(current->key);
+		}
+
+		return keys;
+	}
+
 private:
 	struct Node {
 		K key = K();
