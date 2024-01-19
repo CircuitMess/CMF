@@ -81,6 +81,7 @@ private:
 	WeakObjectPtr<Object> instigator = nullptr;
 	std::set<EventHandleBase*> ownedEventHandles; // TODO: think about using smart pointers to manage these
 
+	// Thread safety
 	std::mutex ownershipMutex;
 	std::mutex instigatorMutex;
 	std::mutex eventHandleMutex;
