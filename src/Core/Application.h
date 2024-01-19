@@ -2,6 +2,8 @@
 #define CMF_APPLICATION_H
 
 #include "Entity/AsyncEntity.h"
+#include "Object/SubclassOf.h"
+#include "Memory/GarbageCollector.h"
 
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
@@ -17,6 +19,8 @@ public:
 
 	Application& operator =(const Application&) = delete;
 	Application& operator =(Application&&) = delete;
+
+	virtual SubclassOf<GarbageCollector> getGarbageCollectorClass() const noexcept;
 
 protected:
 	virtual void postInitProperties() noexcept override;

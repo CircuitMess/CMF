@@ -27,7 +27,7 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 }
 
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> newObject(Class* cls, Object* owner = nullptr) noexcept {
+inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) noexcept {
 	if(cls == nullptr){
 		return nullptr;
 	}
@@ -37,8 +37,8 @@ inline StrongObjectPtr<T> newObject(Class* cls, Object* owner = nullptr) noexcep
 		return nullptr;
 	}
 
-	newObjectPtr->postInitProperties();
-	newObjectPtr->onCreated();
+	cast<Object>(*newObjectPtr)->postInitProperties();
+	cast<Object>(*newObjectPtr)->onCreated();
 
 	if(owner != nullptr){
 		newObjectPtr->setOwner(owner);

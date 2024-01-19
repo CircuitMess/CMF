@@ -30,12 +30,21 @@ public:
 		int i;
 		testQ.front(i);
 
-		TrashCollector = newObject<GarbageCollector>();
 		App = newObject<T>();
+		if(App == nullptr){
+			// TODO: error
+			return;
+		}
+
+		SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
+		if(garbageCollectorClass == nullptr){
+			TrashCollector = newObject<GarbageCollector>();
+		}else{
+			TrashCollector = newObject<GarbageCollector>(*garbageCollectorClass);
+		}
 	}
 
 private:
-	// TODO: make it so that the app given by the user can provide classes used to create objects for garbage collector, singleton and such
 	inline static StrongObjectPtr<Application> App = nullptr;
 	inline static StrongObjectPtr<GarbageCollector> TrashCollector = nullptr;
 };
