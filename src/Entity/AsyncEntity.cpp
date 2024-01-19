@@ -58,16 +58,9 @@ void AsyncEntity::tickHandle() noexcept{
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
 
+	scanEvents(); // TODO: time for blocked waiting etc.
+
 	tick(deltaTime);
-
-	forEachChild([](Object* child) {
-		if(child == nullptr){ // TODO: validity instead
-			return false;
-		}
-
-		child->scanEvents(); // TODO: time for blocked waiting etc.
-		return false;
-	});
 
 	forEachChild([deltaTime](Object* child) {
 		if(child == nullptr){ // TODO: validity instead
@@ -87,6 +80,7 @@ void AsyncEntity::tickHandle() noexcept{
 			return false;
 		}
 
+		// TODO: check what is needed for this to traverse the entire ownership tree
 		if(child->isMarkedForDestroy() && !child->canDelete()){
 			child->onDestroy();
 			childrenToRemove.insert(child);
