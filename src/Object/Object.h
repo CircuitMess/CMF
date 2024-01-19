@@ -8,8 +8,6 @@
 #include "Misc/Djb.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 
-// TODO: owner and event handle thread safety
-
 class Object {
 public:
 	Object() noexcept = default;
