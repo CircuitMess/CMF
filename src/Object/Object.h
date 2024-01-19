@@ -10,7 +10,7 @@
 
 class Object {
 public:
-	Object() noexcept = default;
+	Object() noexcept;
 	virtual ~Object() noexcept = default;
 
 	inline static const Class* staticClass() noexcept {

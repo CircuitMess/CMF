@@ -1,9 +1,11 @@
 #include "Object.h"
 #include "Event/EventHandle.h"
 
-void Object::postInitProperties() noexcept {
+Object::Object() noexcept{
 	destroyMutex.lock();
 }
+
+void Object::postInitProperties() noexcept {}
 
 void Object::onCreated() noexcept {}
 
