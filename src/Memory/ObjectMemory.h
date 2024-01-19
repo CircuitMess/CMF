@@ -37,8 +37,10 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
 		return nullptr;
 	}
 
-	cast<Object>(*newObjectPtr)->postInitProperties();
-	cast<Object>(*newObjectPtr)->onCreated();
+	if(Object* object = cast<Object>(*newObjectPtr)){
+		object->postInitProperties();
+		object->onCreated();
+	}
 
 	if(owner != nullptr){
 		newObjectPtr->setOwner(owner);
