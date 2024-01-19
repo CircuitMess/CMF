@@ -34,18 +34,45 @@ void AsyncEntity::end() noexcept {
 	Super::end();
 }
 
+void AsyncEntity::onDestroy() noexcept{
+	forEachChild([](Object* child){
+		if(child == nullptr){ // TODO: validity instead
+			return false;
+		}
+
+		child->setOwner(nullptr);
+
+		return false;
+	});
+
+	thread->destroy();
+
+	Super::onDestroy();
+}
+
 void AsyncEntity::tickHandle() noexcept{
+	if(!ObjectManager::get()->isValid(this)){
+		return;
+	}
+
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
 
 	tick(deltaTime);
 
-	forEachChild([deltaTime](Object* child) {
-		if(child == nullptr){
+	forEachChild([](Object* child) {
+		if(child == nullptr){ // TODO: validity instead
 			return false;
 		}
 
 		child->scanEvents(); // TODO: time for blocked waiting etc.
+		return false;
+	});
+
+	forEachChild([deltaTime](Object* child) {
+		if(child == nullptr){ // TODO: validity instead
+			return false;
+		}
 
 		if(SyncEntity* entity = cast<SyncEntity>(child)){
 			entity->tick(deltaTime);
@@ -53,6 +80,32 @@ void AsyncEntity::tickHandle() noexcept{
 
 		return false;
 	});
+
+	std::set<Object*> childrenToRemove;
+	forEachChild([&childrenToRemove](Object* child) {
+		if(child == nullptr){
+			return false;
+		}
+
+		if(child->isMarkedForDestroy() && !child->canDelete()){
+			child->onDestroy();
+			childrenToRemove.insert(child);
+		}
+
+		return false;
+	});
+
+	for(Object* child : childrenToRemove){
+		if(child == nullptr){
+			continue;
+		}
+
+		child->setOwner(nullptr);
+	}
+
+	if(isMarkedForDestroy() && !canDelete()){
+		onDestroy();
+	}
 
 	lastTickTime = currentTickTime;
 }

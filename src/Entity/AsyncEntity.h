@@ -21,6 +21,7 @@ protected:
 	virtual void begin() noexcept override;
 	virtual void tick(float deltaTime) noexcept override;
 	virtual void end(/*TODO reason*/) noexcept override;
+	virtual void onDestroy() noexcept override;
 
 private:
 	void tickHandle() noexcept;

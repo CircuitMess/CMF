@@ -32,6 +32,13 @@ void Threaded::onCreated() noexcept{
 	start();
 }
 
+
+void Threaded::onDestroy() noexcept{
+	stop(portMAX_DELAY);
+
+	Super::onDestroy();
+}
+
 void Threaded::start() noexcept{
 	if(state != State::Stopped){
 		return;

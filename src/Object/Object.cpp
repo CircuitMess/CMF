@@ -16,7 +16,6 @@ bool Object::canDelete() noexcept{
 void Object::destroy() noexcept{
 	// TODO: change this so that destroy is guaranteed to execute in the owning thread and not right away, since this can cause problems with ticking and async entities
 	markedForDestroy = true;
-	onDestroy();
 }
 
 void Object::onDestroy() noexcept {

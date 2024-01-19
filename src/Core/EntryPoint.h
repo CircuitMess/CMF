@@ -24,7 +24,6 @@ class CMF {
 public:
 	template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 	static void start(){
-		// TODO: init app, start ticking loop
 		App = newObject<T>();
 		if(App == nullptr){
 			// TODO: error

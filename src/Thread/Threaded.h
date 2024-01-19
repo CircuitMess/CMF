@@ -19,6 +19,7 @@ public:
 
 public:
 	virtual void onCreated() noexcept override;
+	virtual void onDestroy() noexcept override;
 
 	void start() noexcept;
 	void stop(TickType_t wait = portMAX_DELAY) noexcept;

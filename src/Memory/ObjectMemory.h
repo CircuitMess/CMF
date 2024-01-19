@@ -7,6 +7,8 @@
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Statics/ApplicationStatics.h"
 
+// TODO: isValid functions
+
 void initObject(Object* object, Object* owner) noexcept;
 
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
