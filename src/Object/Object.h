@@ -3,9 +3,12 @@
 
 #include <concepts>
 #include <type_traits>
+#include <mutex>
 #include "Class.h"
 #include "Misc/Djb.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
+
+// TODO: owner and event handle thread safety
 
 class Object {
 public:
@@ -34,9 +37,9 @@ public:
 		return false;
 	}
 
-	virtual void postInitProperties() noexcept {}
+	virtual void postInitProperties() noexcept;
 
-	virtual void onCreated() noexcept {}
+	virtual void onCreated() noexcept;
 
 	void destroy() noexcept;
 	virtual void onDestroy() noexcept;
@@ -49,7 +52,7 @@ public:
 	virtual void onOwnerChanged(Object* oldOwner) noexcept;
 	virtual void onChildAdded(Object* child) noexcept;
 	virtual void onChildRemoved(Object* child) noexcept;
-	void forEachChild(const std::function<bool(Object*)>& function) const noexcept;
+	void forEachChild(const std::function<bool(Object*)>& function) noexcept;
 
 	inline constexpr Object* getOwner() const noexcept {
 		if(!owner.isValid()){
@@ -66,7 +69,6 @@ public:
 		return instigator.get();
 	}
 
-
 	virtual void scanEvents() noexcept;
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
@@ -80,6 +82,11 @@ private:
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator = nullptr;
 	std::set<EventHandleBase*> ownedEventHandles; // TODO: think about using smart pointers to manage these
+
+	std::mutex ownershipMutex;
+	std::mutex instigatorMutex;
+	std::mutex eventHandleMutex;
+	std::mutex destroyMutex;
 
 private:
 	void registerChild(Object* child) noexcept;

@@ -1,14 +1,26 @@
 #include "Object.h"
 #include "Event/EventHandle.h"
 
+void Object::postInitProperties() noexcept {
+	destroyMutex.lock();
+}
+
+void Object::onCreated() noexcept {}
+
 void Object::destroy() noexcept{
+	// TODO: change this so that destroy is guaranteed to execute in the owning thread and not right away, since this can cause problems with ticking and async entities
 	markedForDestroy = true;
 	onDestroy();
 }
 
-void Object::onDestroy() noexcept {}
+void Object::onDestroy() noexcept {
+	// TODO: make a way for the garbage collector to access the destroy mutex
+	destroyMutex.unlock();
+}
 
 void Object::setOwner(Object* object) noexcept {
+	std::lock_guard lock(ownershipMutex);
+
 	Object* oldOwner = owner.get();
 
 	if(owner.isValid()){
@@ -30,7 +42,9 @@ void Object::onChildAdded(Object* child) noexcept {}
 
 void Object::onChildRemoved(Object* child) noexcept {}
 
-void Object::forEachChild(const std::function<bool(Object*)>& function) const noexcept {
+void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept {
+	std::lock_guard lock(ownershipMutex);
+
 	for(const WeakObjectPtr<Object>& child : childrenObjects){
 		if(!child.isValid()){
 			continue;
@@ -43,6 +57,7 @@ void Object::forEachChild(const std::function<bool(Object*)>& function) const no
 }
 
 void Object::setInstigator(Object* object) noexcept {
+	std::lock_guard lock(instigatorMutex);
 	Object* oldInstigator = instigator.get();
 	instigator = object;
 	onInstigatorChanged(oldInstigator);
@@ -51,6 +66,8 @@ void Object::setInstigator(Object* object) noexcept {
 void Object::onInstigatorChanged(Object* oldInstigator) noexcept {}
 
 void Object::scanEvents() noexcept {
+	std::lock_guard lock(eventHandleMutex);
+
 	for(class EventHandleBase* handle : ownedEventHandles){
 		handle->scan(0); // TODO: wait time
 	}
@@ -70,14 +87,18 @@ void Object::registerEventHandle(class EventHandleBase* handle) noexcept {
 		return;
 	}
 
+	std::lock_guard lock(eventHandleMutex);
 	ownedEventHandles.insert(handle);
 }
 
 void Object::unregisterEventHandle(EventHandleBase* handle) noexcept {
+	std::lock_guard lock(eventHandleMutex);
 	ownedEventHandles.erase(handle);
 }
 
 inline void Object::registerChild(Object* child) noexcept {
+	std::lock_guard lock(ownershipMutex);
+
 	WeakObjectPtr<Object> newChild = child;
 	if(!newChild.isValid()){
 		return;
@@ -88,6 +109,8 @@ inline void Object::registerChild(Object* child) noexcept {
 }
 
 inline void Object::removeChild(Object* child) noexcept {
+	std::lock_guard lock(ownershipMutex);
+
 	if(child == nullptr){
 		return;
 	}
