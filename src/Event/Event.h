@@ -2,16 +2,16 @@
 #define CMF_EVENT_H
 
 #include <set>
+#include <mutex>
 #include "EventHandle.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 
-// TODO: turn it into thread-safe event class
-// TODO: in derived classes, if there has to be a limit to only owner being able to call broadcast, this should be done using macros
-// TODO: the ownership effect will ensure that the event can be defined in a way that only owner, or only owning class can call it in case owner is null
 template<typename ...Args>
 class Event {
 public:
 	inline virtual ~Event() noexcept {
+		std::lock_guard guard(accessMutex);
+
 		for(const HandleContainer& container : handles){
 			if(container.owned){
 				delete container.handle;
@@ -20,7 +20,12 @@ public:
 	}
 
 	inline void bind(EventHandle<Args...>&& handle) noexcept {
-		handles.insert({&handle, false});
+		if(handle.getOwningObject() == nullptr){
+			return;
+		}
+
+		std::lock_guard guard(accessMutex);
+		handles.insert({&handle, handle.getOwningObject(), false});
 	}
 
 	inline void bind(EventHandle<Args...>* handle) noexcept {
@@ -28,7 +33,13 @@ public:
 			return;
 		}
 
-		handles.insert({handle, false});
+		if(handle->getOwningObject() == nullptr){
+			return;
+		}
+
+		std::lock_guard guard(accessMutex);
+
+		handles.insert({handle, handle->getOwningObject(), false});
 	}
 
 	template<typename O, typename F>
@@ -37,9 +48,12 @@ public:
 			return;
 		}
 
+		std::lock_guard guard(accessMutex);
+
 		HandleContainer container;
 		container.handle = new EventHandle<Args...>();
 		container.handle->bind(object, function);
+		container.owningObject = object;
 
 		handles.insert(container);
 	}
@@ -49,19 +63,24 @@ public:
 			return;
 		}
 
+		std::lock_guard guard(accessMutex);
+
 		HandleContainer container;
 		container.handle = new EventHandle<Args...>();
 		container.handle->bind(object, function);
+		container.owningObject = object;
 
 		handles.insert(container);
 	}
 
 protected:
 	inline bool broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		bool succeeded = true;
 
 		for(const HandleContainer& container : handles){
-			if(container.handle == nullptr){
+			if(container.handle == nullptr || !container.owningObject.isValid()){
 				continue;
 			}
 
@@ -72,10 +91,12 @@ protected:
 	}
 
 	inline bool broadcast(Args&&... args, TickType_t wait = portMAX_DELAY) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		bool succeeded = true;
 
 		for(const HandleContainer& container : handles){
-			if(container.handle == nullptr){
+			if(container.handle == nullptr || !container.owningObject.isValid()){
 				continue;
 			}
 
@@ -88,6 +109,7 @@ protected:
 private:
 	struct HandleContainer {
 		EventHandle<Args...>* handle = nullptr;
+		WeakObjectPtr<Object> owningObject = nullptr;
 		bool owned = true;
 
 		// This is only needed for std::set to work
@@ -97,6 +119,7 @@ private:
 	};
 
 	std::set<HandleContainer> handles;
+	std::mutex accessMutex;
 };
 
 #endif //CMF_EVENT_H

@@ -4,10 +4,10 @@
 #include <set>
 #include <queue>
 #include <cstddef>
+#include <mutex>
 #include "Util/stdafx.h"
 
 // TODO: iterators (const, non const)
-// TODO: this has to be thread-safe, introduce semaphores into the mix
 
 template<typename K, typename V>
 class BinaryTree {
@@ -15,10 +15,13 @@ public:
 	inline BinaryTree() noexcept = default;
 
 	inline BinaryTree(const BinaryTree& other) noexcept {
+		std::lock_guard guard(accessMutex);
 		*this = other;
 	}
 
 	inline BinaryTree(BinaryTree&& other) noexcept {
+		std::lock_guard guard(accessMutex);
+		std::lock_guard guardOther(other.accessMutex);
 		*this = std::move(other);
 	}
 
@@ -27,6 +30,8 @@ public:
 	}
 
 	inline BinaryTree& operator = (const BinaryTree& other) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		if(&other == this){
 			return *this;
 		}
@@ -41,6 +46,9 @@ public:
 	}
 
 	inline BinaryTree& operator = (BinaryTree&& other) noexcept {
+		std::lock_guard guard(accessMutex);
+		std::lock_guard guardOther(other.accessMutex);
+
 		if(&other == this){
 			return *this;
 		}
@@ -63,6 +71,8 @@ public:
 	}
 
 	inline V& operator [] (const K& key) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		V* val = get(key);
 
 		if(val == nullptr){
@@ -85,6 +95,8 @@ public:
 	}
 
 	inline void set(const K& key, const V& value = V()) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		if(head == nullptr){
 			head = new Node();
 			head->key = key;
@@ -136,6 +148,8 @@ public:
 	}
 
 	inline void remove(const K& key) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		Node* foundNode = nullptr;
 		Node* replacementNode = nullptr;
 
@@ -240,6 +254,8 @@ private:
 	Node* start = nullptr;
 	Node* end = nullptr;
 
+	std::mutex accessMutex;
+
 private:
 	inline V* get(const K& key) const noexcept {
 		if(head == nullptr){
@@ -260,6 +276,8 @@ private:
 	}
 
 	inline void destruct() noexcept {
+		std::lock_guard guard(accessMutex);
+
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 

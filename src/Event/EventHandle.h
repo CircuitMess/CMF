@@ -1310,6 +1310,10 @@ public:
 		}
 	}
 
+	Object* getOwningObject() const noexcept {
+		return *owningObject;
+	}
+
 	template<typename O, typename F>
 	inline EventHandle& bind(O* object, F&& function) noexcept {
 		if(owningObject.isValid()){
