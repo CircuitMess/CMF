@@ -36,7 +36,7 @@ protected:
 
 #define broadcastObject(...) blockingBroadcast(__VA_ARGS__, portMAX_DELAY, this)
 
-#define waitBroadcast(wait, ...) blockingBroadcast(__VA_ARGS__, wait, this)
+#define waitBroadcastObject(wait, ...) blockingBroadcast(__VA_ARGS__, wait, this)
 
 #define DECLARE_EVENT(EventName, OwningType, ...)							\
 class EventName : public EventBroadcaster<__VA_ARGS__> {					\
