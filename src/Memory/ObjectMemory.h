@@ -6,22 +6,14 @@
 #include "Object/Object.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Statics/ApplicationStatics.h"
-#include "Core/Application.h"
+
+void initObject(Object* object, Object* owner) noexcept;
 
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept {
 	StrongObjectPtr<T> newObject = new T(args...);
 
-	if(Object* object = cast<Object>(newObject.get())){
-		if(owner != nullptr){
-			object->setOwner(owner);
-		}else{
-			object->setOwner(ApplicationStatics::getApplication());
-		}
-
-		object->postInitProperties();
-		object->onCreated();
-	}
+	initObject(cast<Object>(newObject.get()), owner);
 
 	return newObject;
 }
@@ -37,16 +29,7 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
 		return nullptr;
 	}
 
-	if(Object* object = cast<Object>(*newObjectPtr)){
-		object->postInitProperties();
-		object->onCreated();
-	}
-
-	if(owner != nullptr){
-		newObjectPtr->setOwner(owner);
-	}else{
-		newObjectPtr->setOwner(ApplicationStatics::getApplication());
-	}
+	initObject(cast<Object>(newObjectPtr.get()), owner);
 
 	return newObjectPtr;
 }
