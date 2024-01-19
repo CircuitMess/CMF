@@ -66,6 +66,12 @@ void Object::setInstigator(Object* object) noexcept {
 void Object::onInstigatorChanged(Object* oldInstigator) noexcept {}
 
 void Object::scanEvents() noexcept {
+	if(!eventScanningMutex.try_lock()){
+		// TODO: log error for circular ownership
+		eventScanningMutex.unlock();
+		return;
+	}
+
 	std::lock_guard lock(eventHandleMutex);
 
 	for(class EventHandleBase* handle : ownedEventHandles){
@@ -80,6 +86,8 @@ void Object::scanEvents() noexcept {
 
 		child->scanEvents();
 	}
+
+	eventScanningMutex.unlock();
 }
 
 void Object::registerEventHandle(class EventHandleBase* handle) noexcept {

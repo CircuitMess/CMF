@@ -87,6 +87,7 @@ private:
 	std::mutex instigatorMutex;
 	std::mutex eventHandleMutex;
 	std::mutex destroyMutex;
+	std::mutex eventScanningMutex;
 
 private:
 	void registerChild(Object* child) noexcept;
