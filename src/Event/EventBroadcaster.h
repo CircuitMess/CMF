@@ -2,11 +2,13 @@
 #define CMF_EVENTBROADCASTER_H
 
 #include "Event.h"
+#include "Memory/SmartPtr/WeakObjectPtr.h"
 
-// TODO ownership
 template<typename ...Args>
 class EventBroadcaster : protected Event<Args...> {
 public:
+	inline explicit EventBroadcaster(Object* owningObject) noexcept : owningObject(owningObject) {}
+
 	inline void bind(EventHandle<Args...>&& handle) noexcept {
 		Event<Args...>::bind(handle);
 	}
@@ -26,12 +28,23 @@ public:
 
 protected:
 	inline bool blockingBroadcast(const Args&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept{
+		if(caller != owningObject){
+			return false;
+		}
+
 		return Event<Args...>::broadcast(args..., wait);
 	}
 
 	inline bool blockingBroadcast(Args&&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept{
+		if(caller != owningObject){
+			return false;
+		}
+
 		return Event<Args...>::broadcast(args..., wait);
 	}
+
+private:
+	WeakObjectPtr<Object> owningObject;
 };
 
 #define broadcast(...) blockingBroadcast(__VA_ARGS__, portMAX_DELAY, this)
