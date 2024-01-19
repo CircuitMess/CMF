@@ -155,10 +155,10 @@ public:
 			return;
 		}
 
-		if(foundNode->leftNode != nullptr){
-			for(replacementNode = foundNode->leftNode; replacementNode->rightNode != nullptr; replacementNode = replacementNode->rightNode);
-		}else if(foundNode->rightNode != nullptr){
+		if(foundNode->rightNode != nullptr){
 			for(replacementNode = foundNode->rightNode; replacementNode->leftNode != nullptr; replacementNode = replacementNode->leftNode);
+		}else if(foundNode->leftNode != nullptr){
+			for(replacementNode = foundNode->leftNode; replacementNode->rightNode != nullptr; replacementNode = replacementNode->rightNode);
 		}else{
 			if(start == foundNode){
 				start = foundNode->parent;
