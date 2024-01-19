@@ -46,14 +46,14 @@ public:
 	}
 
 	inline BinaryTree& operator = (BinaryTree&& other) noexcept {
-		std::lock_guard guard(accessMutex);
-		std::lock_guard guardOther(other.accessMutex);
-
 		if(&other == this){
 			return *this;
 		}
 
 		destruct();
+
+		std::lock_guard guard(accessMutex);
+		std::lock_guard guardOther(other.accessMutex);
 
 		head = other.head;
 		start = other.start;
@@ -71,8 +71,6 @@ public:
 	}
 
 	inline V& operator [] (const K& key) noexcept {
-		std::lock_guard guard(accessMutex);
-
 		V* val = get(key);
 
 		if(val == nullptr){
@@ -207,7 +205,9 @@ public:
 		return keys().size();
 	}
 
-	inline std::set<K> keys() const noexcept {
+	inline std::set<K> keys() noexcept {
+		std::lock_guard guard(accessMutex);
+
 		std::set<K> keys;
 
 		if(head == nullptr){
@@ -257,7 +257,9 @@ private:
 	std::mutex accessMutex;
 
 private:
-	inline V* get(const K& key) const noexcept {
+	inline V* get(const K& key) noexcept {
+		std::lock_guard guard(accessMutex);
+
 		if(head == nullptr){
 			return nullptr;
 		}
