@@ -9,6 +9,10 @@ void Object::postInitProperties() noexcept {}
 
 void Object::onCreated() noexcept {}
 
+bool Object::canDelete() noexcept{
+	return destroyMutex.try_lock();
+}
+
 void Object::destroy() noexcept{
 	// TODO: change this so that destroy is guaranteed to execute in the owning thread and not right away, since this can cause problems with ticking and async entities
 	markedForDestroy = true;
@@ -16,7 +20,6 @@ void Object::destroy() noexcept{
 }
 
 void Object::onDestroy() noexcept {
-	// TODO: make a way for the garbage collector to access the destroy mutex
 	destroyMutex.unlock();
 }
 

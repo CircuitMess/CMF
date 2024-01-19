@@ -39,6 +39,8 @@ public:
 
 	virtual void onCreated() noexcept;
 
+	bool canDelete() noexcept;
+
 	void destroy() noexcept;
 	virtual void onDestroy() noexcept;
 

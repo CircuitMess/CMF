@@ -23,6 +23,10 @@ void GarbageCollector::tick(float deltaTime) noexcept{
 			continue;
 		}
 
+		if(!object->canDelete()){
+			return;
+		}
+
 		ObjectManager::get()->onObjectDeleted(object);
 
 		delete object;
