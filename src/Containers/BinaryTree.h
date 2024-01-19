@@ -81,17 +81,6 @@ public:
 		return *val;
 	}
 
-	inline const V& operator [] (const K& key) const noexcept {
-		const V* val = get(key);
-
-		if(val == nullptr){
-			static V defaultValue = V();
-			return defaultValue;
-		}
-
-		return *val;
-	}
-
 	inline void set(const K& key, const V& value = V()) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -291,24 +280,6 @@ private:
 	inline V* get(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
 
-		if(head == nullptr){
-			return nullptr;
-		}
-
-		for(Node* current = head; current != nullptr; ){
-			if(key == current->key){
-				return &current->value;
-			}else if(key > current->key){
-				current = current->rightNode;
-			}else if(key < current->key){
-				current = current->leftNode;
-			}
-		}
-
-		return nullptr;
-	}
-
-	inline V* get(const K& key) const noexcept {
 		if(head == nullptr){
 			return nullptr;
 		}

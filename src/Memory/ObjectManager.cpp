@@ -6,7 +6,7 @@ ObjectManager* ObjectManager::get() noexcept{
 	return &managerInstance;
 }
 
-uint32_t ObjectManager::getReferenceCount(Object* object) const noexcept{
+uint32_t ObjectManager::getReferenceCount(Object* object) noexcept{
 	if(object == nullptr){
 		return 0;
 	}
@@ -14,7 +14,7 @@ uint32_t ObjectManager::getReferenceCount(Object* object) const noexcept{
 	return objectReferenceTree[object].count;
 }
 
-bool ObjectManager::isValid(Object* object) const noexcept{
+bool ObjectManager::isValid(Object* object) noexcept{
 	if(object == nullptr){
 		return false;
 	}
