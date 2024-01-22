@@ -36,7 +36,7 @@ void AsyncEntity::end() noexcept {
 
 void AsyncEntity::onDestroy() noexcept{
 	forEachChild([](Object* child){
-		if(child == nullptr){ // TODO: validity instead
+		if(isValid(child)){
 			return false;
 		}
 
@@ -63,7 +63,7 @@ void AsyncEntity::tickHandle() noexcept{
 	tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child) {
-		if(child == nullptr){ // TODO: validity instead
+		if(isValid(child)){
 			return false;
 		}
 
@@ -76,7 +76,7 @@ void AsyncEntity::tickHandle() noexcept{
 
 	std::set<Object*> childrenToRemove;
 	forEachChild([&childrenToRemove](Object* child) {
-		if(child == nullptr){
+		if(isValid(child)){
 			return false;
 		}
 

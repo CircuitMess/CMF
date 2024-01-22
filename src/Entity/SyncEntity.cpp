@@ -1,6 +1,7 @@
 #include "SyncEntity.h"
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
+#include "Memory/ObjectMemory.h"
 
 SyncEntity::SyncEntity(Object* owner/* = nullptr*/) noexcept : Super() {
 	if(owner == nullptr){
@@ -16,7 +17,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child){
-		if(child == nullptr){
+		if(isValid(child)){
 			return false;
 		}
 
