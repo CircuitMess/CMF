@@ -15,3 +15,11 @@ void initObject(Object* object, Object* owner) noexcept {
 	object->postInitProperties();
 	object->onCreated();
 }
+
+bool isValid(const Object* object) noexcept {
+	if(object == nullptr){
+		return false;
+	}
+
+	return ObjectManager::get()->isValid(object);
+}
