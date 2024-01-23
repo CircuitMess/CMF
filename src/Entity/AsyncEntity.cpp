@@ -99,8 +99,6 @@ void AsyncEntity::tickHandle() noexcept{
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
 				entity->end();
 			}
-
-			child->onDestroy();
 			childrenToRemove.insert(child);
 		}
 
@@ -113,6 +111,7 @@ void AsyncEntity::tickHandle() noexcept{
 		}
 
 		child->setOwner(nullptr);
+		child->onDestroy();
 	}
 
 	if(isMarkedForDestroy() && !canDelete()){
