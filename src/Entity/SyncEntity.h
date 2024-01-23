@@ -19,6 +19,7 @@ public:
 
 protected:
 	virtual void postInitProperties() noexcept override;
+	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
 
 private:
 	WeakObjectPtr<AsyncEntity> ownerEntity = nullptr;

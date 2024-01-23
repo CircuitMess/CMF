@@ -77,3 +77,12 @@ void SyncEntity::begin() noexcept {
 void SyncEntity::end() noexcept {
 	Super::end();
 }
+
+void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{
+	Super::onOwnerChanged(oldOwner);
+
+	// This is intentional, sync entities have to have an owner, otherwise their behavior will not work
+	if(getOwner() == nullptr){
+		setOwner(ApplicationStatics::getApplication());
+	}
+}
