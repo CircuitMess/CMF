@@ -69,6 +69,8 @@ protected:
 	virtual void tick(float deltaTime) noexcept override;
 	virtual void end(/*TODO reason*/) noexcept override;
 
+	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
+
 private:
 	inline static Application* ApplicationInstance = nullptr;
 

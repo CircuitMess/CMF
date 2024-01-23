@@ -31,3 +31,12 @@ void Application::end() noexcept {
 SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexcept{
 	return GarbageCollector::staticClass();
 }
+
+void Application::onOwnerChanged(Object* oldOwner) noexcept{
+	Super::onOwnerChanged(oldOwner);
+
+	// This is on purpose, the application should not have an owner to try to prevent accidental circular ownership
+	if(getOwner() != nullptr){
+		setOwner(nullptr);
+	}
+}

@@ -14,11 +14,11 @@ public:
 	virtual ~SyncEntity() noexcept override;
 
 	virtual void tick(float deltaTime) noexcept override;
+	virtual void begin() noexcept override;
+	virtual void end(/*TODO reason*/) noexcept override;
 
 protected:
 	virtual void postInitProperties() noexcept override;
-	virtual void begin() noexcept override;
-	virtual void end(/*TODO reason*/) noexcept override;
 
 private:
 	WeakObjectPtr<AsyncEntity> ownerEntity = nullptr;
