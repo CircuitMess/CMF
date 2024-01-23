@@ -90,11 +90,10 @@ void AsyncEntity::tickHandle() noexcept{
 
 	std::set<Object*> childrenToRemove;
 	forEachChild([&childrenToRemove](Object* child) {
-		if(isValid(child)){
+		if(!isValid(child)){
 			return false;
 		}
 
-		// TODO: check what is needed for this to traverse the entire ownership tree
 		if(child->isMarkedForDestroy() && !child->canDelete()){
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
 				entity->end();

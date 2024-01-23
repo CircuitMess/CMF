@@ -16,17 +16,54 @@ SyncEntity::~SyncEntity() noexcept = default;
 void SyncEntity::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
 
-	forEachChild([deltaTime](Object* child){
-		if(isValid(child)){
+	forEachChild([](Object* child) {
+		if(!isValid(child)){
 			return false;
 		}
 
-		if(SyncEntity* entityChild = cast<SyncEntity>(child)){
-			entityChild->tick(deltaTime);
+		if(SyncEntity* entity = cast<SyncEntity>(child)){
+			entity->begin();
 		}
 
 		return false;
 	});
+
+	forEachChild([deltaTime](Object* child) {
+		if(!isValid(child)){
+			return false;
+		}
+
+		if(SyncEntity* entity = cast<SyncEntity>(child)){
+			entity->tick(deltaTime);
+		}
+
+		return false;
+	});
+
+	std::set<Object*> childrenToRemove;
+	forEachChild([&childrenToRemove](Object* child) {
+		if(!isValid(child)){
+			return false;
+		}
+
+		if(child->isMarkedForDestroy() && !child->canDelete()){
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				entity->end();
+			}
+			childrenToRemove.insert(child);
+		}
+
+		return false;
+	});
+
+	for(Object* child : childrenToRemove){
+		if(child == nullptr){
+			continue;
+		}
+
+		child->setOwner(nullptr);
+		child->onDestroy();
+	}
 }
 
 void SyncEntity::postInitProperties() noexcept {
