@@ -125,7 +125,7 @@ void Threaded::threadFunction() noexcept{
 		TickType_t semaphoreWait = 0;
 
 		if(millis() - lastLoop < loopInterval){
-			semaphoreWait = millis() - lastLoop + 1;
+			semaphoreWait = loopInterval - (millis() - lastLoop + 1);
 		}
 
 		if(xSemaphoreTake(pauseSemaphore, semaphoreWait) == pdTRUE){
