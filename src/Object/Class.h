@@ -2,8 +2,20 @@
 #define CMF_CLASS_H
 
 #include <cinttypes>
+#include <map>
 
 class Object;
+
+class ClassRegistry {
+public:
+	virtual ~ClassRegistry() noexcept = default;
+
+	const class Class* getClass(uint32_t ID) const noexcept;
+	void registerClass(const Class* cls) noexcept;
+
+private:
+	std::map<uint32_t, const Class*> classes;
+};
 
 class Class {
 	friend class Object;
@@ -20,6 +32,9 @@ public:
 	static inline constexpr bool implements() noexcept {
 		return false;
 	}
+
+protected:
+	static inline ClassRegistry* registry = nullptr;
 
 protected:
 	explicit Class(uint32_t ID) noexcept;
