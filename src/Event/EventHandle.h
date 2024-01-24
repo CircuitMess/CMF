@@ -1356,7 +1356,7 @@ public:
 		return callQueue.push(std::tuple<Args...>(args...), wait);
 	}
 
-	inline void scan(TickType_t wait = portMAX_DELAY) noexcept override {
+	inline void scan(TickType_t wait) noexcept override {
 		if(!owningObject.isValid()){
 			return;
 		}
