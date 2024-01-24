@@ -13,8 +13,8 @@ public:
 public:
 	virtual ~ObjectManager() noexcept = default;
 
-	uint32_t getReferenceCount(Object* object) noexcept;
-	bool isValid(Object* object) noexcept;
+	uint32_t getReferenceCount(const Object* object) noexcept;
+	bool isValid(const Object* object) noexcept;
 
 	void registerReference(Object** object, bool keepAlive = false) noexcept;
 	void unregisterReference(Object** object, bool keepAlive = false) noexcept;

@@ -6,24 +6,24 @@ ObjectManager* ObjectManager::get() noexcept{
 	return &managerInstance;
 }
 
-uint32_t ObjectManager::getReferenceCount(Object* object) noexcept{
+uint32_t ObjectManager::getReferenceCount(const Object* object) noexcept{
 	if(object == nullptr){
 		return 0;
 	}
 
-	return objectReferenceTree[object].count;
+	return objectReferenceTree[const_cast<Object*>(object)].count;
 }
 
-bool ObjectManager::isValid(Object* object) noexcept{
+bool ObjectManager::isValid(const Object* object) noexcept{
 	if(object == nullptr){
 		return false;
 	}
 
-	if(!objectReferenceTree.contains(object)){
+	if(!objectReferenceTree.contains(const_cast<Object*>(object))){
 		return false;
 	}
 
-	return !object->isMarkedForDestroy() && getReferenceCount(object) > 0;
+	return !object->isMarkedForDestroy() && getReferenceCount(const_cast<Object*>(object)) > 0;
 }
 
 void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*/) noexcept{

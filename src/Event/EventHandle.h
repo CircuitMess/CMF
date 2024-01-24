@@ -577,6 +577,9 @@ struct BindHelper {
 						 std::placeholders::_28,
 						 std::placeholders::_29);
 	}
+
+private:
+	inline BindHelper() noexcept = delete;
 };
 
 template<typename ...Args>
