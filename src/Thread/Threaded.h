@@ -8,6 +8,7 @@
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 #include <functional>
+#include <atomic>
 
 class Threaded : public Object {
 	GENERATED_BODY(Threaded, Object)
@@ -45,7 +46,7 @@ private:
 
 private:
 	std::string name;
-	TickType_t loopInterval;
+	std::atomic<TickType_t> loopInterval;
 	size_t stackSize;
 	const uint8_t priority;
 	const int8_t core;

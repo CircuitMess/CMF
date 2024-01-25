@@ -4,9 +4,13 @@
 #include <concepts>
 #include <type_traits>
 #include <mutex>
+#include <freertos/portmacro.h>
+#include <atomic>
 #include "Class.h"
 #include "Misc/Djb.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
+#include "Memory/SmartPtr/StrongObjectPtr.h"
+#include "Containers/Queue.h"
 
 class Object {
 public:
@@ -44,7 +48,7 @@ public:
 	void destroy() noexcept;
 	virtual void onDestroy() noexcept;
 
-	inline constexpr bool isMarkedForDestroy() const noexcept{
+	inline bool isMarkedForDestroy() const noexcept{
 		return markedForDestroy;
 	}
 
@@ -69,19 +73,31 @@ public:
 		return instigator.get();
 	}
 
-	virtual void scanEvents() noexcept;
+	virtual void scanEvents(TickType_t wait = 0) noexcept;
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
+	virtual TickType_t getEventScanningTime() const noexcept;
 
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
 
-	bool markedForDestroy = false;
+	std::atomic<bool> markedForDestroy = false;
 	WeakObjectPtr<Object> owner = nullptr;
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator = nullptr;
-	std::set<EventHandleBase*> ownedEventHandles; // TODO: think about using smart pointers to manage these
+
+	struct EventHandleContainer {
+		EventHandleBase* ownedEventHandle = nullptr;
+		StrongObjectPtr<class Threaded> eventThread = nullptr;
+
+		inline constexpr bool operator < (const EventHandleContainer& other) const noexcept {
+			return ownedEventHandle < other.ownedEventHandle;
+		}
+	};
+
+	std::set<EventHandleContainer> ownedEventHandles;
+	Queue<EventHandleBase*> readyEventHandles;
 
 	// Thread safety
 	std::mutex ownershipMutex;

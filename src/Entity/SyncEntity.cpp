@@ -46,7 +46,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 			return false;
 		}
 
-		if(child->isMarkedForDestroy() && !child->canDelete()){
+		if(!isValid(child) && !child->canDelete()){
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
 				entity->end();
 			}

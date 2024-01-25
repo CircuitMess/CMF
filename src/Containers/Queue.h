@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <mutex>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
@@ -11,11 +12,11 @@
 template<typename T>
 class Queue {
 public:
-	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), accessMutex(xSemaphoreCreateMutex()) {
+	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = new T[bufferSize];
 	}
 
-	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(xSemaphoreCreateMutex()) {
+	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = new T[bufferSize];
 
 		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
@@ -31,10 +32,9 @@ public:
 	}
 
 	inline ~Queue() noexcept {
-		if(accessMutex != nullptr){
-			vSemaphoreDelete(accessMutex);
-			accessMutex = nullptr;
-		}
+		setKillPill();
+
+		std::lock_guard guard(accessMutex);
 
 		delete[] buffer;
 		buffer = nullptr;
@@ -61,14 +61,8 @@ public:
 		return end - begin;
 	}
 
-	inline bool reserve(size_t newSize, TickType_t wait = portMAX_DELAY) noexcept {
-		if(accessMutex == nullptr){
-			return false;
-		}
-
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
-			return false;
-		}
+	inline bool reserve(size_t newSize) noexcept {
+		std::lock_guard guard(accessMutex);
 
 		T* newBuffer = new T[newSize];
 		if(buffer == nullptr){
@@ -87,17 +81,17 @@ public:
 		buffer = newBuffer;
 		bufferSize = newSize;
 
-		xSemaphoreGive(accessMutex);
-
 		return false;
 	}
 
 	inline bool front(T& value, TickType_t wait = portMAX_DELAY) const noexcept {
-		if(accessMutex == nullptr){
+		std::lock_guard guard(accessMutex);
+
+		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
 		}
 
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
+		if(kill){
 			return false;
 		}
 
@@ -107,17 +101,19 @@ public:
 
 		value = buffer[begin];
 
-		xSemaphoreGive(accessMutex);
+		xSemaphoreGive(waitSemaphore);
 
 		return true;
 	}
 
 	inline bool pop(T& value, TickType_t wait = portMAX_DELAY) noexcept {
-		if(accessMutex == nullptr){
+		std::lock_guard guard(accessMutex);
+
+		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
 		}
 
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
+		if(kill){
 			return false;
 		}
 
@@ -130,19 +126,15 @@ public:
 
 		begin = (begin + 1) % bufferSize;
 
-		xSemaphoreGive(accessMutex);
+		if(!empty()){
+			xSemaphoreGive(waitSemaphore);
+		}
 
 		return true;
 	}
 
-	inline bool push(const T& value, TickType_t wait = portMAX_DELAY) noexcept {
-		if(accessMutex == nullptr){
-			return false;
-		}
-
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
-			return false;
-		}
+	inline bool push(const T& value) noexcept {
+		std::lock_guard guard(accessMutex);
 
 		if(full() && !reserve(bufferSize * 2)){
 			return false;
@@ -152,19 +144,13 @@ public:
 
 		buffer[end] = T(value);
 
-		xSemaphoreGive(accessMutex);
+		xSemaphoreGive(waitSemaphore);
 
 		return true;
 	}
 
-	inline bool push(T&& value, TickType_t wait = portMAX_DELAY) noexcept {
-		if(accessMutex == nullptr){
-			return false;
-		}
-
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
-			return false;
-		}
+	inline bool push(T&& value) noexcept {
+		std::lock_guard guard(accessMutex);
 
 		if(full() && !reserve(bufferSize * 2)){
 			return false;
@@ -174,19 +160,13 @@ public:
 
 		buffer[end] = T(value);
 
-		xSemaphoreGive(accessMutex);
+		xSemaphoreGive(waitSemaphore);
 
 		return true;
 	}
 
-	inline bool clear(TickType_t wait = portMAX_DELAY) noexcept {
-		if(accessMutex == nullptr){
-			return false;
-		}
-
-		if(xSemaphoreTake(accessMutex, wait) != pdTRUE){
-			return false;
-		}
+	inline void clear() noexcept {
+		std::lock_guard guard(accessMutex);
 
 		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
 			buffer[i].~T();
@@ -194,7 +174,16 @@ public:
 
 		end = begin = 0;
 
-		xSemaphoreGive(accessMutex);
+		xSemaphoreTake(waitSemaphore, 0);
+	}
+
+	inline void setKillPill(bool value = true) noexcept {
+		std::lock_guard guard(accessMutex);
+		kill = value;
+
+		if(kill){
+			xSemaphoreGive(waitSemaphore);
+		}
 	}
 
 private:
@@ -203,7 +192,9 @@ private:
 	size_t bufferSize;
 	size_t begin = 0;
 	size_t end = 0;
-	SemaphoreHandle_t accessMutex;
+	bool kill = false;
+	std::mutex accessMutex;
+	SemaphoreHandle_t waitSemaphore;
 };
 
 #endif //CMF_QUEUE_H

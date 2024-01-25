@@ -1301,6 +1301,7 @@ private:
 
 class EventHandleBase {
 public:
+	inline virtual bool probe(TickType_t wait) const noexcept = 0;
 	inline virtual void scan(TickType_t wait) noexcept = 0;
 };
 
@@ -1356,7 +1357,12 @@ public:
 		return callQueue.push(std::tuple<Args...>(args...), wait);
 	}
 
-	inline void scan(TickType_t wait) noexcept override {
+	inline virtual bool probe(TickType_t wait) const noexcept override {
+		std::tuple<Args...> arguments;
+		return callQueue.front(arguments, wait);
+	}
+
+	inline virtual void scan(TickType_t wait) noexcept override {
 		if(!owningObject.isValid()){
 			return;
 		}
@@ -1365,6 +1371,7 @@ public:
 			return;
 		}
 
+		// TODO: change this to go by wait time spec
 		while(!callQueue.empty()){
 			const uint64_t beginTime = millis();
 

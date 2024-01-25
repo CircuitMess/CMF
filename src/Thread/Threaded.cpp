@@ -32,7 +32,6 @@ void Threaded::onCreated() noexcept{
 	start();
 }
 
-
 void Threaded::onDestroy() noexcept{
 	stop(portMAX_DELAY);
 
@@ -81,10 +80,6 @@ void Threaded::pause() noexcept{
 	}
 
 	xSemaphoreGive(pauseSemaphore);
-
-	while(!paused){
-		vTaskDelay(1);
-	}
 }
 
 void Threaded::resume() noexcept{
