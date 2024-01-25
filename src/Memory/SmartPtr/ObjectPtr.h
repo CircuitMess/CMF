@@ -7,9 +7,6 @@
 #include "Object/Object.h"
 #include "Memory/ObjectManager.h"
 
-// Spec: pointers are held to a object in memory as long as it exists in memory. After the object is destroyed, pointer will stop being valid but will still point to the
-// memory of the object until the object is deleted from memory, in which case, the pointer will change to nullptr
-
 template<typename T, bool KeepAlive>
 class ObjectPtr : public std::integral_constant<bool, KeepAlive> {
 public:
