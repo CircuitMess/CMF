@@ -134,7 +134,6 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept {
 }
 
 TickType_t Object::getEventScanningTime() const noexcept{
-	// TODO: make sure async entities have this as override and set to the value of their frequency
 	return 0;
 }
 

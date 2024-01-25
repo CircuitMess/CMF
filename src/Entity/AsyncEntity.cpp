@@ -48,6 +48,10 @@ void AsyncEntity::onDestroy() noexcept{
 	Super::onDestroy();
 }
 
+TickType_t AsyncEntity::getEventScanningTime() const noexcept{
+	return Super::getEventScanningTime(); // TODO: this should return the tick frequency if set instead of this
+}
+
 void AsyncEntity::tickHandle() noexcept{
 	if(!ObjectManager::get()->isValid(this)){
 		return;
@@ -60,7 +64,7 @@ void AsyncEntity::tickHandle() noexcept{
 		begin();
 	}
 
-	scanEvents(); // TODO: time for blocked waiting etc.
+	scanEvents(getEventScanningTime());
 
 	tick(deltaTime);
 
