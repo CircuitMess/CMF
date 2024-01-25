@@ -25,6 +25,8 @@ protected:
 	virtual TickType_t getEventScanningTime() const noexcept override;
 	virtual TickType_t getTickingInterval() const noexcept;
 
+	void setTickingInterval(TickType_t value) noexcept;
+
 private:
 	void tickHandle() noexcept;
 

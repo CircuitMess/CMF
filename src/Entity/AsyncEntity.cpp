@@ -57,6 +57,14 @@ TickType_t AsyncEntity::getTickingInterval() const noexcept{
 	return tickingInterval;
 }
 
+void AsyncEntity::setTickingInterval(TickType_t value) noexcept{
+	tickingInterval = value;
+
+	if(thread.isValid() && thread->getInterval() != getTickingInterval()){
+		thread->setInterval(getTickingInterval());
+	}
+}
+
 void AsyncEntity::tickHandle() noexcept{
 	if(!ObjectManager::get()->isValid(this)){
 		return;
