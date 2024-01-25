@@ -3,7 +3,11 @@
 #include "Util/stdafx.h"
 #include "Memory/ObjectMemory.h"
 
-AsyncEntity::AsyncEntity() noexcept : Super(), thread(newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"))), lastTickTime(micros()) {}
+AsyncEntity::AsyncEntity(TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
+						Super(),
+						thread(newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), interval, threadStackSize, threadPriority, cpuCore)),
+						lastTickTime(micros()),
+						tickingInterval(interval) {}
 
 AsyncEntity::~AsyncEntity() noexcept {
 	if(thread == nullptr){
@@ -46,7 +50,11 @@ void AsyncEntity::onDestroy() noexcept{
 }
 
 TickType_t AsyncEntity::getEventScanningTime() const noexcept{
-	return Super::getEventScanningTime(); // TODO: this should return the tick frequency if set instead of this
+	return getTickingInterval();
+}
+
+TickType_t AsyncEntity::getTickingInterval() const noexcept{
+	return tickingInterval;
 }
 
 void AsyncEntity::tickHandle() noexcept{
@@ -56,6 +64,10 @@ void AsyncEntity::tickHandle() noexcept{
 
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
+
+	if(thread.isValid() && thread->getInterval() != getTickingInterval()){
+		thread->setInterval(getTickingInterval());
+	}
 
 	if(!hasBegun()){
 		begin();
