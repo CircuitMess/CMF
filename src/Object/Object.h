@@ -17,6 +17,14 @@ public:
 	Object() noexcept;
 	virtual ~Object() noexcept = default;
 
+	inline constexpr uint32_t getID() const noexcept {
+		return id;
+	}
+
+	inline std::string getName() const noexcept {
+		return std::string(getStaticClass()->getName()).append("_").append(std::to_string(getID()));
+	}
+
 	inline static const Class* staticClass() noexcept {
 		return objectStaticClass;
 	}
@@ -81,6 +89,9 @@ public:
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
+	inline static uint32_t ObjectIndex = 0;
+
+	const uint32_t id;
 
 	std::atomic<bool> markedForDestroy = false;
 	WeakObjectPtr<Object> owner = nullptr;
@@ -132,7 +143,11 @@ private:																													\
                                                                        														\
         inline virtual Object* createDefaultObject() const noexcept override {  											\
 			return new ObjectName();																						\
-		}                                                               													\
+		}                                                                    												\
+																															\
+		inline virtual constexpr const char* getName() const noexcept override{												\
+			return #ObjectName;																								\
+		}																													\
 																															\
 	protected:                                             																	\
 		explicit inline ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}												\

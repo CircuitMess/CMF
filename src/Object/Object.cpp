@@ -3,7 +3,7 @@
 #include "Memory/ObjectMemory.h"
 #include "Thread/Threaded.h"
 
-Object::Object() noexcept{
+Object::Object() noexcept : id(ObjectIndex++){
 	destroyMutex.lock();
 }
 
@@ -107,7 +107,7 @@ void Object::registerEventHandle(EventHandleBase* handle) noexcept {
 
 	std::lock_guard lock(eventHandleMutex);
 
-	const std::string threadName = std::string("EventThread_").append(std::to_string(eventIndex++));
+	const std::string threadName = getName().append("_EventHandle").append(std::to_string(eventIndex++)).append("_Thread");
 
 	EventHandleContainer container = {};
 	container.ownedEventHandle = handle;

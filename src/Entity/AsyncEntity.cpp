@@ -3,10 +3,7 @@
 #include "Util/stdafx.h"
 #include "Memory/ObjectMemory.h"
 
-AsyncEntity::AsyncEntity() noexcept : Super(), thread(newObject<Threaded>(this, [this]() { this->tickHandle();}, "AsyncEntityThread")), lastTickTime(micros()) {
-	// TODO: replace thread name with instance object name once that is implemented
-	// TODO: spec will define postInitProperties as executed in the same thread that created the entity, while all other logic functions must execute in the owned thread of the async entity
-}
+AsyncEntity::AsyncEntity() noexcept : Super(), thread(newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"))), lastTickTime(micros()) {}
 
 AsyncEntity::~AsyncEntity() noexcept {
 	if(thread == nullptr){

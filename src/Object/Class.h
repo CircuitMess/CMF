@@ -25,7 +25,6 @@ public:
 
 	virtual Object* createDefaultObject() const noexcept;
 
-public:
 	uint32_t getID() const noexcept;
 
 	template<typename Type>
@@ -38,6 +37,10 @@ protected:
 
 protected:
 	explicit Class(uint32_t ID) noexcept;
+
+	inline virtual constexpr const char* getName() const noexcept{
+		return "Object";
+	}
 
 private:
 	uint32_t classID;
