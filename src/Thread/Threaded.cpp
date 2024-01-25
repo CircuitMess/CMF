@@ -1,5 +1,6 @@
 #include "Threaded.h"
 #include "Util/stdafx.h"
+#include "Memory/ObjectMemory.h"
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
 						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore) {
@@ -50,11 +51,23 @@ void Threaded::start() noexcept{
 	state = State::Running;
 
 	// TODO: error code checking and logging, error fallback if possible
-	// TODO: check if arg is a non null object pointer that is Threaded before calling the function (after memory functionality is added)
+
+	auto function = [](void* arg) -> void {
+		if(arg == nullptr){
+			return;
+		}
+
+		if(!isValid((Threaded*) arg)){
+			return;
+		}
+
+		((Threaded*) arg)->threadFunction();
+	};
+
 	if(core == -1){
-		xTaskCreate([](void* arg) -> void { ((Threaded*) arg)->threadFunction(); }, name.c_str(), stackSize, this, priority, &task);
+		xTaskCreate(function, name.c_str(), stackSize, this, priority, &task);
 	}else{
-		xTaskCreatePinnedToCore([](void* arg) -> void { ((Threaded*) arg)->threadFunction(); }, name.c_str(), stackSize, this, priority, &task, core);
+		xTaskCreatePinnedToCore(function, name.c_str(), stackSize, this, priority, &task, core);
 	}
 }
 
