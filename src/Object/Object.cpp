@@ -91,7 +91,7 @@ void Object::scanEvents(TickType_t wait/* = 0*/) noexcept {
 	std::lock_guard lock(eventHandleMutex);
 
 	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max((uint64_t)0, wait - (millis() - begin))); ){
-		handle->scan(wait);
+		handle->scan(0);
 	}
 
 	// WARNING: This will not work, or will create an infinite loop if owner system is abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work

@@ -1367,7 +1367,6 @@ public:
 			return;
 		}
 
-		// TODO: change this to go by wait time spec
 		while(!callQueue.empty()){
 			const uint64_t beginTime = millis();
 
