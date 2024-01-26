@@ -19,6 +19,7 @@
 #include "Event/EventHandle.h"
 #include "Event/EventDelegate.h"
 #include "Event/EventBroadcaster.h"
+#include "Log/Log.h"
 
 class CMF {
 public:

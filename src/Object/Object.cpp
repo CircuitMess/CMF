@@ -2,6 +2,7 @@
 #include "Event/EventHandle.h"
 #include "Memory/ObjectMemory.h"
 #include "Thread/Threaded.h"
+#include "Log/Log.h"
 
 Object::Object() noexcept : id(ObjectIndex++){
 	destroyMutex.lock();
