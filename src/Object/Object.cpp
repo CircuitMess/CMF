@@ -9,8 +9,6 @@ Object::Object() noexcept : id(ObjectIndex++){
 
 void Object::postInitProperties() noexcept {}
 
-void Object::onCreated() noexcept {}
-
 bool Object::canDelete() noexcept{
 	return destroyMutex.try_lock();
 }

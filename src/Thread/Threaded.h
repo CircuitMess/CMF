@@ -19,7 +19,7 @@ public:
 	virtual ~Threaded() noexcept;
 
 public:
-	virtual void onCreated() noexcept override;
+	virtual void postInitProperties() noexcept override;
 	virtual void onDestroy() noexcept override;
 
 	void start() noexcept;

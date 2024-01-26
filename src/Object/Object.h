@@ -49,8 +49,6 @@ public:
 
 	virtual void postInitProperties() noexcept;
 
-	virtual void onCreated() noexcept;
-
 	bool canDelete() noexcept;
 
 	void destroy() noexcept;

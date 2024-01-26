@@ -1,9 +1,7 @@
 #include "GarbageCollector.h"
 #include "ObjectManager.h"
 
-GarbageCollector::GarbageCollector() noexcept{
-	// TODO: configure tick frequency of async entity
-}
+GarbageCollector::GarbageCollector() noexcept : Super(120 * 1000) {}
 
 void GarbageCollector::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
