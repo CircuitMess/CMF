@@ -34,16 +34,6 @@ void AsyncEntity::end() noexcept {
 }
 
 void AsyncEntity::onDestroy() noexcept{
-	forEachChild([](Object* child){
-		if(isValid(child)){
-			return false;
-		}
-
-		child->setOwner(nullptr);
-
-		return false;
-	});
-
 	thread->destroy();
 
 	Super::onDestroy();

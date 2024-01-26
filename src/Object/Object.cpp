@@ -18,6 +18,16 @@ void Object::destroy() noexcept{
 }
 
 void Object::onDestroy() noexcept {
+	forEachChild([](Object* child){
+		if(isValid(child)){
+			return false;
+		}
+
+		child->setOwner(nullptr);
+
+		return false;
+	});
+
 	destroyMutex.unlock();
 }
 

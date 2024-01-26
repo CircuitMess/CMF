@@ -9,6 +9,7 @@
 	#error "CMF: Only C++20 or higher supported"
 #endif
 
+// TODO: do this differently
 #define CMF_TARGET_ESP32 0
 #define CMF_TARGET_ESP32S2 1
 #define CMF_TARGET_ESP32S3 2
