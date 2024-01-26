@@ -13,7 +13,7 @@ class AsyncEntity : public Entity {
 	GENERATED_BODY(AsyncEntity, Entity)
 
 public:
-	AsyncEntity(TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
+	explicit AsyncEntity(TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 	virtual ~AsyncEntity() noexcept override;
 
 protected:
