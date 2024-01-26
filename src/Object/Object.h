@@ -81,7 +81,7 @@ public:
 		return instigator.get();
 	}
 
-	virtual void scanEvents(TickType_t wait = 0) noexcept;
+	void scanEvents(TickType_t wait) noexcept;
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
 	virtual TickType_t getEventScanningTime() const noexcept;

@@ -78,7 +78,7 @@ void Object::setInstigator(Object* object) noexcept {
 
 void Object::onInstigatorChanged(Object* oldInstigator) noexcept {}
 
-void Object::scanEvents(TickType_t wait/* = 0*/) noexcept {
+void Object::scanEvents(TickType_t wait) noexcept {
 	if(!eventScanningMutex.try_lock()){
 		// TODO: log error for circular ownership
 		eventScanningMutex.unlock();
