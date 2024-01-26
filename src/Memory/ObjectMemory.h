@@ -30,6 +30,11 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 	return newObject;
 }
 
+template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept requires (sizeof...(Args) == 0){
+	return newObject<T>(T::staticClass());
+}
+
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) noexcept {
 	if(cls == nullptr){

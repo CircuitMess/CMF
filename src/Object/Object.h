@@ -12,6 +12,8 @@
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Containers/Queue.h"
 
+// TODO: technically it could happen that static class instance does not initialize before some other object that uses static functions to retrieve it, therefore change it so that it gets initialized the first time it is retrieved
+
 class Object {
 public:
 	Object() noexcept;
