@@ -216,7 +216,7 @@ public:
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 
-		for(const Node* current = nodeQueue.front(); !nodeQueue.empty(); current = nodeQueue.front()){
+		for(const Node* current = nodeQueue.front(); true; ){
 			nodeQueue.pop();
 
 			if(current == nullptr){
@@ -232,6 +232,12 @@ public:
 			}
 
 			keys.insert(current->key);
+
+			if(nodeQueue.empty()){
+				break;
+			}
+
+			current = nodeQueue.front();
 		}
 
 		return keys;
@@ -247,7 +253,7 @@ public:
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 
-		for(const Node* current = nodeQueue.front(); !nodeQueue.empty(); current = nodeQueue.front()){
+		for(const Node* current = nodeQueue.front(); true; ){
 			nodeQueue.pop();
 
 			if(current == nullptr){
@@ -263,6 +269,12 @@ public:
 			}
 
 			keys.insert(current->key);
+
+			if(nodeQueue.empty()){
+				break;
+			}
+
+			current = nodeQueue.front();
 		}
 
 		return keys;
@@ -313,7 +325,7 @@ private:
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 
-		for(const Node* current = nodeQueue.front(); ; ){
+		for(const Node* current = nodeQueue.front(); true; ){
 			nodeQueue.pop();
 
 			if(current == nullptr){
