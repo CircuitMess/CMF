@@ -19,8 +19,6 @@ bool ObjectManager::isValid(const Object* object) noexcept{
 		return false;
 	}
 
-	return true;
-
 	if(!objectReferenceTree.contains(const_cast<Object*>(object))){
 		return false;
 	}
@@ -29,7 +27,6 @@ bool ObjectManager::isValid(const Object* object) noexcept{
 }
 
 void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*/) noexcept{
-	return;
 	ObjectRefInfo& objectInfo = objectReferenceTree[*object];
 
 	objectInfo.objectPointers.insert(object);
@@ -40,7 +37,6 @@ void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*
 }
 
 void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = false*/) noexcept{
-	return;
 	if(!objectReferenceTree.contains(*object)){
 		return;
 	}

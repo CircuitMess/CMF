@@ -113,7 +113,12 @@ public:
 			}
 
 			if(next == nullptr){
-				newNode = new Node();
+				// TODO error, this should not be possible!?
+				return;
+			}
+
+			if(*next == nullptr){
+				*next = newNode = new Node();
 				newNode->key = key;
 				newNode->value = value;
 				newNode->parent = current;
