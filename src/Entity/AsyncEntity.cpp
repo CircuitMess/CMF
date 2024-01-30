@@ -65,9 +65,9 @@ void AsyncEntity::setTickingInterval(TickType_t value) noexcept{
 }
 
 void AsyncEntity::tickHandle() noexcept{
-	/*if(!ObjectManager::get()->isValid(this)){
+	if(!isValid(this)){
 		return;
-	}*/
+	}
 
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
