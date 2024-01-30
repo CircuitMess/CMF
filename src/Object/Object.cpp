@@ -91,7 +91,11 @@ void Object::scanEvents(TickType_t wait) noexcept {
 
 	std::lock_guard lock(eventHandleMutex);
 
-	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max((uint64_t)0, wait - (millis() - begin))); ){
+	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, (uint64_t)std::max((int64_t) 0, (int64_t) wait - ((int64_t) millis() - (int64_t) begin))); ){
+		if(handle == nullptr){
+			continue;
+		}
+
 		handle->scan(0);
 	}
 

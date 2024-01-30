@@ -54,12 +54,14 @@ void Threaded::start() noexcept{
 
 	auto function = [](void* arg) -> void {
 		if(arg == nullptr){
+			vTaskDelete(nullptr); //TODO
 			return;
 		}
 
-		if(!isValid((Threaded*) arg)){
+		/*if(!isValid((Threaded*) arg)){
+			vTaskDelete(nullptr); // TODO:
 			return;
-		}
+		}*/
 
 		((Threaded*) arg)->threadFunction();
 	};
@@ -136,7 +138,7 @@ void Threaded::threadFunction() noexcept{
 			semaphoreWait = loopInterval - (millis() - lastLoop + 1);
 		}
 
-		if(xSemaphoreTake(pauseSemaphore, semaphoreWait) == pdTRUE){
+		if(xSemaphoreTake(pauseSemaphore, semaphoreWait + 1) == pdTRUE){
 			stop(0);
 			paused = true;
 			return;

@@ -40,3 +40,11 @@ void Application::onOwnerChanged(Object* oldOwner) noexcept{
 		setOwner(nullptr);
 	}
 }
+
+TickType_t Application::getEventScanningTime() const noexcept{
+	return 0;
+}
+
+TickType_t Application::getTickingInterval() const noexcept{
+	return 0;
+}

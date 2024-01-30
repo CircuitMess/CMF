@@ -3,14 +3,19 @@
 #include "Util/stdafx.h"
 #include "Memory/ObjectMemory.h"
 
+// TODO: move onOwnerChanged from application to async entity, async entities as a whole should not have an owner for event scanning related reasons
+
 AsyncEntity::AsyncEntity(TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
 						Super(),
-						thread(newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), interval, threadStackSize, threadPriority, cpuCore)),
+						interval(interval),
+						threadStackSize(threadStackSize),
+						threadPriority(threadPriority),
+						cpuCore(cpuCore),
 						lastTickTime(micros()),
 						tickingInterval(interval) {}
 
 AsyncEntity::~AsyncEntity() noexcept {
-	if(thread == nullptr){
+	if(!thread.isValid()){
 		return;
 	}
 
@@ -19,6 +24,8 @@ AsyncEntity::~AsyncEntity() noexcept {
 
 void AsyncEntity::postInitProperties() noexcept {
 	Super::postInitProperties();
+
+	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), interval, threadStackSize, threadPriority, cpuCore);
 }
 
 void AsyncEntity::begin() noexcept {
@@ -34,7 +41,9 @@ void AsyncEntity::end() noexcept {
 }
 
 void AsyncEntity::onDestroy() noexcept{
-	thread->destroy();
+	if(thread.isValid()){
+		thread->destroy();
+	}
 
 	Super::onDestroy();
 }
@@ -56,9 +65,9 @@ void AsyncEntity::setTickingInterval(TickType_t value) noexcept{
 }
 
 void AsyncEntity::tickHandle() noexcept{
-	if(!ObjectManager::get()->isValid(this)){
+	/*if(!ObjectManager::get()->isValid(this)){
 		return;
-	}
+	}*/
 
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;

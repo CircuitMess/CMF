@@ -31,12 +31,12 @@ public:
 			return;
 		}
 
-		SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
+		/*SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
 		if(garbageCollectorClass == nullptr){
 			TrashCollector = newObject<GarbageCollector>();
 		}else{
 			TrashCollector = newObject<GarbageCollector>(*garbageCollectorClass);
-		}
+		}*/
 	}
 
 private:
@@ -47,7 +47,8 @@ private:
 #define CMF_MAIN(AppName) 				\
 	extern "C" void app_main() 			\
 	{ 									\
-		CMF::start<AppName>(); 			\
+		CMF::start<AppName>();      	\
+		vTaskDelete(nullptr);			\
 	}									\
 
 #endif //CMF_ENTRYPOINT_H

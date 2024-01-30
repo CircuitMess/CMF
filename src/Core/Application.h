@@ -71,6 +71,9 @@ protected:
 
 	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
 
+	virtual TickType_t getEventScanningTime() const noexcept override;
+	virtual TickType_t getTickingInterval() const noexcept override;
+
 private:
 	inline static Application* ApplicationInstance = nullptr;
 
