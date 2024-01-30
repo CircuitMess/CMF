@@ -192,7 +192,12 @@ public:
 	}
 
 	inline bool contains(const K& key) const noexcept {
-		return keys().contains(key);
+		std::set<K> treeKeys = keys();
+		if(treeKeys.empty()){
+			return false;
+		}
+
+		return treeKeys.contains(key);
 	}
 
 	inline size_t size() const noexcept {
@@ -308,7 +313,7 @@ private:
 		std::queue<Node*> nodeQueue;
 		nodeQueue.push(head);
 
-		for(const Node* current = nodeQueue.front(); !nodeQueue.empty(); current = nodeQueue.front()){
+		for(const Node* current = nodeQueue.front(); ; ){
 			nodeQueue.pop();
 
 			if(current == nullptr){
@@ -324,6 +329,12 @@ private:
 			}
 
 			delete current;
+
+			if(nodeQueue.empty()){
+				break;
+			}
+
+			current = nodeQueue.front();
 		}
 
 		head = nullptr;
