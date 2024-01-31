@@ -31,12 +31,12 @@ public:
 			return;
 		}
 
-		/*SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
+		SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
 		if(garbageCollectorClass == nullptr){
 			TrashCollector = newObject<GarbageCollector>();
 		}else{
 			TrashCollector = newObject<GarbageCollector>(*garbageCollectorClass);
-		}*/
+		}
 	}
 
 private:
