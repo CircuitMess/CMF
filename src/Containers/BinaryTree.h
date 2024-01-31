@@ -142,17 +142,17 @@ public:
 	inline void remove(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
 
-		Node* foundNode = nullptr;
-		Node* replacementNode = nullptr;
+		Node** foundNode = nullptr;
+		Node** replacementNode = nullptr;
 
-		for(Node* current = head; current != nullptr; ){
-			if(key == current->key){
+		for(Node** current = &head; *current != nullptr; ){
+			if(key == (*current)->key){
 				foundNode = current;
 				break;
-			}else if(key > current->key){
-				current = current->rightNode;
-			}else if(key < current->key){
-				current = current->leftNode;
+			}else if(key > (*current)->key){
+				current = &(*current)->rightNode;
+			}else if(key < (*current)->key){
+				current = &(*current)->leftNode;
 			}
 		}
 
@@ -160,24 +160,29 @@ public:
 			return;
 		}
 
-		if(foundNode->rightNode != nullptr){
-			for(replacementNode = foundNode->rightNode; replacementNode->leftNode != nullptr; replacementNode = replacementNode->leftNode);
-		}else if(foundNode->leftNode != nullptr){
-			for(replacementNode = foundNode->leftNode; replacementNode->rightNode != nullptr; replacementNode = replacementNode->rightNode);
+		if(*foundNode == nullptr){
+			return;
+		}
+
+		if((*foundNode)->rightNode != nullptr){
+			for(replacementNode = &(*foundNode)->rightNode; (*replacementNode)->leftNode != nullptr; replacementNode = &(*replacementNode)->leftNode);
+		}else if((*foundNode)->leftNode != nullptr){
+			for(replacementNode = &(*foundNode)->leftNode; (*replacementNode)->rightNode != nullptr; replacementNode = &(*replacementNode)->rightNode);
 		}else{
-			if(start == foundNode){
-				start = foundNode->parent;
+			if(start == *foundNode){
+				start = (*foundNode)->parent;
 			}
 
-			if(end == foundNode){
-				end = foundNode->parent;
+			if(end == *foundNode){
+				end = (*foundNode)->parent;
 			}
 
-			if(head == foundNode){
+			if(head == *foundNode){
 				head = nullptr;
 			}
 
-			delete foundNode;
+			delete *foundNode;
+			*foundNode = nullptr;
 			return;
 		}
 
@@ -185,10 +190,15 @@ public:
 			return;
 		}
 
-		std::swap(foundNode->key, replacementNode->key);
-		std::swap(foundNode->value, replacementNode->value);
+		if(*replacementNode == nullptr){
+			return;
+		}
 
-		delete replacementNode;
+		std::swap((*foundNode)->key, (*replacementNode)->key);
+		std::swap((*foundNode)->value, (*replacementNode)->value);
+
+		delete *replacementNode;
+		*replacementNode = nullptr;
 	}
 
 	inline bool contains(const K& key) const noexcept {
