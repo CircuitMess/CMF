@@ -55,33 +55,15 @@ public:
 
 	inline bool full() const noexcept {
 		if(begin > end){
-			return end + bufferSize - begin;
+			return end + bufferSize - begin >= bufferSize - 1;
 		}
 
-		return end - begin;
+		return end - begin >= bufferSize - 1;
 	}
 
 	inline bool reserve(size_t newSize) noexcept {
 		std::lock_guard guard(accessMutex);
-
-		T* newBuffer = new T[newSize];
-		if(buffer == nullptr){
-			return false;
-		}
-
-		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			newBuffer[newSize - bufferSize + i] =  T(std::move_if_noexcept(buffer[i]));
-		}
-
-		if(begin > end){
-			begin = newSize - bufferSize + begin;
-		}
-
-		delete[] buffer;
-		buffer = newBuffer;
-		bufferSize = newSize;
-
-		return false;
+		return reserveInternal(newSize);
 	}
 
 	inline bool front(T& value, TickType_t wait = portMAX_DELAY) const noexcept {
@@ -140,9 +122,9 @@ public:
 			return false;
 		}
 
-		end = (end + 1) % bufferSize;
-
 		buffer[end] = T(value);
+
+		end = (end + 1) % bufferSize;
 
 		xSemaphoreGive(waitSemaphore);
 
@@ -156,9 +138,9 @@ public:
 			return false;
 		}
 
-		end = (end + 1) % bufferSize;
+		buffer[end] = T(std::move(value));
 
-		buffer[end] = T(value);
+		end = (end + 1) % bufferSize;
 
 		xSemaphoreGive(waitSemaphore);
 
@@ -195,6 +177,36 @@ private:
 	bool kill = false;
 	std::mutex accessMutex;
 	SemaphoreHandle_t waitSemaphore;
+
+private:
+	inline bool reserveInternal(size_t newSize) noexcept {
+		T* newBuffer = new T[newSize];
+		if(buffer == nullptr){
+			return false;
+		}
+
+		if(begin > end){
+			for(size_t i = begin; i < bufferSize; ++i){
+				newBuffer[newSize - bufferSize + i] =  T(std::move_if_noexcept(buffer[i]));
+			}
+
+			for(size_t i = 0; i < end; ++i){
+				newBuffer[i] =  T(std::move_if_noexcept(buffer[i]));
+			}
+
+			begin = newSize - bufferSize + begin;
+		}else{
+			for(size_t i = begin; i < end; ++i){
+				newBuffer[newSize - bufferSize + i] =  T(std::move_if_noexcept(buffer[i]));
+			}
+		}
+
+		delete[] buffer;
+		buffer = newBuffer;
+		bufferSize = newSize;
+
+		return true;
+	}
 };
 
 #endif //CMF_QUEUE_H
