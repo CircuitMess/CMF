@@ -1,5 +1,5 @@
-#ifndef CMF_ARCHIVE_HPP
-#define CMF_ARCHIVE_HPP
+#ifndef CMF_ARCHIVE_H
+#define CMF_ARCHIVE_H
 
 #include <queue>
 #include <string>
@@ -159,4 +159,4 @@ public:
 	virtual Archive& operator << (std::vector<std::wstring>& data) noexcept override;
 };
 
-#endif //CMF_ARCHIVE_HPP
+#endif //CMF_ARCHIVE_H

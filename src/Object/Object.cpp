@@ -146,8 +146,12 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept {
 	}
 }
 
-TickType_t Object::getEventScanningTime() const noexcept{
+TickType_t Object::getEventScanningTime() const noexcept {
 	return 0;
+}
+
+Archive& Object::serialize(Archive& archive) noexcept {
+	return archive;
 }
 
 inline void Object::registerChild(Object* child) noexcept {

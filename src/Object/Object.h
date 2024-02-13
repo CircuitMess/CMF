@@ -11,6 +11,7 @@
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Containers/Queue.h"
+#include "Containers/Archive.h"
 
 // TODO: technically it could happen that static class instance does not initialize before some other object that uses static functions to retrieve it, therefore change it so that it gets initialized the first time it is retrieved
 
@@ -85,6 +86,8 @@ public:
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
 	virtual TickType_t getEventScanningTime() const noexcept;
+
+	virtual Archive& serialize(Archive& archive) noexcept;
 
 private:
 	using ClassType = Class;

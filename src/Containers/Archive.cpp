@@ -1,4 +1,4 @@
-#include "Archive.hpp"
+#include "Archive.h"
 
 Archive::Archive(const std::vector<uint8_t>& queue) noexcept {
 	for(uint8_t value : queue) {
