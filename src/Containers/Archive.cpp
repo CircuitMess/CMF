@@ -10,6 +10,16 @@ Archive::Archive(const std::queue<uint8_t>& queue) noexcept : byteBuffer(queue) 
 
 Archive::Archive(std::queue<uint8_t>&& queue) noexcept : byteBuffer(std::move(queue)) {}
 
+void Archive::toByteArray(std::vector<uint8_t>& buffer) const noexcept {
+	buffer.clear();
+	std::queue<uint8_t> bufferCopy = byteBuffer;
+
+	while(!bufferCopy.empty()){
+		buffer.emplace_back(bufferCopy.front());
+		bufferCopy.pop();
+	}
+}
+
 void Archive::pushDataPoint(uint8_t data) noexcept {
 	byteBuffer.push(data);
 }
@@ -257,6 +267,241 @@ Archive& InArchive::operator << (std::vector<std::string>& data) noexcept {
 }
 
 Archive& InArchive::operator<<(std::vector<std::wstring>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		operator<<(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (bool data) noexcept {
+	pushData<bool>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (wchar_t data) noexcept {
+	pushData<wchar_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (uint8_t data) noexcept {
+	pushData<uint8_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (uint16_t data) noexcept {
+	pushData<uint16_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (uint32_t data) noexcept {
+	pushData<uint32_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (uint64_t data) noexcept {
+	pushData<uint64_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (int8_t data) noexcept {
+	pushData<int8_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (int16_t data) noexcept {
+	pushData<int16_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (int32_t data) noexcept {
+	pushData<int32_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (int64_t data) noexcept {
+	pushData<int64_t>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (float data) noexcept {
+	pushData<float>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (double data) noexcept {
+	pushData<double>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (long double data) noexcept {
+	pushData<long double>(data);
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::string& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<char>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::wstring& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<wchar_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<bool>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<bool>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<wchar_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<wchar_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<uint8_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<uint8_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<uint16_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<uint16_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<uint32_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<uint32_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<uint64_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<uint64_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<int8_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<int8_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<int16_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<int16_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<int32_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<int32_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<int64_t>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<int64_t>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<float>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<float>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<double>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<double>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<long double>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		pushData<long double>(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<std::string>& data) noexcept {
+	pushData<size_t>(data.size());
+
+	for(size_t i = 0; i < data.size(); ++i){
+		operator<<(data[i]);
+	}
+
+	return *this;
+}
+
+Archive& InArchive::operator << (const std::vector<std::wstring>& data) noexcept {
 	pushData<size_t>(data.size());
 
 	for(size_t i = 0; i < data.size(); ++i){

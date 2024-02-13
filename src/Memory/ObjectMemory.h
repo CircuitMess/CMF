@@ -51,4 +51,31 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
 	return newObjectPtr;
 }
 
+template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, Object* owner = nullptr) noexcept {
+	OutArchive archive = data;
+	uint32_t classID = 0;
+	archive << classID;
+
+	StrongObjectPtr<T> object = newObject<T>(Class::getClasByID(classID), owner);
+	if(!object.isValid()){
+		return nullptr;
+	}
+
+	object->serialize(archive);
+}
+
+inline void  byteArrayFromObject(Object* object, std::vector<uint8_t>& data) noexcept {
+	if(object == nullptr){
+		return;
+	}
+
+	InArchive archive;
+	archive << object->getStaticClass()->getID();
+
+	object->serialize(archive);
+
+	archive.toByteArray(data);
+}
+
 #endif //CMF_OBJECTMEMORY_H

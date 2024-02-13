@@ -32,6 +32,14 @@ public:
 		return false;
 	}
 
+	static inline const Class* getClasByID(uint32_t ID) noexcept {
+		if(registry == nullptr){
+			return nullptr;
+		}
+
+		return registry->getClass(ID);
+	}
+
 protected:
 	static inline ClassRegistry* registry = nullptr;
 
