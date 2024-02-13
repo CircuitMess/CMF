@@ -65,7 +65,7 @@ inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, 
 	object->serialize(archive);
 }
 
-inline void  byteArrayFromObject(Object* object, std::vector<uint8_t>& data) noexcept {
+inline void byteArrayFromObject(Object* object, std::vector<uint8_t>& data) noexcept {
 	if(object == nullptr){
 		return;
 	}
