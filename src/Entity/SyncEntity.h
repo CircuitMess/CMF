@@ -15,7 +15,7 @@ public:
 
 	virtual void tick(float deltaTime) noexcept override;
 	virtual void begin() noexcept override;
-	virtual void end(/*TODO reason*/) noexcept override;
+	virtual void end(EndReason reason) noexcept override;
 
 protected:
 	virtual void postInitProperties() noexcept override;

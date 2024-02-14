@@ -3,6 +3,8 @@
 #include "Memory/ObjectMemory.h"
 #include "Thread/Threaded.h"
 #include "Log/Log.h"
+#include "Statics/ApplicationStatics.h"
+#include "Core/Application.h"
 
 Object::Object() noexcept : id(ObjectIndex++){
 	destroyMutex.lock();
@@ -24,7 +26,7 @@ void Object::onDestroy() noexcept {
 			return false;
 		}
 
-		child->setOwner(nullptr);
+		child->setOwner(ApplicationStatics::getApplication());
 
 		return false;
 	});

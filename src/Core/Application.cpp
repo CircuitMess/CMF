@@ -24,8 +24,8 @@ void Application::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
 }
 
-void Application::end() noexcept {
-	Super::end();
+void Application::end(EndReason reason) noexcept {
+	Super::end(reason);
 }
 
 SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexcept{

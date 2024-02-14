@@ -19,7 +19,7 @@ struct LogType {
 	const std::string Tag;
 };
 
-#define DEFINE_LOG(name) LogType name = {#name};
+#define DEFINE_LOG(name) inline static const LogType name = {#name};
 DEFINE_LOG(LogTemp)
 DEFINE_LOG(LogCMF)
 

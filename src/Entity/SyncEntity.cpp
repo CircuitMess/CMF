@@ -48,7 +48,13 @@ void SyncEntity::tick(float deltaTime) noexcept {
 
 		if(!isValid(child) && !child->canDelete()){
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
-				entity->end();
+				EndReason reason = EndReason::GarbageCollected;
+
+				if(ObjectManager::get()->getReferenceCount(entity) > 0){
+					reason = EndReason::Destroyed;
+				}
+
+				entity->end(reason);
 			}
 			childrenToRemove.insert(child);
 		}
@@ -74,8 +80,8 @@ void SyncEntity::begin() noexcept {
 	Super::begin();
 }
 
-void SyncEntity::end() noexcept {
-	Super::end();
+void SyncEntity::end(EndReason reason) noexcept {
+	Super::end(reason);
 }
 
 void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{

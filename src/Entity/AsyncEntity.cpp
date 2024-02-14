@@ -35,8 +35,8 @@ void AsyncEntity::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
 }
 
-void AsyncEntity::end() noexcept {
-	Super::end();
+void AsyncEntity::end(EndReason reason) noexcept {
+	Super::end(reason);
 }
 
 void AsyncEntity::setOwner(Object* object) noexcept{
@@ -124,7 +124,13 @@ void AsyncEntity::tickHandle() noexcept{
 
 		if(!isValid(child) && !child->canDelete()){
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
-				entity->end();
+				EndReason reason = EndReason::GarbageCollected;
+
+				if(ObjectManager::get()->getReferenceCount(entity) > 0){
+					reason = EndReason::Destroyed;
+				}
+
+				entity->end(reason);
 			}
 			childrenToRemove.insert(child);
 		}
@@ -141,7 +147,14 @@ void AsyncEntity::tickHandle() noexcept{
 		child->onDestroy();
 	}
 
-	if(isMarkedForDestroy() && !canDelete()){
+	if(!isValid(this) && !canDelete()){
+		EndReason reason = EndReason::GarbageCollected;
+
+		if(ObjectManager::get()->getReferenceCount(this) > 0){
+			reason = EndReason::Destroyed;
+		}
+
+		end(reason);
 		onDestroy();
 	}
 
