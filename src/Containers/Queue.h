@@ -8,6 +8,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
+// TODO: change memory allocation to follow constructor and destructor calls as shown in https://stackoverflow.com/questions/10201214/callling-object-constructor-destructor-with-a-custom-allocator
+
 template<typename T, typename Allocator = std::allocator<T>>
 class Queue {
 public:
