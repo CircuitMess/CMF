@@ -8,19 +8,18 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
-// TODO think about support for custom allocators with Queue
-template<typename T>
+template<typename T, typename Allocator = std::allocator<T>>
 class Queue {
 public:
 	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), waitSemaphore(xSemaphoreCreateBinary()) {
-		buffer = new T[bufferSize];
+		buffer = allocator.allocate(bufferSize);
 	}
 
 	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
-		buffer = new T[bufferSize];
+		buffer = allocator.allocate(bufferSize);
 
 		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			buffer[i] =  T(std::move_if_noexcept(other.buffer[i]));
+			buffer[i] = T(std::move_if_noexcept(other.buffer[i]));
 		}
 	}
 
@@ -36,7 +35,7 @@ public:
 
 		std::lock_guard guard(accessMutex);
 
-		delete[] buffer;
+		allocator.deallocate(buffer, bufferSize);
 		buffer = nullptr;
 		begin = end = 0;
 	}
@@ -171,6 +170,7 @@ public:
 private:
 	static constexpr size_t DefaultSize = 32;
 	T* buffer;
+	Allocator allocator = Allocator();
 	size_t bufferSize;
 	size_t begin = 0;
 	size_t end = 0;
@@ -180,7 +180,7 @@ private:
 
 private:
 	inline bool reserveInternal(size_t newSize) noexcept {
-		T* newBuffer = new T[newSize];
+		T* newBuffer = allocator.allocate(newSize);
 		if(buffer == nullptr){
 			return false;
 		}
@@ -201,7 +201,7 @@ private:
 			}
 		}
 
-		delete[] buffer;
+		allocator.deallocate(buffer, bufferSize);
 		buffer = newBuffer;
 		bufferSize = newSize;
 
