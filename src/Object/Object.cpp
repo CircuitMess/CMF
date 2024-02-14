@@ -81,7 +81,7 @@ void Object::onInstigatorChanged(Object* oldInstigator) noexcept {}
 
 void Object::scanEvents(TickType_t wait) noexcept {
 	if(!eventScanningMutex.try_lock()){
-		// TODO: log error for circular ownership
+		CMF_LOG(LogCMF, Warning, "Circular object ownership detected. Object: %s, Owner: %s", getName().c_str(), getOwner()->getName().c_str());
 		eventScanningMutex.unlock();
 		return;
 	}

@@ -1,5 +1,6 @@
 #include "Threaded.h"
 #include "Util/stdafx.h"
+#include "Log/Log.h"
 #include "Memory/ObjectMemory.h"
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
@@ -18,7 +19,7 @@ Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threa
 
 Threaded::~Threaded() noexcept{
 	if(state != State::Stopped){
-		// TODO: log error
+		CMF_LOG(LogCMF, LogLevel::Error, "Thread was destroyed before being stopped.");
 		abort();
 	}
 
@@ -50,18 +51,18 @@ void Threaded::start() noexcept{
 
 	state = State::Running;
 
-	// TODO: error code checking and logging, error fallback if possible
-
 	auto function = [](void* arg) -> void {
 		if(arg == nullptr){
-			vTaskDelete(nullptr); //TODO
+			CMF_LOG(LogCMF, Error, "Thread native callback started with invalid thread pointer.");
+			vTaskDelete(nullptr);
 			return;
 		}
 
-		/*if(!isValid((Threaded*) arg)){
-			vTaskDelete(nullptr); // TODO:
+		if(!isValid((Threaded*) arg)){
+			CMF_LOG(LogCMF, Error, "Thread native callback started with invalid thread pointer.");
+			vTaskDelete(nullptr);
 			return;
-		}*/
+		}
 
 		((Threaded*) arg)->threadFunction();
 	};

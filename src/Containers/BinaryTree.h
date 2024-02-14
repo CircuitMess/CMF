@@ -113,7 +113,7 @@ public:
 			}
 
 			if(next == nullptr){
-				// TODO error, this should not be possible!?
+				// This should not be possible
 				return;
 			}
 

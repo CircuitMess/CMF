@@ -26,8 +26,8 @@ public:
 	template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 	static void start(){
 		App = newObject<T>();
-		if(App == nullptr){
-			// TODO: error
+		if(!App.isValid()){
+			CMF_LOG(LogCMF, Error, "Application instance could not be created.");
 			return;
 		}
 
@@ -36,6 +36,10 @@ public:
 			TrashCollector = newObject<GarbageCollector>();
 		}else{
 			TrashCollector = newObject<GarbageCollector>(*garbageCollectorClass);
+		}
+
+		if(!TrashCollector.isValid()){
+			CMF_LOG(LogCMF, Error, "GarbageCollector instance could not be created.");
 		}
 	}
 

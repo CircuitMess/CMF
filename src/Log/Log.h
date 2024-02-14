@@ -6,7 +6,7 @@
 #include <esp_log.h>
 #include <source_location>
 
-enum class LogLevel : uint8_t {
+enum LogLevel {
 	None = (uint8_t) ESP_LOG_NONE,
 	Error = (uint8_t) ESP_LOG_ERROR,
 	Warning = (uint8_t) ESP_LOG_WARN,
@@ -25,17 +25,19 @@ DEFINE_LOG(LogCMF)
 
 #define TRACE_LOG(format, ...) printf(std::string("%s(%d:%d) '%s' ").append(format).append("\n").c_str(), std::source_location::current().file_name(),std::source_location::current().line(), std::source_location::current().column(), std::source_location::current().function_name() __VA_OPT__(,) __VA_ARGS__)
 
-#define CMF_LOG(log, level, format, ...)																	\
-	if(level == LogLevel::Error){																			\
-		ESP_LOGE(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
-	}else if(level == LogLevel::Warning){																	\
-		ESP_LOGW(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
-	}else if(level == LogLevel::Info){																		\
-		ESP_LOGI(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
-	}else if(level == LogLevel::Debug){																		\
-		ESP_LOGD(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
-	}else if(level == LogLevel::Verbose){																	\
-		ESP_LOGV(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
-	}else{}																									\
+#define CMF_LOG(log, level, format, ...)																		\
+	do {																										\
+		if(level == Error){																						\
+			ESP_LOGE(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+		}else if(level == LogLevel::Warning){																	\
+			ESP_LOGW(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+		}else if(level == Info){																				\
+			ESP_LOGI(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+		}else if(level == Debug){																				\
+			ESP_LOGD(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+		}else if(level == Verbose){																				\
+			ESP_LOGV(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+		}else{}																									\
+    } while(false)																								\
 
 #endif //CMF_LOG_H
