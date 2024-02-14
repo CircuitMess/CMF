@@ -3,8 +3,6 @@
 
 #include "Object/Object.h"
 
-// TODO: still need to implement logic for passing quit reason to end
-
 enum class EndReason : uint8_t {
 	Destroyed,
 	GarbageCollected,

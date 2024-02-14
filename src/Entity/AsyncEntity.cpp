@@ -3,6 +3,7 @@
 #include "Util/stdafx.h"
 #include "Memory/ObjectMemory.h"
 #include "Log/Log.h"
+#include "Core/Application.h"
 
 AsyncEntity::AsyncEntity(TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
 						Super(),
@@ -147,11 +148,33 @@ void AsyncEntity::tickHandle() noexcept{
 		child->onDestroy();
 	}
 
+	if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
+		forEachChild([](Object* child) {
+			if(!isValid(child)){
+				return false;
+			}
+
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				entity->end(EndReason::Quit);
+			}
+
+			child->destroy();
+			child->onDestroy();
+			child->setOwner(nullptr);
+
+			return false;
+		});
+	}
+
 	if(!isValid(this) && !canDelete()){
 		EndReason reason = EndReason::GarbageCollected;
 
 		if(ObjectManager::get()->getReferenceCount(this) > 0){
 			reason = EndReason::Destroyed;
+		}
+
+		if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
+			reason = EndReason::Quit;
 		}
 
 		end(reason);

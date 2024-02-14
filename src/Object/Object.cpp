@@ -26,7 +26,13 @@ void Object::onDestroy() noexcept {
 			return false;
 		}
 
-		child->setOwner(ApplicationStatics::getApplication());
+		Application* app = ApplicationStatics::getApplication();
+		if(isValid(app) && !app->isShuttingDown()){
+			child->setOwner(ApplicationStatics::getApplication());
+		}else{
+			child->destroy();
+			child->onDestroy();
+		}
 
 		return false;
 	});

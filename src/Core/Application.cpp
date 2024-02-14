@@ -25,7 +25,18 @@ void Application::tick(float deltaTime) noexcept {
 }
 
 void Application::end(EndReason reason) noexcept {
+	reason = EndReason::Quit;
+	shuttingDown = true;
+
 	Super::end(reason);
+
+	ObjectManager::get()->forEachObject([](Object* object) {
+		if(AsyncEntity* entity = cast<AsyncEntity>(object)){
+			entity->destroy();
+		}
+
+		return false;
+	});
 }
 
 SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexcept{

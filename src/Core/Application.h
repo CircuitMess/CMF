@@ -63,6 +63,10 @@ public:
 		return nullptr;
 	}
 
+	inline bool isShuttingDown() const noexcept {
+		return shuttingDown;
+	}
+
 protected:
 	virtual void postInitProperties() noexcept override;
 	virtual void begin() noexcept override;
@@ -77,6 +81,7 @@ private:
 
 private:
 	std::set<StrongObjectPtr<Singleton>> singletons;
+	bool shuttingDown = false;
 };
 
 #endif //CMF_APPLICATION_H
