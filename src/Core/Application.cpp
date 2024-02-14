@@ -32,15 +32,6 @@ SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexc
 	return GarbageCollector::staticClass();
 }
 
-void Application::onOwnerChanged(Object* oldOwner) noexcept{
-	Super::onOwnerChanged(oldOwner);
-
-	// This is on purpose, the application should not have an owner to try to prevent accidental circular ownership
-	if(getOwner() != nullptr){
-		setOwner(nullptr);
-	}
-}
-
 TickType_t Application::getEventScanningTime() const noexcept{
 	return 0;
 }

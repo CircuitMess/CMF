@@ -68,9 +68,7 @@ protected:
 	virtual void begin() noexcept override;
 	virtual void tick(float deltaTime) noexcept override;
 	virtual void end(/*TODO reason*/) noexcept override;
-
-	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
-
+	
 	virtual TickType_t getEventScanningTime() const noexcept override;
 	virtual TickType_t getTickingInterval() const noexcept override;
 

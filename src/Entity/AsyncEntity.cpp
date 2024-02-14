@@ -2,8 +2,7 @@
 #include "SyncEntity.h"
 #include "Util/stdafx.h"
 #include "Memory/ObjectMemory.h"
-
-// TODO: move onOwnerChanged from application to async entity, async entities as a whole should not have an owner for event scanning related reasons
+#include "Log/Log.h"
 
 AsyncEntity::AsyncEntity(TickType_t interval/* = 0*/, size_t threadStackSize/* = 12 * 1024*/, uint8_t threadPriority/* = 5*/, int8_t cpuCore/* = -1*/) noexcept :
 						Super(),
@@ -38,6 +37,15 @@ void AsyncEntity::tick(float deltaTime) noexcept {
 
 void AsyncEntity::end() noexcept {
 	Super::end();
+}
+
+void AsyncEntity::setOwner(Object* object) noexcept{
+	// This is on purpose, async entities should not have an owner to try to prevent accidental circular ownership and issues with event scanning
+	Super::setOwner(nullptr);
+
+	if(object != nullptr && hasBegun()){
+		CMF_LOG(LogCMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
+	}
 }
 
 void AsyncEntity::onDestroy() noexcept{

@@ -61,7 +61,7 @@ public:
 		return markedForDestroy;
 	}
 
-	void setOwner(Object* object) noexcept;
+	virtual void setOwner(Object* object) noexcept;
 	virtual void onOwnerChanged(Object* oldOwner) noexcept;
 	virtual void onChildAdded(Object* child) noexcept;
 	virtual void onChildRemoved(Object* child) noexcept;
