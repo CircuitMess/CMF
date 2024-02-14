@@ -7,8 +7,6 @@
 #include <mutex>
 #include "Util/stdafx.h"
 
-// TODO: iterators (const, non const) ?maybe?
-
 template<typename K, typename V>
 class BinaryTree {
 public:
