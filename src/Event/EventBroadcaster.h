@@ -7,6 +7,9 @@
 template<typename ...Args>
 class EventBroadcaster : protected Event<Args...> {
 public:
+	inline EventBroadcaster() noexcept = delete;
+	inline EventBroadcaster(const EventBroadcaster&) noexcept = delete;
+	inline EventBroadcaster(EventBroadcaster&&) noexcept = delete;
 	inline explicit EventBroadcaster(Object* owningObject) noexcept : owningObject(owningObject) {}
 
 	inline void bind(EventHandle<Args...>&& handle) noexcept {
@@ -32,28 +35,21 @@ protected:
 			return false;
 		}
 
-		return Event<Args...>::broadcast(args..., wait);
-	}
-
-	inline bool blockingBroadcast(Args&&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept{
-		if(caller != owningObject){
-			return false;
-		}
-
-		return Event<Args...>::broadcast(args..., wait);
+		return Event<Args...>::_broadcast(args..., wait);
 	}
 
 private:
 	WeakObjectPtr<Object> owningObject;
 };
 
-#define broadcast(...) blockingBroadcast(__VA_ARGS__, portMAX_DELAY, this)
+#define broadcast(...) blockingBroadcast(__VA_ARGS__ __VA_OPT__(,) portMAX_DELAY, this)
 
-#define waitBroadcast(wait, ...) blockingBroadcast(__VA_ARGS__, wait, this)
+#define waitBroadcast(wait, ...) blockingBroadcast(__VA_ARGS__ __VA_OPT__(,) wait, this)
 
-#define DECLARE_EVENT(EventName, OwningType, ...)							\
-class EventName : public EventBroadcaster<__VA_ARGS__> {					\
-	friend class OwningType;												\
-};																			\
+#define DECLARE_EVENT(EventName, OwningType, ...)																\
+class EventName : public EventBroadcaster<__VA_ARGS__> {														\
+	friend class OwningType;																					\
+	inline explicit EventName(Object* owner) noexcept : EventBroadcaster<__VA_ARGS__>(owner) {}					\
+};																												\
 
 #endif //CMF_EVENTBROADCASTER_H

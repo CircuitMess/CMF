@@ -73,29 +73,25 @@ public:
 		handles.insert(container);
 	}
 
-protected:
-	inline bool broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
-		std::lock_guard guard(accessMutex);
+	inline void unbind(Object* object) noexcept {
+		std::erase_if(handles, [object](const HandleContainer& container) {
+			if(container.owningObject == object){
+				if(container.owned){
+					delete container.handle;
+				}
 
-		bool succeeded = true;
-
-		for(const HandleContainer& container : handles){
-			if(container.handle == nullptr || !container.owningObject.isValid()){
-				continue;
+				return true;
 			}
-
-			succeeded &= container.handle->call(wait, args...);
-		}
-
-		return succeeded;
+		});
 	}
 
-	inline bool broadcast(Args&&... args, TickType_t wait = portMAX_DELAY) noexcept {
+protected:
+	inline bool _broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
 		std::lock_guard guard(accessMutex);
 
 		bool succeeded = true;
 
-		for(const HandleContainer& container : handles){
+		for(HandleContainer container : handles){
 			if(container.handle == nullptr || !container.owningObject.isValid()){
 				continue;
 			}

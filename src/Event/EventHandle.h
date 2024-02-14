@@ -1298,7 +1298,7 @@ private:
 
 class EventHandleBase {
 public:
-	inline virtual bool probe(TickType_t wait) const noexcept = 0;
+	inline virtual bool probe(TickType_t wait) noexcept = 0;
 	inline virtual void scan(TickType_t wait) noexcept = 0;
 };
 
@@ -1347,14 +1347,10 @@ public:
 	}
 
 	inline bool call(TickType_t wait, const Args&... args) noexcept {
-		return callQueue.push(std::tuple<Args...>(args...), wait);
+		return callQueue.push(std::tuple<Args...>(args...));
 	}
 
-	inline bool call(TickType_t wait, Args&&... args) noexcept {
-		return callQueue.push(std::tuple<Args...>(args...), wait);
-	}
-
-	inline virtual bool probe(TickType_t wait) const noexcept override {
+	inline virtual bool probe(TickType_t wait) noexcept override {
 		std::tuple<Args...> arguments;
 		return callQueue.front(arguments, wait);
 	}

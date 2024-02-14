@@ -65,7 +65,7 @@ public:
 		return reserveInternal(newSize);
 	}
 
-	inline bool front(T& value, TickType_t wait = portMAX_DELAY) const noexcept {
+	inline bool front(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		std::lock_guard guard(accessMutex);
 
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){

@@ -7,11 +7,7 @@ template<typename ...Args>
 class EventDelegate : public Event<Args...> {
 public:
 	inline bool blockingBroadcast(const Args&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept {
-		return Event<Args...>::broadcast(args..., wait);
-	}
-
-	inline bool blockingBroadcast(Args&&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept {
-		return Event<Args...>::broadcast(args..., wait);
+		return Event<Args...>::_broadcast(args..., wait);
 	}
 };
 
