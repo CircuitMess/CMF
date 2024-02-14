@@ -30,6 +30,8 @@ public:
 		other.bufferSize = 0;
 		other.begin = other.end = 0;
 		other.accessMutex = nullptr;
+		waitSemaphore = other.waitSemaphore;
+		other.waitSemaphore = nullptr;
 	}
 
 	inline ~Queue() noexcept {
