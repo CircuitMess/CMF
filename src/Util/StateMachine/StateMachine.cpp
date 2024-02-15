@@ -1,9 +1,7 @@
 #include "StateMachine.h"
 #include "Memory/ObjectMemory.h"
 
-// TODO: make sure the state machine can control async entity properties trough its parameters
-// TODO: to make sure not to have to do this anymore, make a object initializer class that will handle all the necessary params in one class
-StateMachine::StateMachine() noexcept : Super() {
+StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 2048) {
 	onStartingTypeSet.bind(this, &StateMachine::onStartingTypeSetCallback);
 }
 
@@ -28,7 +26,7 @@ void StateMachine::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
 
 	if(current.isValid()){
-		SubclassOf<State> nextStateType = current->transitionTo();
+		const SubclassOf<State> nextStateType = current->transitionTo();
 		if(nextStateType != nullptr){
 			const Class* previousType = current->getStaticClass();
 

@@ -10,7 +10,7 @@ class StateMachine : public AsyncEntity {
 	GENERATED_BODY(StateMachine, AsyncEntity)
 
 public:
-	StateMachine() noexcept;
+	explicit StateMachine(TickType_t interval = 0) noexcept;
 
 	virtual TickType_t getEventScanningTime() const noexcept override;
 	void setStartingStateType(const SubclassOf<State>& type) noexcept;
