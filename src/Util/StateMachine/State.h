@@ -11,6 +11,7 @@ public:
 	virtual const Class* transitionTo() const noexcept;
 	virtual void onTransitionFrom(const Class* previous) noexcept;
 	virtual void onTransitionTo(const Class* next) noexcept;
+	class StateMachine* getStateMachine() const noexcept;
 };
 
 #endif //CMF_STATE_H
