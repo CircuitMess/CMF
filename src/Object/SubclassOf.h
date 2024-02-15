@@ -7,6 +7,8 @@
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 class SubclassOf {
 public:
+	inline SubclassOf() noexcept = default;
+
 	inline SubclassOf(const Object* object) noexcept {
 		if(object == nullptr){
 			return;

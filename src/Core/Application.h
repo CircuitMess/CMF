@@ -81,7 +81,7 @@ private:
 
 private:
 	std::set<StrongObjectPtr<Singleton>> singletons;
-	bool shuttingDown = false;
+	bool shuttingDown;
 };
 
 #endif //CMF_APPLICATION_H

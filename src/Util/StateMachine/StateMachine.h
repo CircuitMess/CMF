@@ -23,7 +23,7 @@ private:
 	StartingTypeSetEvent onStartingTypeSet = StartingTypeSetEvent(this);
 
 private:
-	SubclassOf<State> startingStateType = nullptr;
+	SubclassOf<State> startingStateType;
 	StrongObjectPtr<State> current;
 
 private:

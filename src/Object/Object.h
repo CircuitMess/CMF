@@ -99,10 +99,10 @@ private:
 
 	const uint32_t id;
 
-	std::atomic<bool> markedForDestroy = false;
-	WeakObjectPtr<Object> owner = nullptr;
+	std::atomic<bool> markedForDestroy;
+	WeakObjectPtr<Object> owner;
 	std::set<WeakObjectPtr<Object>> childrenObjects;
-	WeakObjectPtr<Object> instigator = nullptr;
+	WeakObjectPtr<Object> instigator;
 
 	struct EventHandleContainer {
 		EventHandleBase* ownedEventHandle = nullptr;
@@ -148,7 +148,9 @@ private:																													\
 		}                                                                    												\
                                                                        														\
         inline virtual Object* createDefaultObject() const noexcept override {  											\
-			return new ObjectName();																						\
+			void* temp = operator new(sizeof(ObjectName));																	\
+			memset(temp, 0, sizeof(ObjectName));																			\
+			return new(temp) ObjectName();																					\
 		}                                                                    												\
 																															\
 		inline virtual constexpr const char* getName() const noexcept override{												\

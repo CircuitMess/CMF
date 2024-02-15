@@ -25,7 +25,7 @@ protected:
 	virtual void end(EndReason reason) noexcept;
 
 private:
-	bool begun = false;
+	bool begun;
 };
 
 #endif //CMF_ENTITY_H

@@ -22,7 +22,7 @@ protected:
 	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
 
 private:
-	WeakObjectPtr<AsyncEntity> ownerEntity = nullptr;
+	WeakObjectPtr<AsyncEntity> ownerEntity;
 };
 
 #endif //CMF_SYNCENTITY_H

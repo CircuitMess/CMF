@@ -30,5 +30,7 @@ Class::Class(uint32_t ID) noexcept : classID(ID) {
 }
 
 Object* Class::createDefaultObject()  const noexcept {
-	return new Object();
+	void* temp = operator new(sizeof(Object));
+	memset(temp, 0, sizeof(Object));
+	return new(temp) Object();
 }

@@ -52,11 +52,11 @@ private:
 	const int8_t core;
 
 	State state = State::Stopped;
-	bool paused = false;
-	TickType_t lastLoop = 0;
-	std::function<void(void)> lambdaLoop = nullptr;
+	bool paused;
+	TickType_t lastLoop;
+	std::function<void(void)> lambdaLoop;
 
-	TaskHandle_t task = nullptr;
+	TaskHandle_t task;
 	SemaphoreHandle_t stopSemaphore;
 	SemaphoreHandle_t stopMutex;
 	SemaphoreHandle_t pauseSemaphore;
