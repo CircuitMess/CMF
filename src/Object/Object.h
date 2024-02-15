@@ -87,6 +87,11 @@ public:
 
 	virtual Archive& serialize(Archive& archive) noexcept;
 
+	static class Application* getApp() noexcept;
+
+	Object* getOutermostOwner() const noexcept;
+	Object* getOutermostInstigator() const noexcept;
+
 private:
 	using ClassType = Class;
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));

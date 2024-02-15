@@ -162,6 +162,32 @@ Archive& Object::serialize(Archive& archive) noexcept {
 	return archive;
 }
 
+Application* Object::getApp() noexcept {
+	return ApplicationStatics::getApplication();
+}
+
+Object* Object::getOutermostOwner() const noexcept{
+	Object* outermost = getOwner();
+	if(outermost == nullptr){
+		return nullptr;
+	}
+
+	for( ; outermost != nullptr && outermost->getOwner() != nullptr; outermost = outermost->getOwner());
+
+	return outermost;
+}
+
+Object* Object::getOutermostInstigator() const noexcept{
+	Object* outermost = getInstigator();
+	if(outermost == nullptr){
+		return nullptr;
+	}
+
+	for( ; outermost != nullptr && outermost->getInstigator() != nullptr; outermost = outermost->getInstigator());
+
+	return outermost;
+}
+
 inline void Object::registerChild(Object* child) noexcept {
 	std::lock_guard lock(ownershipMutex);
 
