@@ -39,6 +39,7 @@ private:
 	T value;
 };
 
+// TODO: make changes to allow enum to be defined so that the values start from a certain number, change so that none and count are min and max. they should always be present
 #define DECLARE_CLASS_ENUM(Name, Type, ...) 																						\
 	class Name : public Enum<Type> {           																						\
 	public:                                																							\

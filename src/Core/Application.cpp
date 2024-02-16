@@ -12,6 +12,10 @@ Application::~Application() noexcept {
 	}
 }
 
+void Application::registerLifetimeObject(Object* object) noexcept{
+	lifetimeObjects.insert(object);
+}
+
 void Application::postInitProperties() noexcept {
 	Super::postInitProperties();
 }

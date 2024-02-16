@@ -208,7 +208,7 @@ public:																														\
 
 // ====================================================================================
 
-class Interface1 {
+/*class Interface1 {
 };
 
 class Interface2 {};
@@ -234,7 +234,7 @@ class DoubleDerivedObject : public SecondExampleDerivedObject {
 
 class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
 	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>)
-};
+};*/
 
 // ====================================================================================
 
