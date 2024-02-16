@@ -8,6 +8,8 @@
 template<typename T = int, typename = std::enable_if<std::integral<T>, T>::type>
 class Enum {
 public:
+	using Type = T;
+
 	inline constexpr Enum() noexcept : value(T()) {}
 
 	template<typename E>
