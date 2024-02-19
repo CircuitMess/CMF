@@ -12,6 +12,7 @@
 #include "Object/Interface.h"
 #include "Devices/Device.h"
 #include "Drivers/Driver.h"
+#include "Services/Service.h"
 
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
@@ -74,34 +75,28 @@ public:
 	void registerLifetimeObject(Object* object) noexcept;
 
 	template<typename T, typename ...Args>
-	T* registerPeriphery(Args&&... args) noexcept {
+	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Periphery>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
 		}
 
-		Interface<Periphery> periph = *object;
-		if(!periph){
-			return nullptr;
-		}
-
-		registerLifetimeObject(*object);
-		periphery.insert(periph);
+		periphery.insert(*object);
 
 		return *object;
 	}
 
 	template<typename T>
-	T* getPeriphery(const std::function<bool(const Interface<Periphery>&)> fn =
-			[](const Interface<Periphery>& interface) {return cast<T>(interface.getObject()) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
+	T* getPeriphery(const std::function<bool(const Periphery*)>& fn =
+			[](const Periphery* periph) {return cast<T>(periph) != nullptr;})
+			const noexcept requires(std::derived_from<T, Periphery>) {
 		if(!fn){
 			return nullptr;
 		}
 
-		for(const Interface<Periphery>& periph : periphery){
-			if(fn(periph)){
-				return cast<T>(periph.getObject());
+		for(const StrongObjectPtr<Periphery>& periph : periphery){
+			if(fn(*periph)){
+				return cast<T>(*periph);
 			}
 		}
 
@@ -109,34 +104,28 @@ public:
 	}
 
 	template<typename T, typename ...Args>
-	T* registerDevice(Args&&... args) noexcept {
+	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Device>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
 		}
 
-		Interface<Device> device = *object;
-		if(!device){
-			return nullptr;
-		}
-
-		registerLifetimeObject(*object);
-		devices.insert(device);
+		devices.insert(*object);
 
 		return *object;
 	}
 
 	template<typename T>
-	T* getDevice(const std::function<bool(const Interface<Device>&)> fn =
-			[](const Interface<Device>& interface) {return cast<T>(interface.getObject()) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
+	T* getDevice(const std::function<bool(const Device*)>& fn =
+			[](const Device* device) {return cast<T>(device) != nullptr;})
+			const noexcept requires(std::derived_from<T, Device>) {
 		if(!fn){
 			return nullptr;
 		}
 
-		for(const Interface<Device>& device : devices){
-			if(fn(device)){
-				return cast<T>(device.getObject());
+		for(const StrongObjectPtr<Device>& device : devices){
+			if(fn(*device)){
+				return cast<T>(*device);
 			}
 		}
 
@@ -144,42 +133,73 @@ public:
 	}
 
 	template<typename T, typename ...Args>
-	T* registerDriver(Args&&... args) noexcept {
+	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Driver>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
 		}
 
-		Interface<Driver> driver = *object;
-		if(!driver){
-			return nullptr;
-		}
-
-		for(const Interface<Driver>& interface : drivers){
-			if(!interface){
+		for(const StrongObjectPtr<Driver>& driver : drivers){
+			if(!driver.isValid()){
 				continue;
 			}
 
-			if(interface.getObject()->getStaticClass() == object->getStaticClass()){
+			if(driver->getStaticClass() == object->getStaticClass()){
 				return nullptr;
 			}
 		}
 
-		registerLifetimeObject(*object);
-		drivers.insert(driver);
+		drivers.insert(*object);
 
 		return *object;
 	}
 
 	template<typename T>
-	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
-		for(const Interface<Driver>& driver : drivers){
-			if(!driver){
+	T* getDriver() const noexcept requires(std::derived_from<T, Driver>) {
+		for(const StrongObjectPtr<Driver>& driver : drivers){
+			if(!driver.isValid()){
 				continue;
 			}
 
-			if(T* driverObject = cast<T>(driver.getObject())){
+			if(T* driverObject = cast<T>(*driver)){
 				return driverObject;
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T, typename ...Args>
+	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Service>){
+		StrongObjectPtr<T> object = newObject<T>(this, args...);
+		if(!object.isValid()){
+			return nullptr;
+		}
+
+		for(const StrongObjectPtr<Service>& service : services){
+			if(!service.isValid()){
+				continue;
+			}
+
+			if(service->getStaticClass() == object->getStaticClass()){
+				return nullptr;
+			}
+		}
+
+		drivers.insert(*object);
+
+		return *object;
+	}
+
+	template<typename T>
+	T* getService() const noexcept requires(std::derived_from<T, Service>) {
+		for(const StrongObjectPtr<Service>& service : services){
+			if(!service.isValid()){
+				continue;
+			}
+
+			if(T* serviceObject = cast<T>(*service)){
+				return serviceObject;
 			}
 		}
 
@@ -202,11 +222,12 @@ private:
 	std::set<StrongObjectPtr<Singleton>> singletons;
 	std::set<StrongObjectPtr<Object>> lifetimeObjects;
 	bool shuttingDown;
+	std::mutex registrationMutex;
 
-	// TODO: think if there is a need for this to be in interfaces, or can this simply be set of object pointers
-	std::set<Interface<Periphery>> periphery;
-	std::set<Interface<Device>> devices;
-	std::set<Interface<Driver>> drivers;
+	std::set<StrongObjectPtr<Periphery>> periphery;
+	std::set<StrongObjectPtr<Device>> devices;
+	std::set<StrongObjectPtr<Driver>> drivers;
+	std::set<StrongObjectPtr<Service>> services;
 };
 
 #endif //CMF_APPLICATION_H
