@@ -38,12 +38,12 @@ public:
 		return other->getID() == staticClass()->getID();
 	}
 
-	template<typename T>
+	template<typename __T>
 	inline bool isA() const noexcept {
-		return isA(T::staticClass());
+		return isA(__T::staticClass());
 	}
 
-	template<typename T>
+	template<typename __T>
 	static inline constexpr bool implements() noexcept {
 		return false;
 	}
@@ -133,18 +133,18 @@ private:
 	static_assert(!std::is_abstract<SuperObject>(), "CMF: Extended object cannot be abstract class.");						\
 																															\
 private:																													\
-	template<typename... Types>																								\
-	class ObjectName##_Class;																								\
+	template<typename... __Types>																							\
+	class __##ObjectName##_Class;																							\
 																															\
-	template<typename T>																									\
-	class ObjectName##_Class<T> : public Class {																			\
+	template<typename __T>																									\
+	class __##ObjectName##_Class<__T> : public Class {																		\
 	public:																													\
 		friend class ObjectName;																							\
 																															\
 	public:																													\
-		template<typename Type>																								\
+		template<typename __Type>																							\
 		inline static constexpr bool implements() noexcept {                 												\
-			return std::is_same<Type, T>::value;																			\
+			return std::is_same<__Type, __T>::value;																		\
 		}                                                                    												\
                                                                        														\
         inline virtual Object* createDefaultObject() const noexcept override {  											\
@@ -158,28 +158,28 @@ private:																													\
 		}																													\
 																															\
 	protected:                                             																	\
-		explicit inline ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}												\
+		explicit inline __##ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}											\
 	};																														\
 																															\
-	template<typename T, typename... Types>																					\
-	class ObjectName##_Class<T, Types...> : public ObjectName##_Class<Types...> {											\
-		typedef ObjectName##_Class<Types...> Inherited;																		\
+	template<typename __T, typename... __Types>																				\
+	class __##ObjectName##_Class<__T, __Types...> : public __##ObjectName##_Class<__Types...> {								\
+		typedef __##ObjectName##_Class<__Types...> Inherited;																\
 																															\
 	public:																													\
 		friend class ObjectName;																							\
 																															\
 	public:																													\
-		template<typename Type>																								\
+		template<typename __Type>																							\
 		inline static constexpr bool implements() noexcept {                 												\
-			return std::is_same<Type, T>::value || Inherited::template implements<Type>();									\
+			return std::is_same<__Type, __T>::value || Inherited::template implements<__Type>();							\
 		}																													\
 																															\
 	protected:																												\
-		explicit inline ObjectName##_Class(uint32_t ID) noexcept : ObjectName##_Class<Types...>(ID) {}						\
+		explicit inline __##ObjectName##_Class(uint32_t ID) noexcept : __##ObjectName##_Class<__Types...>(ID) {}			\
 	};																														\
 																															\
 	using Super = SuperObject;																								\
-	using ClassType = ObjectName##_Class<Super, ##__VA_ARGS__>;																\
+	using ClassType = __##ObjectName##_Class<Super, ##__VA_ARGS__>;															\
 	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH(#ObjectName));								\
 																															\
 public:																														\
@@ -195,20 +195,20 @@ public:																														\
 		return other->getID() == staticClass()->getID() || Super::isA(other);												\
 	}																														\
 																															\
-	template<typename T>																									\
+	template<typename __T>																									\
 	inline bool isA() const noexcept {																						\
-		return isA(T::staticClass());																						\
+		return isA(__T::staticClass());																						\
 	}																														\
 																															\
-	template<typename T>																									\
+	template<typename __T>																									\
 	inline static constexpr bool implements() noexcept {																	\
-		return objectStaticClass->implements<T>() || Super::implements<T>();												\
+		return objectStaticClass->implements<__T>() || Super::implements<__T>();											\
 	}                                                      																	\
 
 
 // ====================================================================================
 
-/*class Interface1 {
+class Interface1 {
 };
 
 class Interface2 {};
@@ -234,7 +234,7 @@ class DoubleDerivedObject : public SecondExampleDerivedObject {
 
 class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
 	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>)
-};*/
+};
 
 // ====================================================================================
 
