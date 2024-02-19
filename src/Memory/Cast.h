@@ -4,7 +4,7 @@
 #include "Object/Object.h"
 
 template<typename T1, typename T2, typename = std::enable_if<std::derived_from<T1, Object>, T1>::type, typename = std::enable_if<std::derived_from<T2, Object>, T2>::type>
-inline static T1* cast(T2* object){
+inline static T1* cast(T2* object) noexcept{
 	if(object == nullptr){
 		return nullptr;
 	}
@@ -17,7 +17,7 @@ inline static T1* cast(T2* object){
 }
 
 template<typename T1, typename T2, typename = std::enable_if<std::derived_from<T1, Object>, T1>::type, typename = std::enable_if<std::derived_from<T2, Object>, T2>::type>
-inline static const T1* cast(const T2* object){
+inline static const T1* cast(const T2* object) noexcept{
 	if(object == nullptr){
 		return nullptr;
 	}

@@ -7,6 +7,7 @@
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Statics/ApplicationStatics.h"
 #include "ObjectManager.h"
+#include "Object/Interface.h"
 
 void initObject(Object* object, Object* owner) noexcept;
 
@@ -19,6 +20,15 @@ inline bool isValid(const ObjectPtr<T, KeepAlive>& object) noexcept {
 	}
 
 	return ObjectManager::get()->isValid(object.get());
+}
+
+template<typename T>
+inline bool isValid(const Interface<T>& interface) noexcept {
+	if(!interface){
+		return false;
+	}
+
+	return isValid(interface.getObject());
 }
 
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
