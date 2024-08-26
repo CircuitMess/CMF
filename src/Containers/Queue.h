@@ -1,12 +1,12 @@
 #ifndef CMF_QUEUE_H
 #define CMF_QUEUE_H
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <cstddef>
 #include <cstring>
 #include <memory>
 #include <mutex>
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
 
 template<typename T, typename Allocator = std::allocator<T>>
 class Queue {

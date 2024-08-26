@@ -1,6 +1,7 @@
 #ifndef CMF_OBJECT_H
 #define CMF_OBJECT_H
 
+#include <freertos/FreeRTOS.h>
 #include <concepts>
 #include <type_traits>
 #include <mutex>
