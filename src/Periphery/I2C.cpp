@@ -37,7 +37,7 @@ void I2C::scan(TickType_t timeout) noexcept{
 
 	for(size_t i = 0; i < 127; ++i){
 		if(probe(i, timeout) == ESP_OK){
-			CMF_LOG(LogCMF, Verbose, "Found device on adderss 0x%x", i);
+			CMF_LOG(LogCMF, Verbose, "Found device on address 0x%x", i);
 		}
 	}
 
