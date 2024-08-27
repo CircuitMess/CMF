@@ -20,11 +20,11 @@ enum class I2CPort : int8_t {
 	COUNT
 };
 
-class I2C : public Periphery {
-	GENERATED_BODY(I2C, Periphery)
+class I2C : public Object {
+	GENERATED_BODY(I2C, Object)
 
 public:
-	explicit I2C(I2CPort port = I2CPort::None, Pin sda = Pin::None, Pin scl = Pin::None) noexcept;
+	explicit I2C(I2CPort port = I2CPort::None, gpio_num_t sda = GPIO_NUM_NC, gpio_num_t scl = GPIO_NUM_NC) noexcept;
 	virtual ~I2C() noexcept override;
 
 	I2CPort getPort() const noexcept;
