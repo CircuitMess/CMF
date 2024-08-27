@@ -195,7 +195,7 @@ protected:
 			}
 		}
 
-		drivers.insert(*object);
+		services.insert(*object);
 
 		return *object;
 	}
