@@ -203,7 +203,7 @@ public:																														\
 																															\
 	template<typename __T>																									\
 	inline static constexpr bool implements() noexcept {																	\
-		return objectStaticClass->implements<__T>() || Super::implements<__T>();											\
+		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();											\
 	}                                                      																	\
 
 
