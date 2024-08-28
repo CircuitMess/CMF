@@ -87,23 +87,26 @@ void AsyncEntity::tickHandle() noexcept{
 
 	if(!hasBegun()){
 		begin();
+
+		forEachChild([](Object* child) {
+			if(!isValid(child)){
+				return false;
+			}
+
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				if(entity->hasBegun()) {
+					return false;
+				}
+
+				entity->begin();
+			}
+
+			return false;
+		});
 	}
 
 	scanEvents(getEventScanningTime());
-
 	tick(deltaTime);
-
-	forEachChild([](Object* child) {
-		if(!isValid(child)){
-			return false;
-		}
-
-		if(SyncEntity* entity = cast<SyncEntity>(child)){
-			entity->begin();
-		}
-
-		return false;
-	});
 
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){

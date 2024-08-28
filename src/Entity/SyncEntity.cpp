@@ -14,19 +14,23 @@ SyncEntity::SyncEntity(Object* owner/* = nullptr*/) noexcept : Super() {
 SyncEntity::~SyncEntity() noexcept = default;
 
 void SyncEntity::tick(float deltaTime) noexcept {
-	Super::tick(deltaTime);
-
 	forEachChild([](Object* child) {
-		if(!isValid(child)){
+			if(!isValid(child)){
+				return false;
+			}
+
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				if(entity->hasBegun()) {
+					return false;
+				}
+
+				entity->begin();
+			}
+
 			return false;
-		}
+		});
 
-		if(SyncEntity* entity = cast<SyncEntity>(child)){
-			entity->begin();
-		}
-
-		return false;
-	});
+	Super::tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){
@@ -78,6 +82,22 @@ void SyncEntity::postInitProperties() noexcept {
 
 void SyncEntity::begin() noexcept {
 	Super::begin();
+
+	forEachChild([](Object* child) {
+		if(!isValid(child)){
+			return false;
+		}
+
+		if(SyncEntity* entity = cast<SyncEntity>(child)){
+			if(entity->hasBegun()) {
+				return false;
+			}
+
+			entity->begin();
+		}
+
+		return false;
+	});
 }
 
 void SyncEntity::end(EndReason reason) noexcept {
