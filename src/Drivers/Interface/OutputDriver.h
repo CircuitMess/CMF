@@ -19,7 +19,7 @@ class OutputDriver : public SyncEntity {
 	GENERATED_BODY(OutputDriver, SyncEntity);
 
 public:
-	virtual bool getState(int port) noexcept;
+	virtual float getState(int port) noexcept;
 	virtual void write(int port, float value) noexcept;
 	virtual void write(int port, bool value) noexcept;
 	virtual void send() noexcept;
@@ -32,9 +32,9 @@ protected:
 
 	/**
 	 * Map of cached output values.
-	 * key = port[int] , value = state[bool]
+	 * key = port[int] , value = state[float]
 	 */
-	std::map<int, bool> states;
+	std::map<int, float> states;
 
 	/**
 	 * Map of inversion settings for each port.

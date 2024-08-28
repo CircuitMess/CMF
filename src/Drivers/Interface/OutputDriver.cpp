@@ -5,7 +5,7 @@ OutputDriver::OutputDriver(const std::vector<OutputPinDef>& outputs) : outputs(o
 
 }
 
-bool OutputDriver::getState(int port) noexcept{
+float OutputDriver::getState(int port) noexcept{
 	if(!states.contains(port)){
 		CMF_LOG(LogCMF, Error, "Port %d not registered", port);
 	}
@@ -13,6 +13,7 @@ bool OutputDriver::getState(int port) noexcept{
 }
 
 void OutputDriver::write(int port, float value) noexcept{
+	states[port] = value;
 
 }
 

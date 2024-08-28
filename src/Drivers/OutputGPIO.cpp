@@ -10,23 +10,18 @@ OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr
 }
 
 void OutputGPIO::write(int port, bool value) noexcept{
-	if(states[port] == value){
-		return;
-	}
+	Super::write(port, value);
+
 	const auto pin = (gpio_num_t) port;
 	gpio->write(pin, value ^ inversions[port]);
-	states[port] = value;
 }
 
 void OutputGPIO::begin() noexcept{
 	Super::begin();
 
 	for(const auto& output: outputs){
-
 		//setting initial state
-		gpio->write((gpio_num_t)output.port, output.inverted);
-
-		states[output.port] = false;
 		inversions[output.port] = output.inverted;
+		write((gpio_num_t)output.port, false);
 	}
 }
