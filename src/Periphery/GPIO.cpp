@@ -21,7 +21,7 @@ bool GPIO::read(gpio_num_t gpioNum){
 }
 
 void GPIO::setPullup(gpio_num_t gpioNum, bool pulledUp){
-	gpio_set_pull_mode(gpioNum, pulledUp ? GPIO_PULLUP_ONLY : GPIO_FLOATING)
+	gpio_set_pull_mode(gpioNum, pulledUp ? GPIO_PULLUP_ONLY : GPIO_FLOATING);
 }
 
 void GPIO::setPulldown(gpio_num_t gpioNum, bool pulledDown){

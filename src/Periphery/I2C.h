@@ -1,7 +1,6 @@
 #ifndef CMF_I2C_H
 #define CMF_I2C_H
 
-#include "Periphery.h"
 #include "GPIO.h"
 #include <hal/i2c_types.h>
 #include <hal/gpio_types.h>
