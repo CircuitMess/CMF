@@ -16,18 +16,6 @@ SyncEntity::~SyncEntity() noexcept = default;
 void SyncEntity::tick(float deltaTime) noexcept {
 	Super::tick(deltaTime);
 
-	forEachChild([](Object* child) {
-		if(!isValid(child)){
-			return false;
-		}
-
-		if(SyncEntity* entity = cast<SyncEntity>(child)){
-			entity->begin();
-		}
-
-		return false;
-	});
-
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){
 			return false;
@@ -78,6 +66,18 @@ void SyncEntity::postInitProperties() noexcept {
 
 void SyncEntity::begin() noexcept {
 	Super::begin();
+
+	forEachChild([](Object* child) {
+		if(!isValid(child)){
+			return false;
+		}
+
+		if(SyncEntity* entity = cast<SyncEntity>(child)){
+			entity->begin();
+		}
+
+		return false;
+	});
 }
 
 void SyncEntity::end(EndReason reason) noexcept {

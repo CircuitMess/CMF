@@ -1,7 +1,7 @@
 #include "Class.h"
 #include "Object.h"
 
-const class Class* ClassRegistry::getClass(uint32_t ID) const noexcept{
+const Class* ClassRegistry::getClass(uint32_t ID) const noexcept{
 	if(!classes.contains(ID)){
 		return nullptr;
 	}

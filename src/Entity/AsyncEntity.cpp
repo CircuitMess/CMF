@@ -87,23 +87,25 @@ void AsyncEntity::tickHandle() noexcept{
 
 	if(!hasBegun()){
 		begin();
+
+		forEachChild([](Object* child) {
+
+			if(!isValid(child)){
+				return false;
+			}
+
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+
+				CMF_LOG(LogCMF, Info, "Starting child %s", entity->getName().c_str());
+				entity->begin();
+			}
+
+			return false;
+		});
 	}
 
 	scanEvents(getEventScanningTime());
 
-	tick(deltaTime);
-
-	forEachChild([](Object* child) {
-		if(!isValid(child)){
-			return false;
-		}
-
-		if(SyncEntity* entity = cast<SyncEntity>(child)){
-			entity->begin();
-		}
-
-		return false;
-	});
 
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){
@@ -180,6 +182,8 @@ void AsyncEntity::tickHandle() noexcept{
 		end(reason);
 		onDestroy();
 	}
+
+	tick(deltaTime);
 
 	lastTickTime = currentTickTime;
 }
