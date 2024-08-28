@@ -80,4 +80,41 @@ static inline constexpr uint32_t DJB_SH(uint32_t start, uint8_t character) noexc
     (sizeof(a) == 33) ? DJB_SH_32(a) : 							\
     0)															\
 
+    #define STD_STRING_HASH(a) ( 								\
+    (void)(sizeof(int[(a.size() > 33 ? -1 : 1)])), 			    \
+    (a.size() == 1) ? DJB_SEED : 								\
+    (a.size() == 2) ? DJB_SH_1(a) : 							\
+    (a.size() == 3) ? DJB_SH_2(a) : 							\
+    (a.size() == 4) ? DJB_SH_3(a) : 							\
+    (a.size() == 4) ? DJB_SH_3(a) : 							\
+    (a.size() == 5) ? DJB_SH_4(a) : 							\
+    (a.size() == 6) ? DJB_SH_5(a) : 							\
+    (a.size() == 7) ? DJB_SH_6(a) : 							\
+    (a.size() == 8) ? DJB_SH_7(a) : 							\
+    (a.size() == 9) ? DJB_SH_8(a) : 							\
+    (a.size() == 10) ? DJB_SH_9(a) : 							\
+    (a.size() == 11) ? DJB_SH_10(a) : 							\
+    (a.size() == 12) ? DJB_SH_11(a) : 							\
+    (a.size() == 13) ? DJB_SH_12(a) : 							\
+    (a.size() == 14) ? DJB_SH_13(a) : 							\
+    (a.size() == 15) ? DJB_SH_14(a) : 							\
+    (a.size() == 16) ? DJB_SH_15(a) : 							\
+    (a.size() == 17) ? DJB_SH_16(a) : 							\
+    (a.size() == 18) ? DJB_SH_17(a) : 							\
+    (a.size() == 19) ? DJB_SH_18(a) : 							\
+    (a.size() == 20) ? DJB_SH_19(a) : 							\
+    (a.size() == 21) ? DJB_SH_20(a) : 							\
+    (a.size() == 22) ? DJB_SH_21(a) : 							\
+    (a.size() == 23) ? DJB_SH_22(a) : 							\
+    (a.size() == 24) ? DJB_SH_23(a) : 							\
+    (a.size() == 25) ? DJB_SH_24(a) : 							\
+    (a.size() == 26) ? DJB_SH_25(a) : 							\
+    (a.size() == 27) ? DJB_SH_26(a) : 							\
+    (a.size() == 28) ? DJB_SH_27(a) : 							\
+    (a.size() == 29) ? DJB_SH_28(a) : 							\
+    (a.size() == 30) ? DJB_SH_29(a) : 							\
+    (a.size() == 31) ? DJB_SH_30(a) : 							\
+    (a.size() == 32) ? DJB_SH_31(a) : 							\
+    0)															\
+
 #endif //CMF_DJB_H

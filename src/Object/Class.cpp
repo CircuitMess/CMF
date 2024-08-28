@@ -1,7 +1,7 @@
 #include "Class.h"
 #include "Object.h"
 
-const Class* ClassRegistry::getClass(uint32_t ID) const noexcept{
+const Class* ClassRegistry::getClass(uint64_t ID) const noexcept{
 	if(!classes.contains(ID)){
 		return nullptr;
 	}
@@ -17,11 +17,11 @@ void ClassRegistry::registerClass(const Class* cls) noexcept{
 	classes[cls->getID()] = cls;
 }
 
-uint32_t Class::getID() const noexcept{
+uint64_t Class::getID() const noexcept{
 	return classID;
 }
 
-Class::Class(uint32_t ID) noexcept : classID(ID) {
+Class::Class(uint64_t ID) noexcept : classID(ID) {
 	if(registry == nullptr){
 		registry = new ClassRegistry();
 	}
