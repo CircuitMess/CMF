@@ -89,14 +89,15 @@ void AsyncEntity::tickHandle() noexcept{
 		begin();
 
 		forEachChild([](Object* child) {
-
 			if(!isValid(child)){
 				return false;
 			}
 
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				if(entity->hasBegun()) {
+					return false;
+				}
 
-				CMF_LOG(LogCMF, Info, "Starting child %s", entity->getName().c_str());
 				entity->begin();
 			}
 
@@ -105,7 +106,7 @@ void AsyncEntity::tickHandle() noexcept{
 	}
 
 	scanEvents(getEventScanningTime());
-
+	tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){
@@ -182,8 +183,6 @@ void AsyncEntity::tickHandle() noexcept{
 		end(reason);
 		onDestroy();
 	}
-
-	tick(deltaTime);
 
 	lastTickTime = currentTickTime;
 }

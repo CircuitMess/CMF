@@ -29,6 +29,7 @@ void Application::tick(float deltaTime) noexcept {
 }
 
 void Application::end(EndReason reason) noexcept {
+	// TODO right now only Quit reason is supported, this needs to be expanded in the future
 	reason = EndReason::Quit;
 	shuttingDown = true;
 

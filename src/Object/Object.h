@@ -9,6 +9,7 @@
 #include <atomic>
 #include "Class.h"
 #include "Misc/Djb.h"
+#include "Misc/TemplateTypes.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Containers/Queue.h"
@@ -24,7 +25,7 @@ public:
 	}
 
 	inline std::string getName() const noexcept {
-		return std::string(getStaticClass()->getName()).append("_").append(std::to_string(getID()));
+		return getStaticClass()->getName().append("_").append(std::to_string(getID()));
 	}
 
 	inline static const Class* staticClass() noexcept {
@@ -93,9 +94,13 @@ public:
 	Object* getOutermostOwner() const noexcept;
 	Object* getOutermostInstigator() const noexcept;
 
+protected:
+	inline static constexpr std::string __getTemplateNames() noexcept { return ""; }
+	inline static constexpr uint32_t __getTemplateHash() noexcept { return 0; }
+
 private:
 	using ClassType = Class;
-	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH("Object"));
+	inline static const ClassType* objectStaticClass = new ClassType((uint64_t) STRING_HASH("Object") << 32);
 	inline static uint32_t ObjectIndex = 0;
 
 	const uint32_t id;
@@ -129,82 +134,90 @@ private:
 	void removeChild(Object* child) noexcept;
 };
 
-#define GENERATED_BODY(ObjectName, SuperObject, ...) 																		\
-	static_assert(std::derived_from<SuperObject, Object>, "CMF: Object must have and inherit a base Object class."); 		\
-	static_assert(!std::is_abstract<SuperObject>(), "CMF: Extended object cannot be abstract class.");						\
-																															\
-private:																													\
-	template<typename... __Types>																							\
-	class __##ObjectName##_Class;																							\
-																															\
-	template<typename __T>																									\
-	class __##ObjectName##_Class<__T> : public Class {																		\
-	public:																													\
-		friend class ObjectName;																							\
-																															\
-	public:																													\
-		template<typename __Type>																							\
-		inline static constexpr bool implements() noexcept {                 												\
-			return std::is_same<__Type, __T>::value;																		\
-		}                                                                    												\
-                                                                       														\
-        inline virtual Object* createDefaultObject() const noexcept override {  											\
-			void* temp = operator new(sizeof(ObjectName));																	\
-			memset(temp, 0, sizeof(ObjectName));																			\
-			return new(temp) ObjectName();																					\
-		}                                                                    												\
-																															\
-		inline virtual constexpr const char* getName() const noexcept override{												\
-			return #ObjectName;																								\
-		}																													\
-																															\
-	protected:                                             																	\
-		explicit inline __##ObjectName##_Class(uint32_t ID) noexcept : Class(ID) {}											\
-	};																														\
-																															\
-	template<typename __T, typename... __Types>																				\
-	class __##ObjectName##_Class<__T, __Types...> : public __##ObjectName##_Class<__Types...> {								\
-		typedef __##ObjectName##_Class<__Types...> Inherited;																\
-																															\
-	public:																													\
-		friend class ObjectName;																							\
-																															\
-	public:																													\
-		template<typename __Type>																							\
-		inline static constexpr bool implements() noexcept {                 												\
-			return std::is_same<__Type, __T>::value || Inherited::template implements<__Type>();							\
-		}																													\
-																															\
-	protected:																												\
-		explicit inline __##ObjectName##_Class(uint32_t ID) noexcept : __##ObjectName##_Class<__Types...>(ID) {}			\
-	};																														\
-																															\
-	using Super = SuperObject;																								\
-	using ClassType = __##ObjectName##_Class<Super, ##__VA_ARGS__>;															\
-	inline static const ClassType* objectStaticClass = new ClassType(STRING_HASH(#ObjectName));								\
-																															\
-public:																														\
-	inline static const Class* staticClass() noexcept {																		\
-		return objectStaticClass;																							\
-	}																														\
-																															\
-	inline virtual const Class* getStaticClass() const noexcept override {													\
-		return staticClass();																								\
-	}																														\
-																															\
-	inline virtual bool isA(const Class* other) const noexcept override {													\
-		return other->getID() == staticClass()->getID() || Super::isA(other);												\
-	}																														\
-																															\
-	template<typename __T>																									\
-	inline bool isA() const noexcept {																						\
-		return isA(__T::staticClass());																						\
-	}																														\
-																															\
-	template<typename __T>																									\
-	inline static constexpr bool implements() noexcept {																	\
-		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();											\
-	}                                                      																	\
+#define TEMPLATE_ATTRIBUTES(T1, ...)																												        \
+protected:																																			        \
+	inline static constexpr std::string __getTemplateNames() noexcept { return TemplateTypesInfo<T1, ##__VA_ARGS__>::TypeNames(); }							\
+	inline static constexpr uint32_t __getTemplateHash() noexcept { return TemplateTypesInfo<T1, ##__VA_ARGS__>::TypesHash(); }						        \
+private:																																			        \
+
+#define GENERATED_BODY(ObjectName, SuperObject, ...) 																		                                \
+	static_assert(std::derived_from<SuperObject, Object>, "CMF: Object must have and inherit a base Object class."); 		                                \
+	static_assert(!std::is_abstract<SuperObject>(), "CMF: Extended object cannot be abstract class.");						                                \
+																															                                \
+private:																													                                \
+	template<typename... __Types>																							                                \
+	class __##ObjectName##_Class;																							                                \
+																															                                \
+	template<typename __T>																									                                \
+	class __##ObjectName##_Class<__T> : public Class {																		                                \
+	public:																													                                \
+		friend class ObjectName;																							                                \
+																															                                \
+	public:																													                                \
+		template<typename __Type>																							                                \
+		inline static constexpr bool implements() noexcept {                 												                                \
+			return std::is_same<__Type, __T>::value;																		                                \
+		}                                                                    												                                \
+                                                                       														                                \
+        inline virtual Object* createDefaultObject() const noexcept override {  											                                \
+			void* temp = operator new(sizeof(ObjectName));																	                                \
+			memset(temp, 0, sizeof(ObjectName));																			                                \
+			return new(temp) ObjectName();																					                                \
+		}                                                                    												                                \
+																															                                \
+		inline virtual constexpr std::string getName() const noexcept override{												                                \
+			const std::string templates = __getTemplateNames();																								\
+			const std::string ret = std::string(#ObjectName) + (templates.empty() ? "" : "<" + templates + ">");											\
+			return ret;																																		\
+		}																													                                \
+																															                                \
+	protected:                                             																	                                \
+		explicit inline __##ObjectName##_Class(uint64_t ID) noexcept : Class(ID) {}											                                \
+	};																														                                \
+																															                                \
+	template<typename __T, typename... __Types>																				                                \
+	class __##ObjectName##_Class<__T, __Types...> : public __##ObjectName##_Class<__Types...> {								                                \
+		typedef __##ObjectName##_Class<__Types...> Inherited;																                                \
+																															                                \
+	public:																													                                \
+		friend class ObjectName;																							                                \
+																															                                \
+	public:																													                                \
+		template<typename __Type>																							                                \
+		inline static constexpr bool implements() noexcept {                 												                                \
+			return std::is_same<__Type, __T>::value || Inherited::template implements<__Type>();							                                \
+		}																													                                \
+																															                                \
+	protected:																												                                \
+		explicit inline __##ObjectName##_Class(uint64_t ID) noexcept : __##ObjectName##_Class<__Types...>(ID) {}			                                \
+	};																														                                \
+																															                                \
+	using Super = SuperObject;																								                                \
+	using ClassType = __##ObjectName##_Class<Super, ##__VA_ARGS__>;															                                \
+	inline static const ClassType* objectStaticClass = new ClassType(((uint64_t) STRING_HASH(#ObjectName) << 32) | __getTemplateHash());					\
+																															                                \
+public:																														                                \
+	inline static const Class* staticClass() noexcept {																		                                \
+		return objectStaticClass;																							                                \
+	}																														                                \
+																															                                \
+	inline virtual const Class* getStaticClass() const noexcept override {													                                \
+		return staticClass();																								                                \
+	}																														                                \
+																															                                \
+	inline virtual bool isA(const Class* other) const noexcept override {													                                \
+		return other->getID() == staticClass()->getID() || Super::isA(other);												                                \
+	}																														                                \
+																															                                \
+	template<typename __T>																									                                \
+	inline bool isA() const noexcept {																						                                \
+		return isA(__T::staticClass());																						                                \
+	}																														                                \
+																															                                \
+	template<typename __T>																									                                \
+	inline static constexpr bool implements() noexcept {																	                                \
+		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();							                                \
+	}                                                      																	                                \
 
 
 // ====================================================================================
@@ -233,8 +246,10 @@ class DoubleDerivedObject : public SecondExampleDerivedObject {
 	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject)
 };
 
+template<typename T, typename U>
 class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
-	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3<int>)
+	TEMPLATE_ATTRIBUTES(T, U)
+	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3)
 };
 
 // ====================================================================================

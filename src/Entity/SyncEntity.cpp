@@ -14,6 +14,22 @@ SyncEntity::SyncEntity(Object* owner/* = nullptr*/) noexcept : Super() {
 SyncEntity::~SyncEntity() noexcept = default;
 
 void SyncEntity::tick(float deltaTime) noexcept {
+	forEachChild([](Object* child) {
+			if(!isValid(child)){
+				return false;
+			}
+
+			if(SyncEntity* entity = cast<SyncEntity>(child)){
+				if(entity->hasBegun()) {
+					return false;
+				}
+
+				entity->begin();
+			}
+
+			return false;
+		});
+
 	Super::tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child) {
@@ -73,6 +89,10 @@ void SyncEntity::begin() noexcept {
 		}
 
 		if(SyncEntity* entity = cast<SyncEntity>(child)){
+			if(entity->hasBegun()) {
+				return false;
+			}
+
 			entity->begin();
 		}
 

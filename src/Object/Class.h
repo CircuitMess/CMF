@@ -3,6 +3,7 @@
 
 #include <cinttypes>
 #include <map>
+#include <string>
 
 class Object;
 
@@ -10,11 +11,11 @@ class ClassRegistry {
 public:
 	virtual ~ClassRegistry() noexcept = default;
 
-	const class Class* getClass(uint32_t ID) const noexcept;
+	const class Class* getClass(uint64_t ID) const noexcept;
 	void registerClass(const Class* cls) noexcept;
 
 private:
-	std::map<uint32_t, const Class*> classes;
+	std::map<uint64_t, const Class*> classes;
 };
 
 class Class {
@@ -25,14 +26,14 @@ public:
 
 	virtual Object* createDefaultObject() const noexcept;
 
-	uint32_t getID() const noexcept;
+	uint64_t getID() const noexcept;
 
 	template<typename Type>
 	static inline constexpr bool implements() noexcept {
 		return false;
 	}
 
-	static inline const Class* getClasByID(uint32_t ID) noexcept {
+	static inline const Class* getClasByID(uint64_t ID) noexcept {
 		if(registry == nullptr){
 			return nullptr;
 		}
@@ -40,18 +41,18 @@ public:
 		return registry->getClass(ID);
 	}
 
+	inline virtual constexpr std::string getName() const noexcept{
+		return "Object";
+	}
+
 protected:
 	static inline ClassRegistry* registry = nullptr;
 
 protected:
-	explicit Class(uint32_t ID) noexcept;
-
-	inline virtual constexpr const char* getName() const noexcept{
-		return "Object";
-	}
+	explicit Class(uint64_t ID) noexcept;
 
 private:
-	uint32_t classID;
+	uint64_t classID;
 };
 
 #endif //CMF_CLASS_H
