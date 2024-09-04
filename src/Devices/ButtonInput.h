@@ -16,11 +16,9 @@ protected:
 	void tick(float deltaTime) noexcept override;
 
 private:
-
-	std::set<InputDriver*> inputSources;
+	std::set<StrongObjectPtr<InputDriver>> inputSources;
 
 	std::map<int, InputPin> buttons;
 };
-
 
 #endif //CMF_TEMPLATE_BUTTONINPUT_H

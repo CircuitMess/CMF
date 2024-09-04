@@ -11,11 +11,11 @@ public:
 	OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIO> gpio);
 
 	void write(int port, bool value) noexcept override;
-	void begin() noexcept override;
 
 private:
+	void performRegister(OutputPinDef output) override;
 	StrongObjectPtr<GPIO> gpio;
-};
 
+};
 
 #endif //CMF_OUTPUTGPIO_H

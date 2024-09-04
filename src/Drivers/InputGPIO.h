@@ -10,13 +10,13 @@ class InputGPIO : public InputDriver {
 public:
 	InputGPIO() = default;
 	InputGPIO(const std::vector<InputPinDef>& inputs, StrongObjectPtr<GPIO> gpio);
-	void begin() noexcept override;
 
 private:
 	void scan() noexcept override;
 
 	StrongObjectPtr<GPIO> gpio;
-};
 
+	void performRegister(InputPinDef input) override;
+};
 
 #endif //CMF_INPUTGPIO_H
