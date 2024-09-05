@@ -10,7 +10,7 @@ class SyncEntity : public Entity {
 	GENERATED_BODY(SyncEntity, Entity)
 
 public:
-	explicit SyncEntity(Object* owner = nullptr) noexcept;
+	explicit SyncEntity() noexcept;
 	virtual ~SyncEntity() noexcept override;
 
 	virtual void tick(float deltaTime) noexcept override;

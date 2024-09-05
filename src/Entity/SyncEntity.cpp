@@ -3,13 +3,7 @@
 #include "Core/Application.h"
 #include "Memory/ObjectMemory.h"
 
-SyncEntity::SyncEntity(Object* owner/* = nullptr*/) noexcept : Super() {
-	if(owner == nullptr){
-		setOwner(ApplicationStatics::getApplication());
-	}else {
-		setOwner(owner);
-	}
-}
+SyncEntity::SyncEntity() noexcept : Super() {}
 
 SyncEntity::~SyncEntity() noexcept = default;
 
