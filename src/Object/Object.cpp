@@ -41,18 +41,22 @@ void Object::onDestroy() noexcept {
 }
 
 void Object::setOwner(Object* object) noexcept {
-	std::lock_guard lock(ownershipMutex);
+	Object* oldOwner = nullptr;
 
-	Object* oldOwner = owner.get();
+	{
+		std::lock_guard lock(ownershipMutex);
 
-	if(owner.isValid()){
-		owner->removeChild(this);
-		owner = nullptr;
-	}
+		oldOwner = owner.get();
 
-	if(object != nullptr && object != this){
-		owner = object;
-		owner->registerChild(this);
+		if(owner.isValid()){
+			owner->removeChild(this);
+			owner = nullptr;
+		}
+
+		if(object != nullptr && object != this){
+			owner = object;
+			owner->registerChild(this);
+		}
 	}
 
 	onOwnerChanged(oldOwner);
