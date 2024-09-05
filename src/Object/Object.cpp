@@ -83,9 +83,13 @@ void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept
 }
 
 void Object::setInstigator(Object* object) noexcept {
-	std::lock_guard lock(instigatorMutex);
-	Object* oldInstigator = instigator.get();
-	instigator = object;
+	Object* oldInstigator = nullptr;
+
+	{
+		std::lock_guard lock(instigatorMutex);
+		oldInstigator = instigator.get();
+		instigator = object;
+	}
 	onInstigatorChanged(oldInstigator);
 }
 
