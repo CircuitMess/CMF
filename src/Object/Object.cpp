@@ -172,7 +172,9 @@ Object* Object::getOutermostOwner() const noexcept{
 		return nullptr;
 	}
 
-	for( ; outermost != nullptr && outermost->getOwner() != nullptr; outermost = outermost->getOwner());
+	while(outermost != nullptr && outermost->getOwner() != nullptr) {
+		outermost = outermost->getOwner();
+	}
 
 	return outermost;
 }
@@ -183,14 +185,15 @@ Object* Object::getOutermostInstigator() const noexcept{
 		return nullptr;
 	}
 
-	for( ; outermost != nullptr && outermost->getInstigator() != nullptr; outermost = outermost->getInstigator());
+	while(outermost != nullptr && outermost->getInstigator() != nullptr) {
+		outermost = outermost->getInstigator();
+	}
 
 	return outermost;
 }
 
 inline void Object::registerChild(Object* child) noexcept {
-	std::lock_guard lock(ownershipMutex);
-
+	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	WeakObjectPtr<Object> newChild = child;
 	if(!newChild.isValid()){
 		return;
@@ -201,8 +204,7 @@ inline void Object::registerChild(Object* child) noexcept {
 }
 
 inline void Object::removeChild(Object* child) noexcept {
-	std::lock_guard lock(ownershipMutex);
-
+	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	if(child == nullptr){
 		return;
 	}
