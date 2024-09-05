@@ -23,13 +23,14 @@ public:
 		}
 	}
 
-	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(other.accessMutex) {
+	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(std::move(other.accessMutex)) {
 		other.buffer = 0;
 		other.bufferSize = 0;
 		other.begin = other.end = 0;
 		other.accessMutex = nullptr;
 		waitSemaphore = other.waitSemaphore;
 		other.waitSemaphore = nullptr;
+		accessMutex.unlock();
 	}
 
 	inline ~Queue() noexcept {
@@ -40,6 +41,7 @@ public:
 		allocator.deallocate(buffer, bufferSize);
 		buffer = nullptr;
 		begin = end = 0;
+		bufferSize = 0;
 	}
 
 	inline size_t size() const noexcept {
@@ -68,11 +70,11 @@ public:
 	}
 
 	inline bool front(T& value, TickType_t wait = portMAX_DELAY) noexcept {
-		std::lock_guard guard(accessMutex);
-
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
 		}
+
+		std::lock_guard guard(accessMutex);
 
 		if(kill){
 			return false;
@@ -90,11 +92,11 @@ public:
 	}
 
 	inline bool pop(T& value, TickType_t wait = portMAX_DELAY) noexcept {
-		std::lock_guard guard(accessMutex);
-
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
 		}
+
+		std::lock_guard guard(accessMutex);
 
 		if(kill){
 			return false;

@@ -65,6 +65,7 @@ public:
 	}
 
 	inline bool operator == (const BinaryTree& other) const noexcept {
+		// TODO consider changing this to equals by data rather than by pointer
 		return other.head == head;
 	}
 

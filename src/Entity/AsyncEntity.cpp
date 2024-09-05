@@ -45,7 +45,7 @@ void AsyncEntity::setOwner(Object* object) noexcept{
 	Super::setOwner(nullptr);
 
 	if(object != nullptr && hasBegun()){
-		CMF_LOG(LogCMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
+		CMF_LOG(LogCMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Async entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
 	}
 }
 
