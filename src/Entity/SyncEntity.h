@@ -22,6 +22,7 @@ protected:
 	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
 
 private:
+	// TODO remove or change to Object
 	WeakObjectPtr<AsyncEntity> ownerEntity;
 };
 
