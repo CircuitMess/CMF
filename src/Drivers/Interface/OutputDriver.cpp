@@ -2,7 +2,7 @@
 #include "Log/Log.h"
 
 OutputDriver::OutputDriver(const std::vector<OutputPinDef>& outputs) : outputs(outputs){
-
+	printf("OutputDriver constr\n");
 }
 
 float OutputDriver::getState(int port) const noexcept{
@@ -15,15 +15,15 @@ float OutputDriver::getState(int port) const noexcept{
 
 void OutputDriver::write(int port, float value) noexcept{
 	states[port] = value;
-
-}
-
-void OutputDriver::send() noexcept{
-
+	performWrite(port, value);
 }
 
 void OutputDriver::write(int port, bool value) noexcept{
 	write(port, value ? 1.f : 0.f);
+}
+
+void OutputDriver::send() noexcept{
+
 }
 
 void OutputDriver::removeOutput(int port){
@@ -73,5 +73,9 @@ void OutputDriver::performRegister(OutputPinDef output){
 }
 
 void OutputDriver::performDeregister(OutputPinDef output){
+
+}
+
+void OutputDriver::performWrite(int port, float value){
 
 }

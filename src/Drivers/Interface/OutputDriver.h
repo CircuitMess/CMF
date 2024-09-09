@@ -28,8 +28,8 @@ class OutputDriver : public SyncEntity {
 
 public:
 	virtual float getState(int port) const noexcept;
-	virtual void write(int port, float value) noexcept;
-	virtual void write(int port, bool value) noexcept;
+	void write(int port, float value) noexcept;
+	void write(int port, bool value) noexcept;
 	virtual void send() noexcept;
 
 	void removeOutput(int port);
@@ -51,6 +51,8 @@ private:
 	virtual void performRegister(OutputPinDef output);
 
 	virtual void performDeregister(OutputPinDef output);
+
+	virtual void performWrite(int port, float value);
 
 	std::vector<OutputPinDef> outputs;
 

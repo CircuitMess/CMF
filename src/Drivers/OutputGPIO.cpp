@@ -5,15 +5,13 @@ OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr
 
 }
 
-void OutputGPIO::write(int port, bool value) noexcept{
-	Super::write(port, value);
-
+void OutputGPIO::performWrite(int port, float value) noexcept{
 	const auto pin = (gpio_num_t) port;
 	if(!getInversions().contains(port)){
 		CMF_LOG(LogCMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
-	gpio->write(pin, value ^ getInversions()[port]);
+	gpio->write(pin, (bool) value ^ getInversions()[port]);
 }
 
 void OutputGPIO::performRegister(OutputPinDef output){
@@ -21,5 +19,5 @@ void OutputGPIO::performRegister(OutputPinDef output){
 	gpio->setMode(pin, GPIOMode::Output);
 	//setting initial state
 	getInversions()[output.port] = output.inverted;
-	write((gpio_num_t)output.port, false);
+	write((gpio_num_t) output.port, false);
 }
