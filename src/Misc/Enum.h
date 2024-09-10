@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstdio>
 #include <numeric>
+#include <vector>
 
 template<typename T = int, typename = std::enable_if<std::integral<T>, T>::type>
 class Enum {

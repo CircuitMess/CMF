@@ -1,66 +1,30 @@
 #ifndef CMF_GPIO_H
 #define CMF_GPIO_H
 
-#include "Entity/SyncEntity.h"
+#include "Object/Object.h"
+#include "driver/gpio.h"
 
-enum class Pin : int8_t {
-	None = -1,
-	Num0,
-	Num1,
-	Num2,
-	Num3,
-	Num4,
-	Num5,
-	Num6,
-	Num7,
-	Num8,
-	Num9,
-	Num10,
-	Num11,
-	Num12,
-	Num13,
-	Num14,
-	Num15,
-	Num16,
-	Num17,
-	Num18,
-	Num19,
-	Num20,
-	Num21,
-	Num22,
-	Num23,
-	Num24,
-	Num25,
-	Num26,
-	Num27,
-	Num28,
-	Num29,
-	Num30,
-	Num31,
-	Num32,
-	Num33,
-	Num34,
-	Num35,
-	Num36,
-	Num37,
-	Num38,
-	Num39,
-	Num40,
-	Num41,
-	Num42,
-	Num43,
-	Num44,
-	Num45,
-	Num46,
-	Num47,
-	Num48,
-	COUNT
+enum class GPIOMode : uint8_t {
+	Input,                //0 - false, 1 - true
+	Output,               //default state is 0
 };
 
-class GPIO : public SyncEntity {
-	GENERATED_BODY(GPIO, SyncEntity)
+/**
+ * Stateless wrapper for GPIO functions.
+ */
+class GPIO : public Object {
+	GENERATED_BODY(GPIO, Object)
 
 public:
+	void setMode(gpio_num_t gpioNum, GPIOMode mode);
+
+	void write(gpio_num_t gpioNum, bool value);
+
+	bool read(gpio_num_t gpioNum);
+
+	void setPullup(gpio_num_t gpioNum, bool pulledUp);
+
+	void setPulldown(gpio_num_t gpioNum, bool pulledDown);
 };
 
 #endif //CMF_GPIO_H
