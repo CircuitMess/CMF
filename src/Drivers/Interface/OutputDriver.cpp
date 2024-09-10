@@ -2,7 +2,7 @@
 #include "Log/Log.h"
 
 OutputDriver::OutputDriver(const std::vector<OutputPinDef>& outputs) : outputs(outputs){
-	printf("OutputDriver constr\n");
+
 }
 
 float OutputDriver::getState(int port) const noexcept{
