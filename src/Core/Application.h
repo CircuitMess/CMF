@@ -8,11 +8,7 @@
 #include "Memory/GarbageCollector.h"
 #include "Memory/ObjectMemory.h"
 #include "Misc/Singleton.h"
-#include "Periphery/Periphery.h"
 #include "Object/Interface.h"
-#include "Devices/Device.h"
-#include "Drivers/Driver.h"
-#include "Services/Service.h"
 
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
@@ -84,7 +80,7 @@ protected:
 	virtual TickType_t getTickingInterval() const noexcept override;
 
 	template<typename T, typename ...Args>
-	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Periphery>) {
+	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
@@ -96,14 +92,14 @@ protected:
 	}
 
 	template<typename T>
-	T* getPeriphery(const std::function<bool(const Periphery*)>& fn =
-			[](const Periphery* periph) {return cast<T>(periph) != nullptr;})
-			const noexcept requires(std::derived_from<T, Periphery>) {
+	T* getPeriphery(const std::function<bool(const Object*)>& fn =
+			[](const Object* periph) {return cast<T>(periph) != nullptr;})
+			const noexcept requires(std::derived_from<T, Object>) {
 		if(!fn){
 			return nullptr;
 		}
 
-		for(const StrongObjectPtr<Periphery>& periph : periphery){
+		for(const StrongObjectPtr<Object>& periph : periphery){
 			if(fn(*periph)){
 				return cast<T>(*periph);
 			}
@@ -113,7 +109,7 @@ protected:
 	}
 
 	template<typename T, typename ...Args>
-	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Device>) {
+	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
@@ -125,14 +121,14 @@ protected:
 	}
 
 	template<typename T>
-	T* getDevice(const std::function<bool(const Device*)>& fn =
-			[](const Device* device) {return cast<T>(device) != nullptr;})
-			const noexcept requires(std::derived_from<T, Device>) {
+	T* getDevice(const std::function<bool(const Object*)>& fn =
+			[](const Object* device) {return cast<T>(device) != nullptr;})
+			const noexcept requires(std::derived_from<T, Object>) {
 		if(!fn){
 			return nullptr;
 		}
 
-		for(const StrongObjectPtr<Device>& device : devices){
+		for(const StrongObjectPtr<Object>& device : devices){
 			if(fn(*device)){
 				return cast<T>(*device);
 			}
@@ -142,13 +138,13 @@ protected:
 	}
 
 	template<typename T, typename ...Args>
-	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Driver>){
+	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Object>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
 		}
 
-		for(const StrongObjectPtr<Driver>& driver : drivers){
+		for(const StrongObjectPtr<Object>& driver : drivers){
 			if(!driver.isValid()){
 				continue;
 			}
@@ -164,8 +160,8 @@ protected:
 	}
 
 	template<typename T>
-	T* getDriver() const noexcept requires(std::derived_from<T, Driver>) {
-		for(const StrongObjectPtr<Driver>& driver : drivers){
+	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& driver : drivers){
 			if(!driver.isValid()){
 				continue;
 			}
@@ -179,13 +175,13 @@ protected:
 	}
 
 	template<typename T, typename ...Args>
-	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Service>){
+	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Object>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
 			return nullptr;
 		}
 
-		for(const StrongObjectPtr<Service>& service : services){
+		for(const StrongObjectPtr<Object>& service : services){
 			if(!service.isValid()){
 				continue;
 			}
@@ -195,14 +191,14 @@ protected:
 			}
 		}
 
-		drivers.insert(*object);
+		services.insert(*object);
 
 		return *object;
 	}
 
 	template<typename T>
-	T* getService() const noexcept requires(std::derived_from<T, Service>) {
-		for(const StrongObjectPtr<Service>& service : services){
+	T* getService() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& service : services){
 			if(!service.isValid()){
 				continue;
 			}
@@ -224,10 +220,10 @@ private:
 	bool shuttingDown;
 	std::mutex registrationMutex;
 
-	std::set<StrongObjectPtr<Periphery>> periphery;
-	std::set<StrongObjectPtr<Device>> devices;
-	std::set<StrongObjectPtr<Driver>> drivers;
-	std::set<StrongObjectPtr<Service>> services;
+	std::set<StrongObjectPtr<Object>> periphery;
+	std::set<StrongObjectPtr<Object>> devices;
+	std::set<StrongObjectPtr<Object>> drivers;
+	std::set<StrongObjectPtr<Object>> services;
 };
 
 #endif //CMF_APPLICATION_H
