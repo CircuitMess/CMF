@@ -5,6 +5,10 @@ class Application;
 
 class ApplicationStatics {
 public:
+	/**
+	 * @brief
+	 * @return
+	 */
 	static Application* getApplication() noexcept;
 };
 

@@ -14,23 +14,59 @@
 #include "Drivers/Driver.h"
 #include "Services/Service.h"
 
+/**
+ * @brief 
+ */
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
 
 	friend class ApplicationStatics;
 
 public:
+	/**
+	 * @brief 
+	 */
 	Application() noexcept;
+
+	/**
+	 * @brief 
+	 */
 	Application(const Application&) = delete;
+
+	/**
+	 * @brief 
+	 */
 	Application(Application&&) = delete;
 
+	/**
+	 * @brief 
+	 */
 	virtual ~Application() noexcept override;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	Application& operator =(const Application&) = delete;
+
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	Application& operator =(Application&&) = delete;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	virtual SubclassOf<GarbageCollector> getGarbageCollectorClass() const noexcept;
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @param cls 
+	 * @return 
+	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Singleton>, T>::type>
 	T* registerSingleton(const Class* cls = nullptr) const noexcept {
 		if(T* existingSingleton = getSingleton<T>(cls)){
@@ -53,6 +89,12 @@ public:
 		return *newSingleton;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @param cls 
+	 * @return 
+	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Singleton>, T>::type>
 	T* getSingleton(const Class* cls = nullptr) const noexcept {
 		if(cls == nullptr){
@@ -68,21 +110,62 @@ public:
 		return nullptr;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline bool isShuttingDown() const noexcept {
 		return shuttingDown;
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 */
 	void registerLifetimeObject(Object* object) noexcept;
 
 protected:
+	/**
+	 * @brief 
+	 */
 	virtual void postInitProperties() noexcept override;
+
+	/**
+	 * @brief 
+	 */
 	virtual void begin() noexcept override;
+
+	/**
+	 * @brief 
+	 * @param deltaTime 
+	 */
 	virtual void tick(float deltaTime) noexcept override;
+
+	/**
+	 * @brief 
+	 * @param reason 
+	 */
 	virtual void end(EndReason reason) noexcept override;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	virtual TickType_t getEventScanningTime() const noexcept override;
+
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	virtual TickType_t getTickingInterval() const noexcept override;
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @tparam Args 
+	 * @param args 
+	 * @return 
+	 */
 	template<typename T, typename ...Args>
 	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Periphery>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -95,6 +178,12 @@ protected:
 		return *object;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @param fn 
+	 * @return 
+	 */
 	template<typename T>
 	T* getPeriphery(const std::function<bool(const Periphery*)>& fn =
 			[](const Periphery* periph) {return cast<T>(periph) != nullptr;})
@@ -112,6 +201,13 @@ protected:
 		return nullptr;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @tparam Args 
+	 * @param args 
+	 * @return 
+	 */
 	template<typename T, typename ...Args>
 	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Device>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -124,6 +220,12 @@ protected:
 		return *object;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @param fn 
+	 * @return 
+	 */
 	template<typename T>
 	T* getDevice(const std::function<bool(const Device*)>& fn =
 			[](const Device* device) {return cast<T>(device) != nullptr;})
@@ -141,6 +243,13 @@ protected:
 		return nullptr;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @tparam Args 
+	 * @param args 
+	 * @return 
+	 */
 	template<typename T, typename ...Args>
 	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Driver>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -163,6 +272,11 @@ protected:
 		return *object;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @return 
+	 */
 	template<typename T>
 	T* getDriver() const noexcept requires(std::derived_from<T, Driver>) {
 		for(const StrongObjectPtr<Driver>& driver : drivers){
@@ -178,6 +292,13 @@ protected:
 		return nullptr;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T 
+	 * @tparam Args 
+	 * @param args 
+	 * @return 
+	 */
 	template<typename T, typename ...Args>
 	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Service>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -200,6 +321,11 @@ protected:
 		return *object;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam T
+	 * @return 
+	 */
 	template<typename T>
 	T* getService() const noexcept requires(std::derived_from<T, Service>) {
 		for(const StrongObjectPtr<Service>& service : services){

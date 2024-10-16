@@ -11,14 +11,34 @@
 #include "Util/stdafx.h"
 #include "Log/Log.h"
 
+/**
+ * @brief
+ * @tparam Args
+ */
 template<typename ...Args>
 struct BindHelper {
+	/**
+	 * @brief
+	 * @tparam O
+	 * @tparam F
+	 * @param object
+	 * @param function
+	 * @return
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept {
 		CMF_LOG(LogCMF, Error, "Unsupported bind attempted on a function with more than 31 argument.");
 		return nullptr;
 	}
 
+	/**
+	 * @brief
+	 * @tparam O
+	 * @tparam F
+	 * @param object
+	 * @param function
+	 * @return
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 0) {
 		return std::bind(function, object);
@@ -576,16 +596,36 @@ struct BindHelper {
 	}
 
 private:
+	/**
+	 * @brief 
+	 */
 	inline BindHelper() noexcept = delete;
 };
 
+/**
+ * @brief 
+ * @tparam Args 
+ */
 template<typename ...Args>
 struct CallHelper {
+	/**
+	 * @brief 
+	 * @param function 
+	 * @param arguments 
+	 * @return 
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept {
 		CMF_LOG(LogCMF, Error, "Unsupported call attempted on a function with more than 31 argument.");
 		return false;
 	}
 
+	// TODO copy this to all others when filled out, it will be the same
+	/**
+	 * @brief 
+	 * @param function 
+	 * @param arguments 
+	 * @return 
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 0) {
 		if(function == nullptr){
 			return false;
@@ -1293,28 +1333,63 @@ struct CallHelper {
 	}
 
 private:
+	/**
+	 * @brief 
+	 */
 	inline CallHelper() noexcept = delete;
 };
 
+/**
+ * @brief 
+ */
 class EventHandleBase {
 public:
+	/**
+	 * @brief 
+	 * @param wait 
+	 * @return 
+	 */
 	inline virtual bool probe(TickType_t wait) noexcept = 0;
+
+	/**
+	 * @brief 
+	 * @param wait 
+	 */
 	inline virtual void scan(TickType_t wait) noexcept = 0;
 };
 
+/**
+ * @brief 
+ * @tparam Args 
+ */
 template<typename ...Args>
 class EventHandle : public EventHandleBase {
 public:
+	/**
+	 * @brief 
+	 */
 	inline virtual ~EventHandle() noexcept {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
 		}
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	Object* getOwningObject() const noexcept {
 		return *owningObject;
 	}
 
+	/**
+	 * @brief 
+	 * @tparam O 
+	 * @tparam F 
+	 * @param object 
+	 * @param function 
+	 * @return 
+	 */
 	template<typename O, typename F>
 	inline EventHandle& bind(O* object, F&& function) noexcept {
 		if(owningObject.isValid()){
@@ -1331,6 +1406,12 @@ public:
 		return *this;
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 * @param function 
+	 * @return 
+	 */
 	inline EventHandle& bind(Object* object, const std::function<void(Args...)>& function) noexcept {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
@@ -1346,15 +1427,30 @@ public:
 		return *this;
 	}
 
+	/**
+	 * @brief 
+	 * @param wait 
+	 * @param args 
+	 * @return 
+	 */
 	inline bool call(TickType_t wait, const Args&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...));
 	}
 
+	/**
+	 * @brief 
+	 * @param wait 
+	 * @return 
+	 */
 	inline virtual bool probe(TickType_t wait) noexcept override {
 		std::tuple<Args...> arguments;
 		return callQueue.front(arguments, wait);
 	}
 
+	/**
+	 * @brief 
+	 * @param wait
+	 */
 	inline virtual void scan(TickType_t wait) noexcept override {
 		if(!owningObject.isValid()){
 			return;

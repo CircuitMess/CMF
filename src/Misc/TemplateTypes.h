@@ -5,9 +5,17 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief A static class used by objects to determine the type information of their templated and generate the corresponding class ID based on the information of the templates.
+ * This is used to distinguish same object types with different templates when casting.
+ * @tparam Args The type of which the information is needed, can return the names of the arguments as well as their hash which is used for the class ID.
+ */
 template<typename... Args>
 class TemplateTypesInfo {
 public:
+    /**
+     * @return The names of the template types separated by ',' character.
+     */
     static constexpr std::string TypeNames() {
         std::string name = std::source_location::current().function_name();
         const size_t first = name.find_first_of('{') + 1;
@@ -17,6 +25,9 @@ public:
         return name;
     }
 
+    /**
+     * @return The hash of the types. There is no limit on the number of arguments, however due to the limited nature of the DJB hashing, hash collisions may occur on edge cases.
+     */
     static constexpr uint32_t TypesHash() {
         std::vector<std::string> substrings;
         std::string names = TypeNames();
@@ -46,6 +57,12 @@ public:
 
         return hashes.front();
     }
+
+private:
+    /**
+     * @brief Default constructor is deleted to prevent creating instances of this purely static class.
+     */
+    TemplateTypesInfo() = delete;
 };
 
 #endif //TEMPLATETYPES_H

@@ -9,10 +9,26 @@
 #include "ObjectManager.h"
 #include "Object/Interface.h"
 
+/**
+ * @brief Initialization function, used to set the owner of the object, as well as call the postInitProperties of the object.
+ * This function is called after an object is created.
+ * @param object The object to initialize.
+ * @param owner The owner to set to the object.
+ */
 void initObject(Object* object, Object* owner) noexcept;
 
+/**
+ * @param object Object to check for validity.
+ * @return Is object valid or not. If object was marked for deletion, deleted or nullptr, it is not valid.
+ */
 bool isValid(const Object* object) noexcept;
 
+/**
+ * @tparam T Object type in the object smart pointer.
+ * @tparam KeepAlive Marks the type of smart pointer, set automatically depending on the type of object pointer passed through the argument.
+ * @param object The object to check for validity.
+ * @return Is object valid or not. If object was marked for deletion, deleted or nullptr, it is not valid.
+ */
 template<typename T, bool KeepAlive>
 inline bool isValid(const ObjectPtr<T, KeepAlive>& object) noexcept {
 	if(object == nullptr){
@@ -22,6 +38,11 @@ inline bool isValid(const ObjectPtr<T, KeepAlive>& object) noexcept {
 	return ObjectManager::get()->isValid(object.get());
 }
 
+/**
+ * @tparam T Type of interface being checked for validity.
+ * @param interface The interface to check for validity.
+ * @return True if interface is not null, and if the object of the interface is valid.
+ */
 template<typename T>
 inline bool isValid(const Interface<T>& interface) noexcept {
 	if(!interface){
@@ -31,6 +52,14 @@ inline bool isValid(const Interface<T>& interface) noexcept {
 	return isValid(interface.getObject());
 }
 
+/**
+ * @brief Creates a object of type T with given arguments passed to the constructor.
+ * @tparam T Type of object to create.
+ * @tparam Args Types of arguments that need to be passed to the object constructor.
+ * @param owner The owner to set.
+ * @param args Arguments that are passed to the object constructor.
+ * @return A strong object pointer to the newly created object.
+ */
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept {
 	StrongObjectPtr<T> newObject = new T(args...);
@@ -40,11 +69,13 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 	return newObject;
 }
 
-template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept requires (sizeof...(Args) == 0){
-	return newObject<T>(T::staticClass());
-}
-
+/**
+ * @brief Creates a new object from a give class.
+ * @tparam T Type of object being created.
+ * @param cls Class of which the object is created.
+ * @param owner Owner of the new object.
+ * @return Strong object pointer to the newly created object.
+ */
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) noexcept {
 	if(cls == nullptr){
@@ -61,6 +92,26 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
 	return newObjectPtr;
 }
 
+/**
+ * @brief Specialization of the newObject function for empty constructors.
+ * @tparam T Type of object being created.
+ * @tparam Args Types of arguments being passed to the object, which are always empty in the case of this function.
+ * @param owner The owner of the newly created object.
+ * @param args Arguments being passed to the object, which are always empty in the case of this function.
+ * @return Strong object pointer to the new object instance.
+ */
+template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept requires (sizeof...(Args) == 0){
+	return newObject<T>(T::staticClass(), owner);
+}
+
+/**
+ * @brief De-serializes an object of type T from a byte array with a given owner.
+ * @tparam T Type of object being de-serialized.
+ * @param data Byte array containing information about the object.
+ * @param owner Owner being set to the created object.
+ * @return The newly created object.
+ */
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, Object* owner = nullptr) noexcept {
 	OutArchive archive = data;
@@ -75,6 +126,11 @@ inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, 
 	object->serialize(archive);
 }
 
+/**
+ * @brief Serializes the given object to a byte array by using archives internally.
+ * @param object The object being serialized.
+ * @param data Data buffer being set.
+ */
 inline void byteArrayFromObject(Object* object, std::vector<uint8_t>& data) noexcept {
 	if(object == nullptr){
 		return;

@@ -8,13 +8,26 @@
 #include <memory>
 #include <mutex>
 
+/**
+ * @brief 
+ * @tparam T 
+ * @tparam Allocator 
+ */
 template<typename T, typename Allocator = std::allocator<T>>
 class Queue {
 public:
+	/**
+	 * @brief 
+	 * @param size 
+	 */
 	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = allocator.allocate(bufferSize);
 	}
 
+	/**
+	 * @brief 
+	 * @param other 
+	 */
 	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = allocator.allocate(bufferSize);
 
@@ -23,6 +36,10 @@ public:
 		}
 	}
 
+	/**
+	 * @brief 
+	 * @param other 
+	 */
 	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(std::move(other.accessMutex)) {
 		other.buffer = 0;
 		other.bufferSize = 0;
@@ -33,6 +50,9 @@ public:
 		accessMutex.unlock();
 	}
 
+	/**
+	 * @brief 
+	 */
 	inline ~Queue() noexcept {
 		setKillPill();
 
@@ -44,18 +64,34 @@ public:
 		bufferSize = 0;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline size_t size() const noexcept {
 		return end - begin + 1;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline size_t capacity() const noexcept {
 		return bufferSize;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline bool empty() const noexcept {
 		return begin == end;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline bool full() const noexcept {
 		if(begin > end){
 			return end + bufferSize - begin >= bufferSize - 1;
@@ -64,11 +100,22 @@ public:
 		return end - begin >= bufferSize - 1;
 	}
 
+	/**
+	 * @brief 
+	 * @param newSize 
+	 * @return 
+	 */
 	inline bool reserve(size_t newSize) noexcept {
 		std::lock_guard guard(accessMutex);
 		return reserveInternal(newSize);
 	}
 
+	/**
+	 * @brief 
+	 * @param value 
+	 * @param wait 
+	 * @return 
+	 */
 	inline bool front(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
@@ -91,6 +138,12 @@ public:
 		return true;
 	}
 
+	/**
+	 * @brief 
+	 * @param value 
+	 * @param wait 
+	 * @return 
+	 */
 	inline bool pop(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
 			return false;
@@ -118,6 +171,11 @@ public:
 		return true;
 	}
 
+	/**
+	 * @brief 
+	 * @param value 
+	 * @return 
+	 */
 	inline bool push(const T& value) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -134,6 +192,11 @@ public:
 		return true;
 	}
 
+	/**
+	 * @brief 
+	 * @param value 
+	 * @return 
+	 */
 	inline bool push(T&& value) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -150,6 +213,9 @@ public:
 		return true;
 	}
 
+	/**
+	 * @brief 
+	 */
 	inline void clear() noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -162,6 +228,10 @@ public:
 		xSemaphoreTake(waitSemaphore, 0);
 	}
 
+	/**
+	 * @brief 
+	 * @param value 
+	 */
 	inline void setKillPill(bool value = true) noexcept {
 		std::lock_guard guard(accessMutex);
 		kill = value;
@@ -183,6 +253,11 @@ private:
 	SemaphoreHandle_t waitSemaphore;
 
 private:
+	/**
+	 * @brief 
+	 * @param newSize 
+	 * @return 
+	 */
 	inline bool reserveInternal(size_t newSize) noexcept {
 		T* newBuffer = allocator.allocate(newSize);
 		if(buffer == nullptr){

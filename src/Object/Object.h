@@ -15,58 +15,145 @@
 #include "Containers/Queue.h"
 #include "Containers/Archive.h"
 
+/**
+ * @brief 
+ */
 class Object {
 public:
+	/**
+	 * @brief 
+	 */
 	Object() noexcept;
+
+	/**
+	 * @brief 
+	 */
 	virtual ~Object() noexcept = default;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline constexpr uint32_t getID() const noexcept {
 		return id;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline std::string getName() const noexcept {
 		return getStaticClass()->getName().append("_").append(std::to_string(getID()));
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline static const Class* staticClass() noexcept {
 		return objectStaticClass;
 	}
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline virtual const Class* getStaticClass() const noexcept {
 		return staticClass();
 	}
 
+	/**
+	 * @brief 
+	 * @param other 
+	 * @return 
+	 */
 	inline virtual bool isA(const Class* other) const noexcept {
 		return other->getID() == staticClass()->getID();
 	}
 
+	/**
+	 * @brief 
+	 * @tparam __T 
+	 * @return 
+	 */
 	template<typename __T>
 	inline bool isA() const noexcept {
 		return isA(__T::staticClass());
 	}
 
+	/**
+	 * @brief 
+	 * @tparam __T 
+	 * @return 
+	 */
 	template<typename __T>
 	static inline constexpr bool implements() noexcept {
 		return false;
 	}
 
+	/**
+	 * @brief 
+	 */
 	virtual void postInitProperties() noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	bool canDelete() noexcept;
 
+	/**
+	 * @brief 
+	 */
 	void destroy() noexcept;
+
+	/**
+	 * @brief 
+	 */
 	virtual void onDestroy() noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline bool isMarkedForDestroy() const noexcept{
 		return markedForDestroy;
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 */
 	virtual void setOwner(Object* object) noexcept;
+
+	/**
+	 * @brief 
+	 * @param oldOwner 
+	 */
 	virtual void onOwnerChanged(Object* oldOwner) noexcept;
+
+	/**
+	 * @brief 
+	 * @param child 
+	 */
 	virtual void onChildAdded(Object* child) noexcept;
+
+	/**
+	 * @brief 
+	 * @param child 
+	 */
 	virtual void onChildRemoved(Object* child) noexcept;
+
+	/**
+	 * @brief 
+	 * @param function 
+	 */
 	void forEachChild(const std::function<bool(Object*)>& function) noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline constexpr Object* getOwner() const noexcept {
 		if(!owner.isValid()){
 			return nullptr;
@@ -75,27 +162,86 @@ public:
 		return *owner;
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 */
 	void setInstigator(Object* object) noexcept;
+
+	/**
+	 * @brief 
+	 * @param oldInstigator 
+	 */
 	virtual void onInstigatorChanged(Object* oldInstigator) noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline constexpr Object* getInstigator() const noexcept {
 		return instigator.get();
 	}
 
+	/**
+	 * @brief 
+	 * @param wait 
+	 */
 	void scanEvents(TickType_t wait) noexcept;
+
+	/**
+	 * @brief 
+	 * @param handle 
+	 */
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
+
+	/**
+	 * @brief 
+	 * @param handle 
+	 */
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
+
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	virtual TickType_t getEventScanningTime() const noexcept;
 
+	/**
+	 * @brief 
+	 * @param archive 
+	 * @return 
+	 */
 	virtual Archive& serialize(Archive& archive) noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	static class Application* getApp() noexcept;
 
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	Object* getOutermostOwner() const noexcept;
+
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	Object* getOutermostInstigator() const noexcept;
 
 protected:
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline static constexpr std::string __getTemplateNames() noexcept { return ""; }
+
+	/**
+	 * @brief 
+	 * @return 
+	 */
 	inline static constexpr uint32_t __getTemplateHash() noexcept { return 0; }
 
 private:
@@ -130,16 +276,34 @@ private:
 	std::mutex eventScanningMutex;
 
 private:
+	/**
+	 * @brief 
+	 * @param child 
+	 */
 	void registerChild(Object* child) noexcept;
+
+	/**
+	 * @brief 
+	 * @param child
+	 */
 	void removeChild(Object* child) noexcept;
 };
 
+/**
+ * @brief
+ * @param T1
+ */
 #define TEMPLATE_ATTRIBUTES(T1, ...)																												        \
 protected:																																			        \
 	inline static constexpr std::string __getTemplateNames() noexcept { return TemplateTypesInfo<T1, ##__VA_ARGS__>::TypeNames(); }							\
 	inline static constexpr uint32_t __getTemplateHash() noexcept { return TemplateTypesInfo<T1, ##__VA_ARGS__>::TypesHash(); }						        \
 private:																																			        \
 
+/**
+ * @brief
+ * @param ObjectName
+ * @param SuperObject
+ */
 #define GENERATED_BODY(ObjectName, SuperObject, ...) 																		                                \
 	static_assert(std::derived_from<SuperObject, Object>, "CMF: Object must have and inherit a base Object class."); 		                                \
 	static_assert(!std::is_abstract<SuperObject>(), "CMF: Extended object cannot be abstract class.");						                                \
@@ -218,6 +382,7 @@ public:																														                                \
 	inline static constexpr bool implements() noexcept {																	                                \
 		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();							                                \
 	}                                                      																	                                \
+private:																																					\
 
 
 // ====================================================================================

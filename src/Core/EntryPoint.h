@@ -21,8 +21,15 @@
 #include "Event/EventBroadcaster.h"
 #include "Log/Log.h"
 
+/**
+ * @brief 
+ */
 class CMF {
 public:
+	/**
+	 * @brief 
+	 * @tparam T 
+	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 	static void start(){
 		App = newObject<T>();
@@ -48,6 +55,10 @@ private:
 	inline static StrongObjectPtr<GarbageCollector> TrashCollector = nullptr;
 };
 
+/**
+ * @brief 
+ * @param AppName 
+ */
 #define CMF_MAIN(AppName) 				\
 	extern "C" void app_main() 			\
 	{ 									\

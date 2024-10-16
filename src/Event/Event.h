@@ -6,9 +6,16 @@
 #include "EventHandle.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 
+/**
+ * @brief 
+ * @tparam Args 
+ */
 template<typename ...Args>
 class Event {
 public:
+	/**
+	 * @brief 
+	 */
 	inline virtual ~Event() noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -19,6 +26,10 @@ public:
 		}
 	}
 
+	/**
+	 * @brief 
+	 * @param handle 
+	 */
 	inline void bind(EventHandle<Args...>&& handle) noexcept {
 		if(handle.getOwningObject() == nullptr){
 			return;
@@ -28,6 +39,10 @@ public:
 		handles.insert({&handle, handle.getOwningObject(), false});
 	}
 
+	/**
+	 * @brief 
+	 * @param handle 
+	 */
 	inline void bind(EventHandle<Args...>* handle) noexcept {
 		if(handle == nullptr){
 			return;
@@ -42,6 +57,13 @@ public:
 		handles.insert({handle, handle->getOwningObject(), false});
 	}
 
+	/**
+	 * @brief 
+	 * @tparam O 
+	 * @tparam F 
+	 * @param object 
+	 * @param function 
+	 */
 	template<typename O, typename F>
 	inline void bind(O* object, F&& function) noexcept {
 		if(object == nullptr || function == nullptr){
@@ -58,6 +80,11 @@ public:
 		handles.insert(container);
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 * @param function 
+	 */
 	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
 		if(object == nullptr || function == nullptr){
 			return;
@@ -73,6 +100,10 @@ public:
 		handles.insert(container);
 	}
 
+	/**
+	 * @brief 
+	 * @param object 
+	 */
 	inline void unbind(Object* object) noexcept {
 		std::erase_if(handles, [object](const HandleContainer& container) {
 			if(container.owningObject == object){
@@ -86,6 +117,12 @@ public:
 	}
 
 protected:
+	/**
+	 * @brief 
+	 * @param args 
+	 * @param wait 
+	 * @return 
+	 */
 	inline bool _broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -103,12 +140,20 @@ protected:
 	}
 
 private:
+	/**
+	 * @brief 
+	 */
 	struct HandleContainer {
 		EventHandle<Args...>* handle = nullptr;
 		WeakObjectPtr<Object> owningObject = nullptr;
 		bool owned = true;
 
 		// This is only needed for std::set to work
+		/**
+		 * @brief 
+		 * @param other 
+		 * @return 
+		 */
 		bool operator < (const HandleContainer& other) const noexcept {
 			return (uint32_t) handle < (uint32_t) other.handle;
 		}

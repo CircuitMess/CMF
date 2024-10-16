@@ -7,26 +7,50 @@
 #include <mutex>
 #include "Util/stdafx.h"
 
+/**
+ * @brief
+ * @tparam K
+ * @tparam V
+ */
 template<typename K, typename V>
 class BinaryTree {
 public:
+	/**
+	 * @brief
+	 */
 	inline BinaryTree() noexcept = default;
 
+	/**
+	 * @brief
+	 * @param other
+	 */
 	inline BinaryTree(const BinaryTree& other) noexcept {
 		std::lock_guard guard(accessMutex);
 		*this = other;
 	}
 
+	/**
+	 * @brief
+	 * @param other
+	 */
 	inline BinaryTree(BinaryTree&& other) noexcept {
 		std::lock_guard guard(accessMutex);
 		std::lock_guard guardOther(other.accessMutex);
 		*this = std::move(other);
 	}
 
+	/**
+	 * @brief
+	 */
 	inline virtual ~BinaryTree() noexcept {
 		destruct();
 	}
 
+	/**
+	 * @brief
+	 * @param other
+	 * @return
+	 */
 	inline BinaryTree& operator = (const BinaryTree& other) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -43,6 +67,11 @@ public:
 		return *this;
 	}
 
+	/**
+	 * @brief
+	 * @param other
+	 * @return
+	 */
 	inline BinaryTree& operator = (BinaryTree&& other) noexcept {
 		if(&other == this){
 			return *this;
@@ -64,11 +93,21 @@ public:
 		return *this;
 	}
 
+	/**
+	 * @brief
+	 * @param other
+	 * @return
+	 */
 	inline bool operator == (const BinaryTree& other) const noexcept {
 		// TODO consider changing this to equals by data rather than by pointer
 		return other.head == head;
 	}
 
+	/**
+	 * @brief
+	 * @param key
+	 * @return
+	 */
 	inline V& operator [] (const K& key) noexcept {
 		V* val = get(key);
 
@@ -80,6 +119,11 @@ public:
 		return *val;
 	}
 
+	/**
+	 * @brief
+	 * @param key
+	 * @param value
+	 */
 	inline void set(const K& key, const V& value = V()) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -138,6 +182,10 @@ public:
 		}
 	}
 
+	/**
+	 * @brief
+	 * @param key
+	 */
 	inline void remove(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -200,6 +248,11 @@ public:
 		*replacementNode = nullptr;
 	}
 
+	/**
+	 * @brief
+	 * @param key
+	 * @return
+	 */
 	inline bool contains(const K& key) const noexcept {
 		std::set<K> treeKeys = keys();
 		if(treeKeys.empty()){
@@ -209,10 +262,18 @@ public:
 		return treeKeys.contains(key);
 	}
 
+	/**
+	 * @brief
+	 * @return
+	 */
 	inline size_t size() const noexcept {
 		return keys().size();
 	}
 
+	/**
+	 * @brief
+	 * @return
+	 */
 	inline std::set<K> keys() noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -252,6 +313,10 @@ public:
 		return keys;
 	}
 
+	/**
+	 * @brief
+	 * @return
+	 */
 	inline std::set<K> keys() const noexcept {
 		std::set<K> keys;
 
@@ -290,6 +355,9 @@ public:
 	}
 
 private:
+	/**
+	 * @brief
+	 */
 	struct Node {
 		K key = K();
 		V value = V();
@@ -308,6 +376,11 @@ private:
 	std::mutex accessMutex;
 
 private:
+	/**
+	 * @brief
+	 * @param key
+	 * @return
+	 */
 	inline V* get(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
 
@@ -328,6 +401,9 @@ private:
 		return nullptr;
 	}
 
+	/**
+	 * @brief
+	 */
 	inline void destruct() noexcept {
 		std::lock_guard guard(accessMutex);
 
