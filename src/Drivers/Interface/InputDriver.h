@@ -3,18 +3,14 @@
 
 #include "Misc/Enum.h"
 #include "Entity/SyncEntity.h"
-
-enum class PullMode : uint8_t {
-	None, Up, Down
-};
+#include "Log/Log.h"
 
 struct InputPinDef {
 	int port;
 	bool inverted;
-	PullMode pullMode;
 
 	bool operator==(const InputPinDef& rhs) const{
-		return port == rhs.port && inverted == rhs.inverted && pullMode == rhs.pullMode;
+		return port == rhs.port && inverted == rhs.inverted;
 	}
 
 	bool operator!=(const InputPinDef& rhs) const{
@@ -23,40 +19,92 @@ struct InputPinDef {
 };
 
 struct InputPin {
-	class InputDriver* driver;
+	Object* driver;
 	int port;
 };
 
+template<typename T = InputPinDef> requires std::derived_from<T, InputPinDef>
 class InputDriver : public SyncEntity {
 	GENERATED_BODY(InputDriver, SyncEntity);
 
 public:
-	virtual void scan() noexcept;
-	virtual float read(int port) const noexcept;
+	virtual void scan() noexcept{};
 
-	void registerInput(InputPinDef pinDef);
+	virtual float read(int port) const noexcept{
+		if(!states.contains(port)){
+			CMF_LOG(LogCMF, Error, "Input port %d not registered", port);
+			return 0;
+		}
+		return states.at(port);
+	}
 
-	void removeInput(int port);
+	void registerInput(T pinDef){
+		inputs.emplace_back(pinDef);
+		performRegister(pinDef);
+	}
 
-	void removeInput(InputPinDef input);
+	void removeInput(int port){
+		auto it = std::remove_if(inputs.begin(), inputs.end(), [port](const InputPinDef& pinDef){
+			return pinDef.port == port;
+		});
+		for(auto i = it; i != inputs.end(); ++i){
+			performDeregister(*i);
+			states.erase(i->port);
+		}
+		inputs.erase(it, inputs.end());
+	}
 
-	void begin() noexcept override;
+	void removeInput(T input){
+		auto it = std::remove(inputs.begin(), inputs.end(), input);
+		for(auto i = it; i != inputs.end(); ++i){
+			performDeregister(*i);
+			states.erase(i->port);
+		}
+		inputs.erase(it, inputs.end());
+	}
+
+
+	void begin() noexcept override{
+		Super::begin();
+
+		scan();
+	}
 
 protected:
 	InputDriver() = default;
-	InputDriver(const std::vector<InputPinDef>& inputs);
 
-	void forEachInput(std::function<void(const InputPinDef&)> func) const;
-	std::vector<InputPinDef>& getInputs();
-	std::map<int, bool>& getStates();
+	InputDriver(const std::vector<T>& inputs) : inputs(inputs){
+
+	}
+
+	void forEachInput(std::function<void(const T&)> func) const{
+		for(const auto& input: inputs){
+			func(input);
+		}
+	}
+
+	std::vector<T>& getInputs(){
+		return inputs;
+	}
+
+	std::map<int, bool>& getStates(){
+		return states;
+	}
 
 private:
-	void postInitProperties() noexcept override final;
+	void postInitProperties() noexcept override final{
+		SyncEntity::postInitProperties();
 
-	virtual void performRegister(InputPinDef input);
-	virtual void performDeregister(InputPinDef input);
+		for(const auto& input: inputs){
+			performRegister(input);
+		}
+	}
 
-	std::vector<InputPinDef> inputs;
+	virtual void performRegister(T input){}
+
+	virtual void performDeregister(T input){}
+
+	std::vector<T> inputs;
 
 	/**
 	 * Map of cached input values.

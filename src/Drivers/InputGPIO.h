@@ -4,19 +4,27 @@
 #include "Drivers/Interface/InputDriver.h"
 #include "Periphery/GPIO.h"
 
-class InputGPIO : public InputDriver {
+enum class PullMode : uint8_t {
+	None, Up, Down
+};
+
+struct GPIOPinDef : InputPinDef {
+	PullMode pullMode;
+};
+
+class InputGPIO : public InputDriver<GPIOPinDef> {
 	GENERATED_BODY(InputGPIO, InputDriver);
 
 public:
 	InputGPIO() = default;
-	InputGPIO(const std::vector<InputPinDef>& inputs, StrongObjectPtr<GPIO> gpio);
+	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio);
 
 private:
 	void scan() noexcept override;
 
 	StrongObjectPtr<GPIO> gpio;
 
-	void performRegister(InputPinDef input) override;
+	void performRegister(GPIOPinDef input) override;
 };
 
 #endif //CMF_INPUTGPIO_H

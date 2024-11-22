@@ -1,19 +1,19 @@
 #include "InputGPIO.h"
 #include "Log/Log.h"
 
-InputGPIO::InputGPIO(const std::vector<InputPinDef>& inputs, StrongObjectPtr<GPIO> gpio) : InputDriver(inputs), gpio(std::move(gpio)){
+InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) : InputDriver(inputs), gpio(std::move(gpio)){
 
 }
 
 void InputGPIO::scan() noexcept{
 	Super::scan();
-	forEachInput([this](const InputPinDef& input){
+	forEachInput([this](const GPIOPinDef& input){
 		const auto pin = (gpio_num_t) input.port;
 		getStates()[input.port] = gpio->read(pin) ^ input.inverted;
 	});
 }
 
-void InputGPIO::performRegister(InputPinDef input){
+void InputGPIO::performRegister(GPIOPinDef input){
 	const auto pin = (gpio_num_t) input.port;
 	gpio->setMode(pin, GPIOMode::Input);
 	switch(input.pullMode){
