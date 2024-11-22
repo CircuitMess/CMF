@@ -33,7 +33,10 @@ inline bool isValid(const Interface<T>& interface) noexcept {
 
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept {
-	StrongObjectPtr<T> newObject = new T(args...);
+	// TODO change this to better support with API
+	void* temp = operator new(sizeof(T));
+	memset(temp, 0, sizeof(T));
+	StrongObjectPtr<T> newObject = new(temp) T(args...);
 
 	initObject(cast<Object>(newObject.get()), owner);
 

@@ -16,7 +16,7 @@ protected:
 	void tick(float deltaTime) noexcept override;
 
 private:
-	std::set<StrongObjectPtr<InputDriver>> inputSources;
+	std::set<StrongObjectPtr<InputDriver<InputPinDef>>> inputSources;
 
 	std::map<int, InputPin> buttons;
 };

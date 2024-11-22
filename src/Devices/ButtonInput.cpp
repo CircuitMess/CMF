@@ -1,8 +1,9 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
+#include "Memory/Cast.h"
 
 void ButtonInput::reg(Enum<int> button, InputPin pin){
-	inputSources.insert(StrongObjectPtr<InputDriver>(pin.driver));
+	inputSources.insert(StrongObjectPtr<InputDriver<InputPinDef>>(pin.driver));
 	buttons[button] = pin;
 }
 
@@ -12,8 +13,8 @@ bool ButtonInput::getState(Enum<int> button){
 		return false;
 	}
 	const auto& inputPin = buttons[button];
-
-	bool res = (bool) inputPin.driver->read(inputPin.port);
+	auto* inputDriver = cast<InputDriver<InputPinDef>>(inputPin.driver);
+	bool res = (bool) inputDriver->read(inputPin.port);
 
 	return res;
 }
