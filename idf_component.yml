@@ -1,0 +1,12 @@
+dependencies:
+  LovyanGFX:
+    git: https://github.com/lovyan03/LovyanGFX.git
+
+  lvgl/lvgl: ">=9.2.0"
+
+  idf:
+    version: '>=5.1.1'
+description: CircuitMess Framework
+repository: git://github.com/CircuitMess/CMF.git
+url: https://github.com/CircuitMess/CMF
+version: 1.0.0
