@@ -32,7 +32,7 @@ public:
 
 	virtual float read(int port) const noexcept{
 		if(!states.contains(port)){
-			CMF_LOG(LogCMF, Error, "Input port %d not registered", port);
+			CMF_LOG(CMF, Error, "Input port %d not registered", port);
 			return 0;
 		}
 		return states.at(port);

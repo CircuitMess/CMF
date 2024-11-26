@@ -31,7 +31,7 @@ class OutputDriver : public SyncEntity {
 public:
 	virtual float getState(int port) const noexcept{
 		if(!states.contains(port)){
-			CMF_LOG(LogCMF, Error, "Output port %d not registered", port);
+			CMF_LOG(CMF, Error, "Output port %d not registered", port);
 			return 0;
 		}
 		return states.at(port);

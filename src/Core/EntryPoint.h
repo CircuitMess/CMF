@@ -27,7 +27,7 @@ public:
 	static void start(){
 		App = newObject<T>();
 		if(!App.isValid()){
-			CMF_LOG(LogCMF, Error, "Application instance could not be created.");
+			CMF_LOG(CMF, Error, "Application instance could not be created.");
 			return;
 		}
 
@@ -39,7 +39,7 @@ public:
 		}
 
 		if(!TrashCollector.isValid()){
-			CMF_LOG(LogCMF, Error, "GarbageCollector instance could not be created.");
+			CMF_LOG(CMF, Error, "GarbageCollector instance could not be created.");
 		}
 	}
 
