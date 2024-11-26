@@ -19,24 +19,23 @@ struct LogType {
 	const std::string Tag;
 };
 
-#define DEFINE_LOG(name) inline static const LogType name = {#name};
-DEFINE_LOG(LogTemp)
-DEFINE_LOG(LogCMF)
+#define DEFINE_LOG(name) inline static const LogType name##_log = {#name};
+DEFINE_LOG(CMF)
 
 #define TRACE_LOG(format, ...) printf(std::string("%s(%d:%d) '%s' ").append(format).append("\n").c_str(), std::source_location::current().file_name(),std::source_location::current().line(), std::source_location::current().column(), std::source_location::current().function_name() __VA_OPT__(,) __VA_ARGS__)
 
 #define CMF_LOG(log, level, format, ...)																		\
 	do {																										\
 		if(level == Error){																						\
-			ESP_LOGE(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGE(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == LogLevel::Warning){																	\
-			ESP_LOGW(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGW(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Info){																				\
-			ESP_LOGI(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGI(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Debug){																				\
-			ESP_LOGD(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGD(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Verbose){																				\
-			ESP_LOGV(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGV(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else{}																									\
     } while(false)																								\
 
