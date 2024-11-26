@@ -70,6 +70,70 @@ public:
 
 	void registerLifetimeObject(Object* object) noexcept;
 
+	template<typename T>
+	T* getPeriphery(const std::function<bool(const Object*)>& fn =
+	[](const Object* periph) {return cast<T>(periph) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
+
+		for(const StrongObjectPtr<Object>& periph : periphery){
+			if(fn(*periph)){
+				return cast<T>(*periph);
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	T* getDevice(const std::function<bool(const Object*)>& fn =
+	[](const Object* device) {return cast<T>(device) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
+
+		for(const StrongObjectPtr<Object>& device : devices){
+			if(fn(*device)){
+				return cast<T>(*device);
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	T* getService() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& service : services){
+			if(!service.isValid()){
+				continue;
+			}
+
+			if(T* serviceObject = cast<T>(*service)){
+				return serviceObject;
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& driver : drivers){
+			if(!driver.isValid()){
+				continue;
+			}
+
+			if(T* driverObject = cast<T>(*driver)){
+				return driverObject;
+			}
+		}
+
+		return nullptr;
+	}
+
 protected:
 	virtual void postInitProperties() noexcept override;
 	virtual void begin() noexcept override;
@@ -91,23 +155,6 @@ protected:
 		return *object;
 	}
 
-	template<typename T>
-	T* getPeriphery(const std::function<bool(const Object*)>& fn =
-			[](const Object* periph) {return cast<T>(periph) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
-		if(!fn){
-			return nullptr;
-		}
-
-		for(const StrongObjectPtr<Object>& periph : periphery){
-			if(fn(*periph)){
-				return cast<T>(*periph);
-			}
-		}
-
-		return nullptr;
-	}
-
 	template<typename T, typename ...Args>
 	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -118,23 +165,6 @@ protected:
 		devices.insert(*object);
 
 		return *object;
-	}
-
-	template<typename T>
-	T* getDevice(const std::function<bool(const Object*)>& fn =
-			[](const Object* device) {return cast<T>(device) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
-		if(!fn){
-			return nullptr;
-		}
-
-		for(const StrongObjectPtr<Object>& device : devices){
-			if(fn(*device)){
-				return cast<T>(*device);
-			}
-		}
-
-		return nullptr;
 	}
 
 	template<typename T, typename ...Args>
@@ -159,21 +189,6 @@ protected:
 		return *object;
 	}
 
-	template<typename T>
-	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& driver : drivers){
-			if(!driver.isValid()){
-				continue;
-			}
-
-			if(T* driverObject = cast<T>(*driver)){
-				return driverObject;
-			}
-		}
-
-		return nullptr;
-	}
-
 	template<typename T, typename ...Args>
 	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Object>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
@@ -194,21 +209,6 @@ protected:
 		services.insert(*object);
 
 		return *object;
-	}
-
-	template<typename T>
-	T* getService() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& service : services){
-			if(!service.isValid()){
-				continue;
-			}
-
-			if(T* serviceObject = cast<T>(*service)){
-				return serviceObject;
-			}
-		}
-
-		return nullptr;
 	}
 
 private:
