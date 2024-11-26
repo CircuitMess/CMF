@@ -403,7 +403,7 @@ public:
 	 * @return True if object is valid, meaning not nullptr and valid in the object manager.
 	 */
 	inline constexpr bool isValid() const noexcept {
-		if(ptr == nullptr){
+		if(get() == nullptr){
 			return false;
 		}
 

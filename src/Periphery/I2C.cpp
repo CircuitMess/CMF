@@ -2,19 +2,19 @@
 #include <driver/i2c.h>
 #include "Log/Log.h"
 
-I2C::I2C(I2CPort port, Pin sda, Pin scl) noexcept : Super(), port(i2c_port_t(port)){
+I2C::I2C(I2CPort port, gpio_num_t sda, gpio_num_t scl) noexcept : Super(), port(i2c_port_t(port)){
 	if(port == I2CPort::None){
 		return;
 	}
 
-	if(sda == Pin::None || scl == Pin::None){
+	if(sda == GPIO_NUM_NC || scl == GPIO_NUM_NC){
 		return;
 	}
 
 	const i2c_config_t config = {
 		.mode = I2C_MODE_MASTER,
-		.sda_io_num = (gpio_num_t) sda,
-		.scl_io_num = (gpio_num_t) scl,
+		.sda_io_num = sda,
+		.scl_io_num = scl,
 		.sda_pullup_en = false,
 		.scl_pullup_en = false,
 		.master = {.clk_speed = 400000}, // TODO: maybe make this configurable in the future
@@ -34,15 +34,15 @@ I2CPort I2C::getPort() const noexcept{
 }
 
 void I2C::scan(TickType_t timeout) noexcept{
-	CMF_LOG(LogCMF, Verbose, "I2C scan:");
+	CMF_LOG(CMF, Verbose, "I2C scan:");
 
 	for(size_t i = 0; i < 127; ++i){
 		if(probe(i, timeout) == ESP_OK){
-			CMF_LOG(LogCMF, Verbose, "Found device on address 0x%x", i);
+			CMF_LOG(CMF, Verbose, "Found device on address 0x%x", i);
 		}
 	}
 
-	CMF_LOG(LogCMF, Verbose, "I2C scan done.");
+	CMF_LOG(CMF, Verbose, "I2C scan done.");
 }
 
 esp_err_t I2C::probe(uint8_t address, TickType_t timeout) noexcept{

@@ -28,7 +28,7 @@ struct BindHelper {
 	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported bind attempted on a function with more than 29 argument.");
+		CMF_LOG(CMF, Error, "Unsupported bind attempted on a function with more than 31 argument.");
 		return nullptr;
 	}
 
@@ -848,7 +848,7 @@ struct CallHelper {
 	 * @return Always false.
 	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported call attempted on a function with more than 29 argument.");
+		CMF_LOG(CMF, Error, "Unsupported call attempted on a function with more than 31 argument.");
 		return false;
 	}
 
@@ -1839,19 +1839,19 @@ public:
 
 	// TODO the wait time might not be necessary
 	/**
-	 * @brief 
-	 * @param wait 
-	 * @param args 
-	 * @return 
+	 * @brief
+	 * @param wait
+	 * @param args
+	 * @return
 	 */
 	inline bool call(TickType_t wait, const Args&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...));
 	}
 
 	/**
-	 * @brief 
-	 * @param wait 
-	 * @return 
+	 * @brief
+	 * @param wait
+	 * @return
 	 */
 	inline virtual bool probe(TickType_t wait) noexcept override {
 		std::tuple<Args...> arguments;

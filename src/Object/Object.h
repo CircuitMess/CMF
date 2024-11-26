@@ -16,65 +16,65 @@
 #include "Containers/Archive.h"
 
 /**
- * @brief 
+ * @brief
  */
 class Object {
 public:
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	Object() noexcept;
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	virtual ~Object() noexcept = default;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline constexpr uint32_t getID() const noexcept {
 		return id;
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline std::string getName() const noexcept {
 		return getStaticClass()->getName().append("_").append(std::to_string(getID()));
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline static const Class* staticClass() noexcept {
 		return objectStaticClass;
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline virtual const Class* getStaticClass() const noexcept {
 		return staticClass();
 	}
 
 	/**
-	 * @brief 
-	 * @param other 
-	 * @return 
+	 * @brief
+	 * @param other
+	 * @return
 	 */
 	inline virtual bool isA(const Class* other) const noexcept {
 		return other->getID() == staticClass()->getID();
 	}
 
 	/**
-	 * @brief 
-	 * @tparam __T 
-	 * @return 
+	 * @brief
+	 * @tparam __T
+	 * @return
 	 */
 	template<typename __T>
 	inline bool isA() const noexcept {
@@ -82,9 +82,9 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @tparam __T 
-	 * @return 
+	 * @brief
+	 * @tparam __T
+	 * @return
 	 */
 	template<typename __T>
 	static inline constexpr bool implements() noexcept {
@@ -92,67 +92,67 @@ public:
 	}
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	virtual void postInitProperties() noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	bool canDelete() noexcept;
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	void destroy() noexcept;
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	virtual void onDestroy() noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline bool isMarkedForDestroy() const noexcept{
 		return markedForDestroy;
 	}
 
 	/**
-	 * @brief 
-	 * @param object 
+	 * @brief
+	 * @param object
 	 */
 	virtual void setOwner(Object* object) noexcept;
 
 	/**
-	 * @brief 
-	 * @param oldOwner 
+	 * @brief
+	 * @param oldOwner
 	 */
 	virtual void onOwnerChanged(Object* oldOwner) noexcept;
 
 	/**
-	 * @brief 
-	 * @param child 
+	 * @brief
+	 * @param child
 	 */
 	virtual void onChildAdded(Object* child) noexcept;
 
 	/**
-	 * @brief 
-	 * @param child 
+	 * @brief
+	 * @param child
 	 */
 	virtual void onChildRemoved(Object* child) noexcept;
 
 	/**
-	 * @brief 
-	 * @param function 
+	 * @brief
+	 * @param function
 	 */
 	void forEachChild(const std::function<bool(Object*)>& function) noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline constexpr Object* getOwner() const noexcept {
 		if(!owner.isValid()){
@@ -163,84 +163,84 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param object 
+	 * @brief
+	 * @param object
 	 */
 	void setInstigator(Object* object) noexcept;
 
 	/**
-	 * @brief 
-	 * @param oldInstigator 
+	 * @brief
+	 * @param oldInstigator
 	 */
 	virtual void onInstigatorChanged(Object* oldInstigator) noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline constexpr Object* getInstigator() const noexcept {
 		return instigator.get();
 	}
 
 	/**
-	 * @brief 
-	 * @param wait 
+	 * @brief
+	 * @param wait
 	 */
 	void scanEvents(TickType_t wait) noexcept;
 
 	/**
-	 * @brief 
-	 * @param handle 
+	 * @brief
+	 * @param handle
 	 */
 	void registerEventHandle(class EventHandleBase* handle) noexcept;
 
 	/**
-	 * @brief 
-	 * @param handle 
+	 * @brief
+	 * @param handle
 	 */
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	virtual TickType_t getEventScanningTime() const noexcept;
 
 	/**
-	 * @brief 
-	 * @param archive 
-	 * @return 
+	 * @brief
+	 * @param archive
+	 * @return
 	 */
 	virtual Archive& serialize(Archive& archive) noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	static class Application* getApp() noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	Object* getOutermostOwner() const noexcept;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	Object* getOutermostInstigator() const noexcept;
 
 protected:
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline static constexpr std::string __getTemplateNames() noexcept { return ""; }
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief
+	 * @return
 	 */
 	inline static constexpr uint32_t __getTemplateHash() noexcept { return 0; }
 
@@ -277,13 +277,13 @@ private:
 
 private:
 	/**
-	 * @brief 
-	 * @param child 
+	 * @brief
+	 * @param child
 	 */
 	void registerChild(Object* child) noexcept;
 
 	/**
-	 * @brief 
+	 * @brief
 	 * @param child
 	 */
 	void removeChild(Object* child) noexcept;

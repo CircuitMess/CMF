@@ -31,10 +31,8 @@ struct LogType {
  * @brief Macro used to define a custom log.
  * @param name The name of the custom log.
  */
-#define DEFINE_LOG(name) inline static const LogType name = { #name };
-
-DEFINE_LOG(LogTemp)
-DEFINE_LOG(LogCMF)
+#define DEFINE_LOG(name) inline static const LogType name##_log = {#name};
+DEFINE_LOG(CMF)
 
 /**
  * @brief Log used to trace location of the code to the serial output.
@@ -52,15 +50,15 @@ DEFINE_LOG(LogCMF)
 #define CMF_LOG(log, level, format, ...)																		\
 	do {																										\
 		if(level == Error){																						\
-			ESP_LOGE(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGE(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == LogLevel::Warning){																	\
-			ESP_LOGW(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGW(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Info){																				\
-			ESP_LOGI(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGI(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Debug){																				\
-			ESP_LOGD(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGD(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else if(level == Verbose){																				\
-			ESP_LOGV(log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
+			ESP_LOGV(log##_log.Tag.c_str(), format __VA_OPT__(,) __VA_ARGS__);										\
 		}else{}																									\
     } while(false)																								\
 
