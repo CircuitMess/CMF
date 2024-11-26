@@ -218,6 +218,7 @@ public:																														                                \
 	inline static constexpr bool implements() noexcept {																	                                \
 		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();							                                \
 	}                                                      																	                                \
+private:
 
 
 // ====================================================================================

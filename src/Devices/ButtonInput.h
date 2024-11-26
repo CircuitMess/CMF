@@ -8,15 +8,15 @@ class ButtonInput : public AsyncEntity {
 	GENERATED_BODY(ButtonInput, AsyncEntity);
 
 public:
-	void reg(Enum<int> button, InputPin pin);
+	void reg(Enum<int> button, InputPin pin) noexcept;
 
-	bool getState(Enum<int> button);
+	bool getState(Enum<int> button) noexcept;
 
 protected:
 	void tick(float deltaTime) noexcept override;
 
 private:
-	std::set<StrongObjectPtr<InputDriver<InputPinDef>>> inputSources;
+	std::set<StrongObjectPtr<InputDriverBase>> inputSources;
 
 	std::map<int, InputPin> buttons;
 };

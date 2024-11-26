@@ -12,13 +12,13 @@ class InputTouchGPIO : public InputDriver<TouchPinDef> {
 	GENERATED_BODY(InputTouchGPIO, InputDriver);
 
 public:
-	InputTouchGPIO() = default;
-	InputTouchGPIO(const std::vector<TouchPinDef>& inputs);
+	InputTouchGPIO() noexcept = default;
+	InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept;
 
 private:
 	void scan() noexcept override;
 
-	void performRegister(TouchPinDef input) override;
+	void performRegister(TouchPinDef input) noexcept override;
 
 //	std::map<int, uint32_t> benchmarks;
 };
