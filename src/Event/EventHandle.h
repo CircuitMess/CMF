@@ -15,7 +15,7 @@ template<typename ...Args>
 struct BindHelper {
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported bind attempted on a function with more than 31 argument.");
+		CMF_LOG(CMF, Error, "Unsupported bind attempted on a function with more than 31 argument.");
 		return nullptr;
 	}
 
@@ -582,7 +582,7 @@ private:
 template<typename ...Args>
 struct CallHelper {
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported call attempted on a function with more than 31 argument.");
+		CMF_LOG(CMF, Error, "Unsupported call attempted on a function with more than 31 argument.");
 		return false;
 	}
 

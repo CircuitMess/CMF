@@ -8,7 +8,7 @@ OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr
 void OutputGPIO::performWrite(int port, float value) noexcept{
 	const auto pin = (gpio_num_t) port;
 	if(!getInversions().contains(port)){
-		CMF_LOG(LogCMF, Warning, "Output port %d inversion missing", port);
+		CMF_LOG(CMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
 	gpio->write(pin, (bool) value ^ getInversions()[port]);
