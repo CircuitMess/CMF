@@ -22,13 +22,13 @@
 #include "Log/Log.h"
 
 /**
- * @brief 
+ * @brief The static CMF class used to setup the framework for execution and start the application execution.
  */
 class CMF {
 public:
 	/**
-	 * @brief 
-	 * @tparam T 
+	 * @brief Starts the application execution, sets up the garbage collector.
+	 * @tparam T The type of application defined by the user for initialization and execution.
 	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Application>>::type>
 	static void start(){
@@ -56,8 +56,8 @@ private:
 };
 
 /**
- * @brief 
- * @param AppName 
+ * @brief The macro abstracting the definition of the main function from the user of the framework.
+ * @param AppName The name of the application type the user wants the framework to run.
  */
 #define CMF_MAIN(AppName) 				\
 	extern "C" void app_main() 			\

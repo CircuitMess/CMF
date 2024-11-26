@@ -7,7 +7,8 @@
 class Object;
 
 /**
- * @brief Object manager is a class that keeps all valid references to objects, invalidates them when needed, checks validity of object pointers and check if an object is ready for garbage collection.
+ * @brief Object manager is a class that keeps all valid references to objects, invalidates them when needed,
+ * checks validity of object pointers and check if an object is ready for garbage collection.
  */
 class ObjectManager {
 public:
@@ -29,7 +30,8 @@ public:
 	uint32_t getReferenceCount(const Object* object) noexcept;
 
 	/**
-	 * @brief Checks if the object is valid. Object is considered valid if it is not nullptr, contained in the object reference tree with more than 0 strong references and not marked for destroy.
+	 * @brief Checks if the object is valid. Object is considered valid if it is not nullptr,
+	 * contained in the object reference tree with more than 0 strong references and not marked for destroy.
 	 * @param object Object being checked for validity.
 	 * @return True if given object is valid.
 	 */
@@ -43,7 +45,8 @@ public:
 	void registerReference(Object** object, bool keepAlive = false) noexcept;
 
 	/**
-	 * @brief Unregisters a weak or strong object reference to the given pointer. Usually happens when a smart object pointer is destroyed.
+	 * @brief Unregisters a weak or strong object reference to the given pointer.
+	 * Usually happens when a smart object pointer is destroyed.
 	 * @param object Pointer to the object pointer being unregistered.
 	 * @param keepAlive Determines if the pointer is weak or strong type.
 	 */
@@ -56,14 +59,16 @@ public:
 	void forEachObject(const std::function<bool(Object*)>& fn) const noexcept;
 
 	/**
-	 * @brief Called when an object is deleted from memory by the garbage collector. Removes internal components needed for managing that object.
+	 * @brief Called when an object is deleted from memory by the garbage collector.
+	 * Removes internal components needed for managing that object.
 	 * @param object The object being deleted.
 	 */
 	void onObjectDeleted(Object* object) noexcept;
 
 private:
 	/**
-	 * @brief Contains all pointers that reference a single object, both weak and strong. Only the strong pointer influence the count, which is what keeps the object alive while > 0.
+	 * @brief Contains all pointers that reference a single object, both weak and strong.
+	 * Only the strong pointer influence the count, which is what keeps the object alive while > 0.
 	 */
 	struct ObjectRefInfo {
 		uint32_t count = 0;

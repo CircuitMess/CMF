@@ -6,8 +6,7 @@ class Application;
 class ApplicationStatics {
 public:
 	/**
-	 * @brief
-	 * @return
+	 * @return Static application instance.
 	 */
 	static Application* getApplication() noexcept;
 };

@@ -4,7 +4,7 @@
 #include "Object/Object.h"
 
 /**
- * @brief 
+ * @brief End reason enum, representing the reason why the entity is being destroyed.
  */
 enum class EndReason : uint8_t {
 	Destroyed,
@@ -13,25 +13,24 @@ enum class EndReason : uint8_t {
 };
 
 /**
- * @brief 
+ * @brief The base entity class representing an object that has begin, tick and end lifetime functionality.
  */
 class Entity : public Object {
 	GENERATED_BODY(Entity, Object)
 
 public:
 	/**
-	 * @brief 
+	 * @brief Creates an entity.
 	 */
 	Entity() noexcept;
 
 	/**
-	 * @brief 
+	 * @brief Default emprt destructor.
 	 */
 	virtual ~Entity() noexcept override;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return True if entity has begun ticking, false otherwise.
 	 */
 	bool hasBegun() const noexcept;
 
@@ -42,19 +41,19 @@ protected:
 	virtual void postInitProperties() noexcept override;
 
 	/**
-	 * @brief 
+	 * @brief Called before the first tick, the function marks the begin of the entities lifetime as a fully setup object.
 	 */
 	virtual void begin() noexcept;
 
 	/**
-	 * @brief 
-	 * @param deltaTime 
+	 * @brief Called once per ticking period as long as the entity exists.
+	 * @param deltaTime The time passed since the last tick call.
 	 */
 	virtual void tick(float deltaTime) noexcept;
 
 	/**
-	 * @brief 
-	 * @param reason 
+	 * @brief Called after the final tick, marks the end of the entities lifetime with given reason.
+	 * @param reason The reason for end of life.
 	 */
 	virtual void end(EndReason reason) noexcept;
 

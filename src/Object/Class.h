@@ -24,7 +24,8 @@ public:
 	const class Class* getClass(uint64_t ID) const noexcept;
 
 	/**
-	 * @brief Registers a class, called by each class when constructed. Each class is constructed only once statically for each Object type.
+	 * @brief Registers a class, called by each class when constructed.
+	 * Each class is constructed only once statically for each Object type.
 	 * @param cls 
 	 */
 	void registerClass(const Class* cls) noexcept;
@@ -34,7 +35,8 @@ private:
 };
 
 /**
- * @brief Class distinguishes the Objects. Each object has a unique class which is implemented uniquely depending on the object.
+ * @brief Class distinguishes the Objects.
+ * Each object has a unique class which is implemented uniquely depending on the object.
  * Classes are mainly used for Object casting and construction.
  */
 class Class {
@@ -52,7 +54,8 @@ public:
 	virtual Object* createDefaultObject() const noexcept;
 
 	/**
-	 * @return The ID of the class. Each class has a unique ID depending on the name of the object it represents and the templates types of that object.
+	 * @return The ID of the class. Each class has a unique ID
+	 * depending on the name of the object it represents and the templates types of that object.
 	 */
 	uint64_t getID() const noexcept;
 
@@ -89,7 +92,8 @@ protected:
 
 protected:
 	/**
-	 * @brief Constructor of the class with given ID. The ID is generated partially at compile time, and partially at the beginning of the runtime statically.
+	 * @brief Constructor of the class with given ID. The ID is generated partially at compile time,
+	 * and partially at the beginning of the runtime statically.
 	 * @param ID The generated ID of the class.
 	 */
 	explicit Class(uint64_t ID) noexcept;

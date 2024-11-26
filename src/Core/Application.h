@@ -15,7 +15,9 @@
 #include "Services/Service.h"
 
 /**
- * @brief 
+ * @brief The base class used to define the core applications,
+ * as well as all variable modules it uses to control the hardware and software on the device.
+ * The user of the framework must extend this class to define their own application that is custom to their hardware and software.
  */
 class Application : public AsyncEntity {
 	GENERATED_BODY(Application, AsyncEntity)
@@ -24,48 +26,49 @@ class Application : public AsyncEntity {
 
 public:
 	/**
-	 * @brief 
+	 * @brief The default constructor. Sets the static instance pointer to the first constructed instance of the Application class that is still alive.
 	 */
 	Application() noexcept;
 
 	/**
-	 * @brief 
+	 * @brief Deleted copy constructor.
 	 */
 	Application(const Application&) = delete;
 
 	/**
-	 * @brief 
+	 * @brief Deleted move constructor.
 	 */
 	Application(Application&&) = delete;
 
 	/**
-	 * @brief 
+	 * @brief Destructor. Sets the static instance pointer to nullptr if it was set to the instance being destroyed.
 	 */
 	virtual ~Application() noexcept override;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Deleted copy operator.
 	 */
 	Application& operator =(const Application&) = delete;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Deleted move operator.
 	 */
 	Application& operator =(Application&&) = delete;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Allows the user of the framework to specify their own garbage collector type.
+	 * If nullptr is returned, the default CMF garbage collector will be used.
+	 * @return The type of garbage collector the application uses.
 	 */
 	virtual SubclassOf<GarbageCollector> getGarbageCollectorClass() const noexcept;
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @param cls 
-	 * @return 
+	 * @brief Registers a singleton to the application.
+	 * Only one of each type can ever exist registered within the application.
+	 * @tparam T The type of singleton being registered and returned.
+	 * @param cls The class of the singleton, in case a base class pointer should be returned,
+	 * but a derived class type should be created.
+	 * @return The created singleton if successful, nullptr otherwise.
 	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Singleton>, T>::type>
 	T* registerSingleton(const Class* cls = nullptr) const noexcept {
@@ -90,10 +93,10 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @param cls 
-	 * @return 
+	 * @brief A singleton getter found by class from the argument or template if argument not provided.
+	 * @tparam T The type of singleton to return.
+	 * @param cls The singleton class used to find the registered singleton.
+	 * @return The found singleton if successful, nullptr otherwise.
 	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Singleton>, T>::type>
 	T* getSingleton(const Class* cls = nullptr) const noexcept {
@@ -111,16 +114,16 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Marks if the application is in the middle of shutting down or not.
+	 * @return If the application is shutting down, true, otherwise false.
 	 */
 	inline bool isShuttingDown() const noexcept {
 		return shuttingDown;
 	}
 
 	/**
-	 * @brief 
-	 * @param object 
+	 * @brief Used to register object instances that should be kept alive passively as long as the application exists.
+	 * @param object The object instance to keep alive.
 	 */
 	void registerLifetimeObject(Object* object) noexcept;
 
@@ -137,25 +140,23 @@ protected:
 
 	/**
 	 * @brief 
-	 * @param deltaTime 
+	 * @param deltaTime The time passed since the last tick call.
 	 */
 	virtual void tick(float deltaTime) noexcept override;
 
 	/**
 	 * @brief 
-	 * @param reason 
+	 * @param reason The reason why the entity instance stopped ticking and is getting destroyed.
 	 */
 	virtual void end(EndReason reason) noexcept override;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return The maximum wait time for receiving events.
 	 */
 	virtual TickType_t getEventScanningTime() const noexcept override;
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return The frequency of ticks of the entity instance.
 	 */
 	virtual TickType_t getTickingInterval() const noexcept override;
 

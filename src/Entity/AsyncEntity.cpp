@@ -87,8 +87,9 @@ void AsyncEntity::tickHandle() noexcept{
 
 	if(!hasBegun()){
 		begin();
+	}
 
-		forEachChild([](Object* child) {
+	forEachChild([](Object* child) {
 			if(!isValid(child)){
 				return false;
 			}
@@ -103,7 +104,6 @@ void AsyncEntity::tickHandle() noexcept{
 
 			return false;
 		});
-	}
 
 	scanEvents(getEventScanningTime());
 	tick(deltaTime);

@@ -10,29 +10,31 @@
 class SyncEntity;
 
 /**
- * @brief
+ * @brief AsyncEntity is an owner-less Entity implementation which begins,
+ * ticks and ends asynchronously in its own thread,
+ * and handles lifetime of its child objects in the same thread.
  */
 class AsyncEntity : public Entity {
 	GENERATED_BODY(AsyncEntity, Entity)
 
 public:
 	/**
-	 * @brief
-	 * @param interval
-	 * @param threadStackSize
-	 * @param threadPriority
-	 * @param cpuCore
+	 * @brief Creates an async entity with given parameters as its behavior properties.
+	 * @param interval The time between ticks.
+	 * @param threadStackSize Stack size of the async entity thread.
+	 * @param threadPriority Thread priority.
+	 * @param cpuCore The core of execution.
 	 */
 	explicit AsyncEntity(TickType_t interval = 0, size_t threadStackSize = 4 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 
 	/**
-	 * @brief
+	 * @brief Stops the thread if still running, then destroys the entity.
 	 */
 	virtual ~AsyncEntity() noexcept override;
 
 protected:
 	/**
-	 * @brief
+	 * @brief Creates the thread of the entity and starts its execution.
 	 */
 	virtual void postInitProperties() noexcept override;
 
@@ -54,37 +56,36 @@ protected:
 	virtual void end(EndReason reason) noexcept override;
 
 	/**
-	 * @brief
-	 * @param object
+	 * @brief Ensures that the owner set is always nullptr since async entities cannot have an owner.
+	 * @param object The owner object, always ignored and set to nullptr.
 	 */
 	virtual void setOwner(Object* object) noexcept override final;
 
 	/**
-	 * @brief
+	 * @brief Stops and destroys the thread.
 	 */
 	virtual void onDestroy() noexcept override;
 
 	/**
-	 * @brief
-	 * @return
+	 * @return The maximum wait time on new events.
 	 */
 	virtual TickType_t getEventScanningTime() const noexcept override;
 
 	/**
-	 * @brief
-	 * @return
+	 * @return The time between tick executions.
 	 */
 	virtual TickType_t getTickingInterval() const noexcept;
 
 	/**
-	 * @brief
-	 * @param value
+	 * @param value New ticking interval.
 	 */
 	void setTickingInterval(TickType_t value) noexcept;
 
 private:
 	/**
-	 * @brief
+	 * @brief The internal tick handle which is running within the native thread.
+	 * This function calls the tick and event scanning of this object,
+	 * as well as all necessary lifetime and event functionality of child objects and entities.
 	 */
 	void tickHandle() noexcept;
 

@@ -9,24 +9,25 @@
 #include <mutex>
 
 /**
- * @brief 
- * @tparam T 
- * @tparam Allocator 
+ * @brief A variable size queue which is thread-safe, template,
+ * and supports a custom allocator for all memory allocations.
+ * @tparam T The type of data being held in the queue.
+ * @tparam Allocator The type of allocator used for memory operations within the queue.
  */
 template<typename T, typename Allocator = std::allocator<T>>
 class Queue {
 public:
 	/**
-	 * @brief 
-	 * @param size 
+	 * @brief The constructor with starting size option,
+	 * @param size The size the queue starts its life with.
 	 */
 	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = allocator.allocate(bufferSize);
 	}
 
 	/**
-	 * @brief 
-	 * @param other 
+	 * @brief The copy constructor from another queue of same data type.
+	 * @param other The queue being copied.
 	 */
 	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
 		buffer = allocator.allocate(bufferSize);
@@ -37,8 +38,8 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param other 
+	 * @brief The move constructor from another queue with the same data type.
+	 * @param other The queue being moved. The queue is empty after the constructor finishes execution.
 	 */
 	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(std::move(other.accessMutex)) {
 		other.buffer = 0;
@@ -51,7 +52,7 @@ public:
 	}
 
 	/**
-	 * @brief 
+	 * @brief Unblocks the thread-safe synchronization and frees memory, destroys the queue.
 	 */
 	inline ~Queue() noexcept {
 		setKillPill();
@@ -65,32 +66,30 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return The size of the queue.
 	 */
 	inline size_t size() const noexcept {
 		return end - begin + 1;
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return The capacity of the queue (maximum size without resizing).
 	 */
 	inline size_t capacity() const noexcept {
 		return bufferSize;
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Checker for an empty queue.
+	 * @return True if size is 0. False otherwise.
 	 */
 	inline bool empty() const noexcept {
 		return begin == end;
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @brief Checker for a full queue.
+	 * @return True if size equals capacity. False otherwise.
 	 */
 	inline bool full() const noexcept {
 		if(begin > end){
@@ -101,9 +100,9 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param newSize 
-	 * @return 
+	 * @brief Reserves a capacity of the queue to the given size.
+	 * @param newSize The new capacity of the queue.
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool reserve(size_t newSize) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -111,10 +110,9 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param value 
-	 * @param wait 
-	 * @return 
+	 * @param value The variable that is set to the front value.
+	 * @param wait The maximum time to halt thread execution and wait to retrieve a value.
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool front(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
@@ -139,10 +137,10 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param value 
-	 * @param wait 
-	 * @return 
+	 * @brief Pop function which retrieves a value from the internal buffer before removing it internally.
+	 * @param value The value variable set to the value at the top of the stack before removing it.
+	 * @param wait The maximum wait time for a successful value pop before abort.
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool pop(T& value, TickType_t wait = portMAX_DELAY) noexcept {
 		if(xSemaphoreTake(waitSemaphore, wait) != pdTRUE){
@@ -172,9 +170,9 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param value 
-	 * @return 
+	 * @brief Push function which adds a value at the end of the queue.
+	 * @param value The value being added to the queue.
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool push(const T& value) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -193,9 +191,9 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param value 
-	 * @return 
+	 * @brief A move push function. The give value is moved to the queue and emptied / invalidated.
+	 * @param value The value being added to the queue.
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool push(T&& value) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -214,7 +212,7 @@ public:
 	}
 
 	/**
-	 * @brief 
+	 * @brief Removes all values from the queue, leaving it empty.
 	 */
 	inline void clear() noexcept {
 		std::lock_guard guard(accessMutex);
@@ -229,8 +227,8 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param value 
+	 * @brief Unblocks all thread-safe functionality with a kill pill, meaning all data retrieval attempts will fail, but will unblock threads waiting on it.
+	 * @param value The value being set to the kill pill.
 	 */
 	inline void setKillPill(bool value = true) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -254,9 +252,10 @@ private:
 
 private:
 	/**
-	 * @brief 
-	 * @param newSize 
-	 * @return 
+	 * @brief An internal function used to reserve memory needed for resizing of the queue.
+	 * Before resizing, all values that will be lost when downsizing are destroyed first. The rest are moved or copied to the new buffer.
+	 * @param newSize The new size of the queue./
+	 * @return True if successful, false otherwise.
 	 */
 	inline bool reserveInternal(size_t newSize) noexcept {
 		T* newBuffer = allocator.allocate(newSize);

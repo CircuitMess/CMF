@@ -17,7 +17,8 @@ public:
 	inline SubclassOf() noexcept = default;
 
 	/**
-	 * @brief Constructs a SubclassOf from the given object, if object is of class T or derives class T. If not, the constructed SubclassOf is null.
+	 * @brief Constructs a SubclassOf from the given object, if object is of class T or derives class T.
+	 * If not, the constructed SubclassOf is null.
 	 * @param object Object from which the SubclassOf will be constructed.
 	 */
 	inline SubclassOf(const Object* object) noexcept {

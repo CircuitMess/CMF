@@ -12,49 +12,74 @@
 #include "Log/Log.h"
 
 /**
- * @brief
- * @tparam Args
+ * @brief A static helper function used to simplify binding of object member functions to events as callbacks.
+ * @tparam Args The types of arguments of the bound function.
  */
 template<typename ...Args>
 struct BindHelper {
 	/**
-	 * @brief
-	 * @tparam O
-	 * @tparam F
-	 * @param object
-	 * @param function
-	 * @return
+	 * @brief Binding a function with more than 29 argument is not possible.
+	 * This function variation ensures correct error logging in such case.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return Always nullptr.
 	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported bind attempted on a function with more than 31 argument.");
+		CMF_LOG(LogCMF, Error, "Unsupported bind attempted on a function with more than 29 argument.");
 		return nullptr;
 	}
 
 	/**
-	 * @brief
-	 * @tparam O
-	 * @tparam F
-	 * @param object
-	 * @param function
-	 * @return
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
 	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 0) {
 		return std::bind(function, object);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 1) {
 		return std::bind(function, object, std::placeholders::_1);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 2) {
 		return std::bind(function, object, std::placeholders::_1,
 						 std::placeholders::_2);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 3) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -62,6 +87,14 @@ struct BindHelper {
 						 std::placeholders::_3);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 4) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -70,6 +103,14 @@ struct BindHelper {
 						 std::placeholders::_4);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 5) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -79,6 +120,14 @@ struct BindHelper {
 						 std::placeholders::_5);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 6) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -89,6 +138,14 @@ struct BindHelper {
 									std::placeholders::_6);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 7) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -100,6 +157,14 @@ struct BindHelper {
 						 std::placeholders::_7);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 8) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -112,6 +177,14 @@ struct BindHelper {
 						 std::placeholders::_8);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 9) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -125,6 +198,14 @@ struct BindHelper {
 						 std::placeholders::_9);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 10) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -139,6 +220,14 @@ struct BindHelper {
 						 std::placeholders::_10);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 11) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -154,6 +243,14 @@ struct BindHelper {
 						 std::placeholders::_11);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 12) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -170,6 +267,14 @@ struct BindHelper {
 						 std::placeholders::_12);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 13) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -187,6 +292,14 @@ struct BindHelper {
 						 std::placeholders::_13);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 14) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -205,6 +318,14 @@ struct BindHelper {
 						 std::placeholders::_14);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 15) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -224,6 +345,14 @@ struct BindHelper {
 						 std::placeholders::_15);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 16) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -244,6 +373,14 @@ struct BindHelper {
 						 std::placeholders::_16);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 17) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -265,6 +402,14 @@ struct BindHelper {
 						 std::placeholders::_17);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 18) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -287,6 +432,14 @@ struct BindHelper {
 						 std::placeholders::_18);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 19) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -310,6 +463,14 @@ struct BindHelper {
 						 std::placeholders::_19);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 20) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -334,6 +495,14 @@ struct BindHelper {
 						 std::placeholders::_20);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 21) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -359,6 +528,14 @@ struct BindHelper {
 						 std::placeholders::_21);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 22) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -385,6 +562,14 @@ struct BindHelper {
 						 std::placeholders::_22);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 23) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -412,6 +597,14 @@ struct BindHelper {
 						 std::placeholders::_23);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 24) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -440,6 +633,14 @@ struct BindHelper {
 						 std::placeholders::_24);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 25) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -469,6 +670,14 @@ struct BindHelper {
 						 std::placeholders::_25);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 26) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -499,6 +708,14 @@ struct BindHelper {
 						 std::placeholders::_26);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 27) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -530,6 +747,14 @@ struct BindHelper {
 						 std::placeholders::_27);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 28) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -562,6 +787,14 @@ struct BindHelper {
 						 std::placeholders::_28);
 	}
 
+	/**
+	 * @brief Function helper for binding a function with various number of arguments.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The object instance upon which the function will be bound and called.
+	 * @param function The function being bound.
+	 * @return The object member function in a std::function wrapper.
+	 */
 	template<typename O, typename F>
 	inline static constexpr std::function<void(Args...)> get(O* object, F&& function) noexcept requires (sizeof...(Args) == 29) {
 		return std::bind(function, object, std::placeholders::_1,
@@ -597,34 +830,33 @@ struct BindHelper {
 
 private:
 	/**
-	 * @brief 
+	 * @brief Deleted constructor to ensure static use of the class.
 	 */
 	inline BindHelper() noexcept = delete;
 };
 
 /**
- * @brief 
- * @tparam Args 
+ * @brief A helper static class used to call bound object member functions by passing arguments in a form of std::tuple.
+ * @tparam Args The types of arguments passed when the function is called.
  */
 template<typename ...Args>
 struct CallHelper {
 	/**
-	 * @brief 
-	 * @param function 
-	 * @param arguments 
-	 * @return 
+	 * @brief Function variation which ensures proper error logging in event a function with more than 29 arguments is attempted to be called.
+	 * @param function The function in a std::function wrapper being called.
+	 * @param arguments The arguments in a std::tuple being passed as individual arguments to the function.
+	 * @return Always false.
 	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept {
-		CMF_LOG(LogCMF, Error, "Unsupported call attempted on a function with more than 31 argument.");
+		CMF_LOG(LogCMF, Error, "Unsupported call attempted on a function with more than 29 argument.");
 		return false;
 	}
 
-	// TODO copy this to all others when filled out, it will be the same
 	/**
-	 * @brief 
-	 * @param function 
-	 * @param arguments 
-	 * @return 
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
 	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 0) {
 		if(function == nullptr){
@@ -636,6 +868,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 1) {
 		if(function == nullptr){
 			return false;
@@ -646,6 +884,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 2) {
 		if(function == nullptr){
 			return false;
@@ -657,6 +901,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 3) {
 		if(function == nullptr){
 			return false;
@@ -669,6 +919,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 4) {
 		if(function == nullptr){
 			return false;
@@ -682,6 +938,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 5) {
 		if(function == nullptr){
 			return false;
@@ -696,6 +958,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 6) {
 		if(function == nullptr){
 			return false;
@@ -711,6 +979,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 7) {
 		if(function == nullptr){
 			return false;
@@ -727,6 +1001,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 8) {
 		if(function == nullptr){
 			return false;
@@ -744,6 +1024,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 9) {
 		if(function == nullptr){
 			return false;
@@ -762,6 +1048,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 10) {
 		if(function == nullptr){
 			return false;
@@ -781,6 +1073,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 11) {
 		if(function == nullptr){
 			return false;
@@ -801,6 +1099,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 12) {
 		if(function == nullptr){
 			return false;
@@ -822,6 +1126,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 13) {
 		if(function == nullptr){
 			return false;
@@ -844,6 +1154,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 14) {
 		if(function == nullptr){
 			return false;
@@ -867,6 +1183,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 15) {
 		if(function == nullptr){
 			return false;
@@ -891,6 +1213,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 16) {
 		if(function == nullptr){
 			return false;
@@ -916,6 +1244,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 17) {
 		if(function == nullptr){
 			return false;
@@ -942,6 +1276,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 18) {
 		if(function == nullptr){
 			return false;
@@ -969,6 +1309,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 19) {
 		if(function == nullptr){
 			return false;
@@ -997,6 +1343,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 20) {
 		if(function == nullptr){
 			return false;
@@ -1026,6 +1378,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 21) {
 		if(function == nullptr){
 			return false;
@@ -1056,6 +1414,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 22) {
 		if(function == nullptr){
 			return false;
@@ -1087,6 +1451,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 23) {
 		if(function == nullptr){
 			return false;
@@ -1119,6 +1489,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 24) {
 		if(function == nullptr){
 			return false;
@@ -1152,6 +1528,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 25) {
 		if(function == nullptr){
 			return false;
@@ -1186,6 +1568,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 26) {
 		if(function == nullptr){
 			return false;
@@ -1221,6 +1609,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 27) {
 		if(function == nullptr){
 			return false;
@@ -1257,6 +1651,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 28) {
 		if(function == nullptr){
 			return false;
@@ -1294,6 +1694,12 @@ struct CallHelper {
 		return true;
 	}
 
+	/**
+	 * @brief A helper function used to call a function with arguments contained in a std::tuple.
+	 * @param function The function being called in a std::function wrapper.
+	 * @param arguments The arguments being passed to the function in a std::tuple.
+	 * @return False if function is invalid, true otherwise.
+	 */
 	inline static constexpr bool call(const std::function<void(Args...)>& function, const std::tuple<Args...>& arguments) noexcept requires (sizeof...(Args) == 29) {
 		if(function == nullptr){
 			return false;
@@ -1334,61 +1740,65 @@ struct CallHelper {
 
 private:
 	/**
-	 * @brief 
+	 * @brief Deleted default constructor ensuring the class can only be used statically.
 	 */
 	inline CallHelper() noexcept = delete;
 };
 
 /**
- * @brief 
+ * @brief Base event handle interface demanding implementation of probing and scanning functionality from the event handle implementations.
  */
 class EventHandleBase {
 public:
 	/**
-	 * @brief 
-	 * @param wait 
-	 * @return 
+	* @brief Default destructor.
+	*/
+	virtual ~EventHandleBase() = default;
+
+	/**
+	 * @brief A function used to check if an event trigger is queued or not.
+	 * @param wait The wait time for the check.
+	 * @return True if there is a queued event trigger.
 	 */
 	inline virtual bool probe(TickType_t wait) noexcept = 0;
 
 	/**
-	 * @brief 
-	 * @param wait 
+	 * @brief A function used to scan and process callbacks of queued event triggers.
+	 * @param wait The wait time for the queued event pop.
 	 */
 	inline virtual void scan(TickType_t wait) noexcept = 0;
 };
 
 /**
- * @brief 
- * @tparam Args 
+ * @brief Event handle implementation with custom argument types.
+ * @tparam Args The types of arguments being broadcast to the callback functions.
  */
 template<typename ...Args>
 class EventHandle : public EventHandleBase {
 public:
 	/**
-	 * @brief 
+	 * @brief Destructor unregisters this event handle from the owning object, stopping its scanning.
 	 */
-	inline virtual ~EventHandle() noexcept {
+	inline virtual ~EventHandle() noexcept override {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
 		}
 	}
 
 	/**
-	 * @brief 
-	 * @return 
+	 * @return The object owning the handle, responsible for its scanning and lifetime.
 	 */
 	Object* getOwningObject() const noexcept {
 		return *owningObject;
 	}
 
 	/**
-	 * @brief 
-	 * @tparam O 
-	 * @tparam F 
-	 * @param object 
-	 * @param function 
-	 * @return 
+	 * @brief Bind function binds a member function of an object type instance to the event as a callback.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The instance of object owning the function.
+	 * @param function The function reference being bound.
+	 * @return Reference to this.
 	 */
 	template<typename O, typename F>
 	inline EventHandle& bind(O* object, F&& function) noexcept {
@@ -1407,10 +1817,10 @@ public:
 	}
 
 	/**
-	 * @brief 
-	 * @param object 
-	 * @param function 
-	 * @return 
+	 * @brief Bind function binds a std::function wrapped function to the event as a callback paired with owning object instance..
+	 * @param object Owning object instance.
+	 * @param function Function being bound.
+	 * @return Reference to this.
 	 */
 	inline EventHandle& bind(Object* object, const std::function<void(Args...)>& function) noexcept {
 		if(owningObject.isValid()){
@@ -1427,6 +1837,7 @@ public:
 		return *this;
 	}
 
+	// TODO the wait time might not be necessary
 	/**
 	 * @brief 
 	 * @param wait 
@@ -1448,7 +1859,7 @@ public:
 	}
 
 	/**
-	 * @brief 
+	 * @brief
 	 * @param wait
 	 */
 	inline virtual void scan(TickType_t wait) noexcept override {

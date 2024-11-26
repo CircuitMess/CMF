@@ -4,7 +4,8 @@
 #include "ObjectPtr.h"
 
 /**
- * @brief Weak object pointer holds a weak reference to an instance of an object. This does not impact the lifetime of the object, and the pointer is invalidated when the object is destroyed.
+ * @brief Weak object pointer holds a weak reference to an instance of an object.
+ * This does not impact the lifetime of the object, and the pointer is invalidated when the object is destroyed.
  * @tparam T The type of object being pointed to.
  */
 template<typename T>
@@ -46,7 +47,8 @@ public:
 	inline constexpr WeakObjectPtr(Object* object) noexcept : ObjectPtr<T, false>(object) {}
 
 	/**
-	 * @brief Constructor from a nullptr_t type. The weak object pointer is always invalid after this until another pointer is set to it.
+	 * @brief Constructor from a nullptr_t type.
+	 * The weak object pointer is always invalid after this until another pointer is set to it.
 	 */
 	inline constexpr WeakObjectPtr(nullptr_t) noexcept : ObjectPtr<T, false>(nullptr) {}
 
@@ -80,7 +82,7 @@ public:
 	}
 
 	/**
-	 * @brief Move operator = with a weak object pointer of a different object type. Invalidates the other weak object pointer.
+	 * @brief Move assignment operator with a weak object pointer of a different object type. Invalidates the other weak object pointer.
 	 * @tparam _T The other object type.
 	 * @param other The weak object pointer being moved.
 	 * @return Reference to this weak object pointer.

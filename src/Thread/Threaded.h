@@ -11,7 +11,8 @@
 #include <atomic>
 
 /**
- * @brief Thread object that runs continuously with control of its properties like stack size, priority, core and interval, and an optional callback function that is called once per loop.
+ * @brief Thread object that runs continuously with control of its properties like stack size,
+ * priority, core and interval, and an optional callback function that is called once per loop.
  * The thread starts running immediately as constructed.
  */
 class Threaded : public Object {
@@ -107,13 +108,15 @@ public:
 	virtual bool onStop() noexcept;
 
 	/**
-	 * @brief Loops as often as possible determined by the interval of the thread. Calls the callback function every loop cycle, if any is set to the thread.
+	 * @brief Loops as often as possible determined by the interval of the thread.
+	 * Calls the callback function every loop cycle, if any is set to the thread.
 	 */
 	virtual void loop() noexcept;
 
 private:
 	/**
-	 * @brief The state in which the thread is at the moment. It can be either running, stopping - waiting to finish or stopped.
+	 * @brief The state in which the thread is at the moment.
+	 * It can be either running, stopping - waiting to finish or stopped.
 	 */
 	enum class State : uint8_t {
 		Running,

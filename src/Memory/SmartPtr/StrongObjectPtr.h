@@ -4,7 +4,8 @@
 #include "ObjectPtr.h"
 
 /**
- * @brief Strong object pointer holds a strong reference to an instance of an object, which works towards keeping the object from being destroyed.
+ * @brief Strong object pointer holds a strong reference to an instance of an object,
+ * which works towards keeping the object from being destroyed.
  * @tparam T The type of object being pointer to.
  */
 template<typename T>
@@ -80,7 +81,8 @@ public:
 	}
 
 	/**
-	 * @brief Move operator = with a strong object pointer of a different object type. Invalidates the other strong object pointer.
+	 * @brief Move operator = with a strong object pointer of a different object type.
+	 * Invalidates the other strong object pointer.
 	 * @tparam _T The other object type.
 	 * @param other The strong object pointer being moved.
 	 * @return Reference to this strong object pointer.

@@ -20,7 +20,8 @@ public:
 	explicit StateMachine(TickType_t interval = 0) noexcept;
 
 	/**
-	 * @brief Sets the event scanning type of the AsyncEntity to 0 if the starting state type is set, otherwise waits indefinitely to avoid ticking without need when no initial state is valid.
+	 * @brief Sets the event scanning type of the AsyncEntity to 0 if the starting state type is set,
+	 * otherwise waits indefinitely to avoid ticking without need when no initial state is valid.
 	 * @return The delay when scanning for events. 0 if starting type is set.
 	 */
 	virtual TickType_t getEventScanningTime() const noexcept override;
@@ -33,7 +34,8 @@ public:
 
 protected:
 	/**
-	 * @brief Checks if the current state is ready to transition to another one. If that is the case, the state transition is triggered.
+	 * @brief Checks if the current state is ready to transition to another one.
+	 * If that is the case, the state transition is triggered.
 	 * @param deltaTime Time passed between the last tick and this tick.
 	 */
 	virtual void tick(float deltaTime) noexcept override;
@@ -48,7 +50,8 @@ private:
 
 private:
 	/**
-	 * @brief Event callback, triggers the tick when called, called after the starting state type is set. Creates the current state object from the set starting type.
+	 * @brief Event callback, triggers the tick when called, called after the starting state type is set.
+	 * Creates the current state object from the set starting type.
 	 */
 	void onStartingTypeSetCallback() noexcept;
 };

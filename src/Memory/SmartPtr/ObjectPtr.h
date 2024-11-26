@@ -75,7 +75,8 @@ public:
 	}
 
 	/**
-	 * @brief Move constructor for an object pointer with different object type, and same or different lifetime management. The other pointer is invalidated.
+	 * @brief Move constructor for an object pointer with different object type,
+	 * and same or different lifetime management. The other pointer is invalidated.
 	 * @tparam _T The object type of the object pointer being moved.
 	 * @tparam _KeepAlive The lifetime management type of the object pointer being copied.
 	 * @param other The object pointer being copied.
@@ -218,7 +219,8 @@ public:
 	}
 
 	/**
-	 * @brief Move operator = with a different type object pointer, with same or different lifetime management. The other object pointer is invalidated.
+	 * @brief Move operator = with a different type object pointer,
+	 * with same or different lifetime management. The other object pointer is invalidated.
 	 * @tparam _T The other object type.
 	 * @tparam _KeepAlive The other pointer lifetime management.
 	 * @param other The object pointer being moved.

@@ -8,21 +8,21 @@
 #include "Util/stdafx.h"
 
 /**
- * @brief
- * @tparam K
- * @tparam V
+ * @brief A binary tree of key-value pairs. The tree is constructed using the comparison operators of the type of key given.
+ * @tparam K The type of key. The key type must have overridden comparison operators.
+ * @tparam V The type of value.
  */
 template<typename K, typename V>
 class BinaryTree {
 public:
 	/**
-	 * @brief
+	 * @brief A default empty constructor.
 	 */
 	inline BinaryTree() noexcept = default;
 
 	/**
-	 * @brief
-	 * @param other
+	 * @brief A copy constructor from another binary tree with same template types.
+	 * @param other The binary tree being copied from.
 	 */
 	inline BinaryTree(const BinaryTree& other) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -30,8 +30,8 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param other
+	 * @brief A move constructor from another binary tree with the same template types.
+	 * @param other The binary tree being moved. This binary tree is empty when the constructor finishes execution.
 	 */
 	inline BinaryTree(BinaryTree&& other) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -47,9 +47,9 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param other
-	 * @return
+	 * @brief Assignment copy operator from another binary tree with the same template types.
+	 * @param other The binary tree being copied.
+	 * @return The reference to the binary tree called on.
 	 */
 	inline BinaryTree& operator = (const BinaryTree& other) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -68,9 +68,9 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param other
-	 * @return
+	 * @brief Assignment move operator from another binary tree with the same template types.
+	 * @param other The binary tree being moved. This tree is empty after the operator finished with execution.
+	 * @return The reference to the binary tree called on.
 	 */
 	inline BinaryTree& operator = (BinaryTree&& other) noexcept {
 		if(&other == this){
@@ -94,9 +94,9 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param other
-	 * @return
+	 * @brief The equals comparison operator that compares two binary trees.
+	 * @param other The second binary tree in comparison.
+	 * @return True if the head pointer is same in both, false otherwise.
 	 */
 	inline bool operator == (const BinaryTree& other) const noexcept {
 		// TODO consider changing this to equals by data rather than by pointer
@@ -104,9 +104,10 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param key
-	 * @return
+	 * @brief The index operator. If no value is paired to the give key,
+	 * a new key-value pair with the default value of type V will be created and returned.
+	 * @param key The key of which the value should be returned.
+	 * @return The value paired to the given key.
 	 */
 	inline V& operator [] (const K& key) noexcept {
 		V* val = get(key);
@@ -120,9 +121,9 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param key
-	 * @param value
+	 * @brief Set function used to create a new key-value pair from given parameters, or alter an existing one.
+	 * @param key The key in the key-value pair.
+	 * @param value The value in the key-value pair.
 	 */
 	inline void set(const K& key, const V& value = V()) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -183,8 +184,8 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param key
+	 * @brief Removes a key-value pair from the tree.
+	 * @param key The key in the key-value pair being removed.
 	 */
 	inline void remove(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -249,9 +250,9 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @param key
-	 * @return
+	 * @brief Checker function for weather the key-value pair exists in the tree or not.
+	 * @param key The key in the key-value pair.
+	 * @return True if key-value pair with the given key exists. False otherwise.
 	 */
 	inline bool contains(const K& key) const noexcept {
 		std::set<K> treeKeys = keys();
@@ -263,16 +264,14 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @return
+	 * @return The number of key-value pairs in the tree.
 	 */
 	inline size_t size() const noexcept {
 		return keys().size();
 	}
 
 	/**
-	 * @brief
-	 * @return
+	 * @return Returns a set of all keys paired with values in the tree.
 	 */
 	inline std::set<K> keys() noexcept {
 		std::lock_guard guard(accessMutex);
@@ -314,8 +313,7 @@ public:
 	}
 
 	/**
-	 * @brief
-	 * @return
+	 * @return Returns a set of all keys paired with values in the tree.
 	 */
 	inline std::set<K> keys() const noexcept {
 		std::set<K> keys;
@@ -356,7 +354,7 @@ public:
 
 private:
 	/**
-	 * @brief
+	 * @brief The internal node used for the structure of the tree.
 	 */
 	struct Node {
 		K key = K();
@@ -369,7 +367,8 @@ private:
 private:
 	Node* head = nullptr;
 
-	// These two will serve well for iterating through the tree, it will always be sorted while iterating, and provides faster start of iteration in either direction
+	// These two will serve well for iterating through the tree, it will always be sorted while iterating,
+	// and provides faster start of iteration in either direction
 	Node* start = nullptr;
 	Node* end = nullptr;
 
@@ -377,9 +376,9 @@ private:
 
 private:
 	/**
-	 * @brief
-	 * @param key
-	 * @return
+	 * @brief Getter for a pointer of a value paired to the given key.
+	 * @param key The key in the key-value pair.
+	 * @return The pointer to the value paired to the given key.
 	 */
 	inline V* get(const K& key) noexcept {
 		std::lock_guard guard(accessMutex);
@@ -402,7 +401,7 @@ private:
 	}
 
 	/**
-	 * @brief
+	 * @brief Destroys the tree and all nodes in it, deallocates memory.
 	 */
 	inline void destruct() noexcept {
 		std::lock_guard guard(accessMutex);

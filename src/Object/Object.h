@@ -384,39 +384,4 @@ public:																														                                \
 	}                                                      																	                                \
 private:																																					\
 
-
-// ====================================================================================
-
-class Interface1 {
-};
-
-class Interface2 {};
-
-template<typename T>
-class Interface3 {};
-
-class ExampleDerivedObject : public Object, public Interface1, public Interface2 {
-	GENERATED_BODY(ExampleDerivedObject, Object, Interface2, Interface1)
-};
-
-class SecondExampleDerivedObject : public Object, public Interface1 {
-	GENERATED_BODY(SecondExampleDerivedObject, Object, Interface1)
-};
-
-class ThirdExampleDerivedObject : public Object, public Interface2 {
-	GENERATED_BODY(ThirdExampleDerivedObject, Object, Interface2)
-};
-
-class DoubleDerivedObject : public SecondExampleDerivedObject {
-	GENERATED_BODY(DoubleDerivedObject, SecondExampleDerivedObject)
-};
-
-template<typename T, typename U>
-class TestTemplateObject : public SecondExampleDerivedObject, public Interface3<int> {
-	TEMPLATE_ATTRIBUTES(T, U)
-	GENERATED_BODY(TestTemplateObject, SecondExampleDerivedObject, Interface3)
-};
-
-// ====================================================================================
-
 #endif //CMF_OBJECT_H

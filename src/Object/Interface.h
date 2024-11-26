@@ -7,14 +7,16 @@
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 
 /**
- * @brief Interface is used to pass pointer to an object that extends an interface, that is needed both as an object, and as the interface type.
+ * @brief Interface is used to pass pointer to an object that extends an interface,
+ * that is needed both as an object, and as the interface type.
  * @tparam I The interface that the underlying object implements.
  */
 template<typename I, typename = std::enable_if<!std::derived_from<I, Object>, I>::type>
 class Interface {
 public:
 	/**
-	 * @brief Constructs an Interface by using the given object. If the object does not implement the templated interface or is nullptr, the Interface instance will be null.
+	 * @brief Constructs an Interface by using the given object.
+	 * If the object does not implement the templated interface or is nullptr, the Interface instance will be null.
 	 * @tparam O The type of object that the parameter is, that implements the template type I interface.
 	 * @param object Object that implements the template type I interface, used to construct the internals of an Interface instance.
 	 */
