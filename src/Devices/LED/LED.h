@@ -7,26 +7,35 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "Log/Log.h"
 #include "Memory/ObjectMemory.h"
+#include "Object/SubclassOf.h"
 
 template<typename LED, typename DataT>
-class LEDFunction;
+class LEDFunction : public SyncEntity {
+	TEMPLATE_ATTRIBUTES(LED, DataT)
+	GENERATED_BODY(LEDFunction, SyncEntity)
+
+public:
+	virtual bool isDone() const noexcept{ return true; }
+	virtual DataT getValue() const noexcept{ return {}; }
+};
 
 template<typename LED, typename DataT> requires (std::same_as<DataT, glm::vec3> || std::same_as<DataT, float>)
 class LEDBase : public SyncEntity {
+	TEMPLATE_ATTRIBUTES(LED, DataT)
 	GENERATED_BODY(LEDBase, SyncEntity)
 
 public:
-	void reg(LED led, std::array<OutputPin, sizeof(DataT) / sizeof(float)> pins){
+	void reg(LED led, std::array<OutputPin, sizeof(DataT) / sizeof(float)> pins) noexcept{
 		accessMutex.lock();
 		outputs[led] = pins;
 		accessMutex.unlock();
 		off(led);
 	}
 
-	void off(LED led){
+	void off(LED led) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
-			CMF_LOG(LogCMF, Error, "LED %d not registered", (int) led);
+			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return;
 		}
 
@@ -42,10 +51,10 @@ public:
 		}
 	}
 
-	void on(LED led, DataT level){
+	void on(LED led, DataT level) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
-			CMF_LOG(LogCMF, Error, "LED %d not registered", (int) led);
+			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return;
 		}
 
@@ -61,14 +70,14 @@ public:
 		}
 	}
 
-	void set(LED led, std::unique_ptr<LEDFunction<LED, DataT>> func, bool temp = false){
+	void set(LED led, const SubclassOf<LEDFunction<LED, DataT>>& functionClass, bool temp = false) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
-			CMF_LOG(LogCMF, Error, "LED %d not registered", (int) led);
+			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return;
 		}
 
-		RegisteredFunction regFunc = { std::move(func), temp };
+		RegisteredFunction regFunc = { newObject<LEDFunction<LED, DataT>>(*functionClass, this), temp };
 
 		if(currentFunctions.contains(led)){
 			if(!currentFunctions[led].temp){
@@ -77,13 +86,12 @@ public:
 		}
 
 		currentFunctions[led] = regFunc;
-
 	}
 
-	DataT getValue(LED led) requires (std::same_as<DataT, float>){
+	DataT getValue(LED led) noexcept requires (std::same_as<DataT, float>){
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
-			CMF_LOG(LogCMF, Error, "LED %d not registered", (int) led);
+			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return DataT();
 		}
 
@@ -91,10 +99,10 @@ public:
 		return pin.driver->getState(pin.port);
 	}
 
-	DataT getValue(LED led) requires (std::same_as<DataT, glm::vec3>){
+	DataT getValue(LED led) noexcept requires (std::same_as<DataT, glm::vec3>){
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
-			CMF_LOG(LogCMF, Error, "LED %d not registered", (int) led);
+			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return DataT();
 		}
 
@@ -106,12 +114,12 @@ public:
 	}
 
 	void tick(float deltaTime) noexcept override{
-		SyncEntity::tick(deltaTime);
+		Super::tick(deltaTime);
 
 		std::lock_guard guard(accessMutex);
 
 		for(auto& [led, func]: currentFunctions){
-			DataT level = func.function->loop(deltaTime);
+			const DataT level = func.function->getValue();
 			internalOn(led, level);
 
 			if(!func.function->isDone()) continue;
@@ -128,8 +136,25 @@ public:
 	}
 
 private:
+	void internalOn(LED led, DataT level) noexcept requires (std::same_as<DataT, float>){
+		const auto& pin = outputs[led][0];
+		pin.driver->write(pin.port, level);
+	}
+
+	void internalOn(LED led, DataT level) noexcept requires (std::same_as<DataT, glm::vec3>){
+		for(int i = 0; i < outputs[led].size(); i++){
+			outputs[led][i].driver->write(outputs[led][i].port, level[i]);
+		}
+	}
+
+	void internalOff(LED led) noexcept{
+		for(const OutputPin& pin: outputs[led]){
+			pin.driver->write(pin.port, false);
+		}
+	}
+
 	struct RegisteredFunction {
-		std::shared_ptr<LEDFunction<LED, DataT>> function;
+		StrongObjectPtr<LEDFunction<LED, DataT>> function;
 		bool temp;
 	};
 
@@ -139,23 +164,6 @@ private:
 	std::map<LED, DataT> prevStates;
 
 	std::mutex accessMutex;
-
-	void internalOn(LED led, DataT level) requires (std::same_as<DataT, float>){
-		const auto& pin = outputs[led][0];
-		pin.driver->write(pin.port, level);
-	}
-
-	void internalOn(LED led, DataT level) requires (std::same_as<DataT, glm::vec3>){
-		for(int i = 0; i < outputs[led].size(); i++){
-			outputs[led][i].driver->write(outputs[led][i].port, level[i]);
-		}
-	}
-
-	void internalOff(LED led){
-		for(const OutputPin& pin: outputs[led]){
-			pin.driver->write(pin.port, false);
-		}
-	}
 };
 
 template<typename Monos, typename RGBs>
@@ -163,67 +171,54 @@ class LED : public AsyncEntity {
 	GENERATED_BODY(LED, AsyncEntity)
 
 public:
-	LED(){
+	LED() noexcept{
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 	}
 
-	void reg(Monos led, OutputPin pin){
+	void reg(Monos led, OutputPin pin) noexcept{
 		monos->reg(led, { pin });
 	}
 
-	void reg(RGBs led, OutputPin pin_r, OutputPin pin_g, OutputPin pin_b){
+	void reg(RGBs led, OutputPin pin_r, OutputPin pin_g, OutputPin pin_b) noexcept{
 		rgbs->reg(led, { pin_r, pin_g, pin_b });
 	}
 
-	void off(Monos led){
+	void off(Monos led) noexcept{
 		monos->off(led);
 	}
 
-	void off(RGBs led){
+	void off(RGBs led) noexcept{
 		rgbs->off(led);
 	}
 
-	void on(Monos led, float level){
+	void on(Monos led, float level) noexcept{
 		monos->on(led, level);
 	}
 
-	void on(RGBs led, glm::vec3 level){
+	void on(RGBs led, glm::vec3 level) noexcept{
 		rgbs->on(led, level);
 	}
 
-	void set(Monos led, std::unique_ptr<LEDFunction<Monos, float>> func, bool temp = false){
-		monos->set(led, std::move(func), temp);
+	void set(Monos led, const SubclassOf<LEDFunction<Monos, float>>& functionClass, bool temp = false) noexcept{
+		monos->set(led, functionClass, temp);
 	}
 
-	void set(RGBs led, std::unique_ptr<LEDFunction<RGBs, glm::vec3>> func, bool temp = false){
-		rgbs->set(led, std::move(func), temp);
+	void set(RGBs led, const SubclassOf<LEDFunction<RGBs, glm::vec3>>& functionClass, bool temp = false) noexcept{
+		rgbs->set(led, functionClass, temp);
 	}
 
-	float getValue(Monos led){
+	float getValue(Monos led) noexcept{
 		return monos->getValue(led);
 	}
 
-	glm::vec3 getValue(RGBs led){
+	glm::vec3 getValue(RGBs led) noexcept{
 		return rgbs->getValue(led);
 	}
 
 private:
 	StrongObjectPtr<LEDBase<Monos, float>> monos;
 	StrongObjectPtr<LEDBase<RGBs, glm::vec3>> rgbs;
-};
-
-template<typename LED, typename DataT>
-class LEDFunction {
-	friend class LEDBase<LED, DataT>;
-
-public:
-	virtual ~LEDFunction() = default;
-
-private:
-	virtual DataT loop(float dt) = 0;
-
-	virtual bool isDone() = 0;
 };
 
 #endif //CMF_LED_H

@@ -7,11 +7,11 @@
 class OutputGPIO : public OutputDriver<> {
 	GENERATED_BODY(OutputGPIO, OutputDriver);
 public:
-	OutputGPIO() = default;
-	OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIO> gpio);
+	OutputGPIO() noexcept = default;
+	OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIO> gpio) noexcept;
 
 private:
-	void performRegister(OutputPinDef output) override;
+	void performRegister(OutputPinDef output) noexcept override;
 
 	void performWrite(int port, float value) noexcept override;
 

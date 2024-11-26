@@ -248,7 +248,7 @@ public:
 	}
 
 	inline constexpr bool isValid() const noexcept {
-		if(ptr == nullptr){
+		if(get() == nullptr){
 			return false;
 		}
 

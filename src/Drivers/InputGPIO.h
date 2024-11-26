@@ -16,15 +16,15 @@ class InputGPIO : public InputDriver<GPIOPinDef> {
 	GENERATED_BODY(InputGPIO, InputDriver);
 
 public:
-	InputGPIO() = default;
-	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio);
+	InputGPIO() noexcept = default;
+	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) noexcept;
 
 private:
 	void scan() noexcept override;
 
-	StrongObjectPtr<GPIO> gpio;
+	void performRegister(GPIOPinDef input) noexcept override;
 
-	void performRegister(GPIOPinDef input) override;
+	StrongObjectPtr<GPIO> gpio;
 };
 
 #endif //CMF_INPUTGPIO_H
