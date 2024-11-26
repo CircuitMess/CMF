@@ -23,5 +23,4 @@ private:
 //	std::map<int, uint32_t> benchmarks;
 };
 
-
 #endif //CMF_INPUTTOUCHGPIO_H
