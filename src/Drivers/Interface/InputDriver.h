@@ -25,6 +25,7 @@ struct InputPin {
 
 template<typename T = InputPinDef> requires std::derived_from<T, InputPinDef>
 class InputDriver : public SyncEntity {
+	TEMPLATE_ATTRIBUTES(T);
 	GENERATED_BODY(InputDriver, SyncEntity);
 
 public:
