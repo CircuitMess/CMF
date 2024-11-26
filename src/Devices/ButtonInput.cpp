@@ -9,7 +9,7 @@ void ButtonInput::reg(Enum<int> button, InputPin pin){
 
 bool ButtonInput::getState(Enum<int> button){
 	if(!buttons.contains(button)){
-		CMF_LOG(LogCMF, Error, "Button %d not registered", (int) button);
+		CMF_LOG(CMF, Error, "Button %d not registered", (int) button);
 		return false;
 	}
 	const auto& inputPin = buttons[button];

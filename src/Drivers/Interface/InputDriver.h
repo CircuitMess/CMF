@@ -25,6 +25,7 @@ struct InputPin {
 
 template<typename T = InputPinDef> requires std::derived_from<T, InputPinDef>
 class InputDriver : public SyncEntity {
+	TEMPLATE_ATTRIBUTES(T);
 	GENERATED_BODY(InputDriver, SyncEntity);
 
 public:
@@ -32,7 +33,7 @@ public:
 
 	virtual float read(int port) const noexcept{
 		if(!states.contains(port)){
-			CMF_LOG(LogCMF, Error, "Input port %d not registered", port);
+			CMF_LOG(CMF, Error, "Input port %d not registered", port);
 			return 0;
 		}
 		return states.at(port);
