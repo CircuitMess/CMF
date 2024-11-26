@@ -17,7 +17,7 @@ void delayMicros(uint32_t micros){
 }
 
 void delayMillis(uint32_t millis){
-	vTaskDelay(millis);
+	vTaskDelay(millis / portTICK_PERIOD_MS);
 }
 
 void ramReport(){
