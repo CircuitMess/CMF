@@ -50,11 +50,12 @@ public:
         while(hashes.size() > 1) {
             std::string newHashStr;
 
-            for(size_t i = 0; i < std::min(hashes.size(), static_cast<size_t>(3)); ++i) {
+            constexpr static size_t MagicHashNumber = 3; // This is the max number of hashes that can fit into a 32 character string by appending, that is then used to calculate a new hash.
+            for(size_t i = 0; i < std::min(hashes.size(), static_cast<size_t>(MagicHashNumber)); ++i) {
                 newHashStr += std::to_string(hashes[i]);
             }
 
-            hashes.erase(hashes.begin(), hashes.begin() + std::min(hashes.size(), static_cast<size_t>(3)) + 1);
+            hashes.erase(hashes.begin(), hashes.begin() + std::min(hashes.size(), static_cast<size_t>(MagicHashNumber)));
             hashes.emplace_back(STD_STRING_HASH(newHashStr));
         }
 
