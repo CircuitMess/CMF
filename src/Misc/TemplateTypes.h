@@ -40,7 +40,7 @@ public:
                 newHashStr += std::to_string(hashes[i]);
             }
 
-            hashes.erase(hashes.begin(), hashes.begin() + std::min(hashes.size(), static_cast<size_t>(3)) + 1);
+            hashes.erase(hashes.begin(), hashes.begin() + std::min(hashes.size(), static_cast<size_t>(3)));
             hashes.emplace_back(STD_STRING_HASH(newHashStr));
         }
 
