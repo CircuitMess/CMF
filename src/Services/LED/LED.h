@@ -80,7 +80,7 @@ public:
 		RegisteredFunction regFunc = { newObject<LEDFunction<LED, DataT>>(*functionClass, this), temp };
 
 		if(currentFunctions.contains(led)){
-			if(!currentFunctions[led].temp){
+			if(!currentFunctions[led].isTemporary){
 				prevFunctions[led] = currentFunctions[led];
 			}
 		}
@@ -125,7 +125,8 @@ public:
 			if(!func.function->isDone()) continue;
 
 			if(prevFunctions.contains(led)){
-				currentFunctions[led] = prevFunctions[led];
+				currentFunctions[led].function = std::move(prevFunctions[led].function);
+				currentFunctions[led].isTemporary = prevFunctions[led].isTemporary;
 				prevFunctions.erase(led);
 			}else if(prevStates.contains(led)){
 				internalOn(led, prevStates[led]);
@@ -155,7 +156,7 @@ private:
 
 	struct RegisteredFunction {
 		StrongObjectPtr<LEDFunction<LED, DataT>> function;
-		bool temp;
+		bool isTemporary;
 	};
 
 	std::map<LED, std::array<OutputPin, sizeof(DataT) / sizeof(float)>> outputs;
