@@ -107,6 +107,13 @@ esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, const std::vector<uin
 	return write(address, buffer, wait);
 }
 
+esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, const uint8_t* data, size_t size, TickType_t wait){
+	std::vector<uint8_t> buf(size+1);
+	buf[0] = reg;
+	memcpy(buf.data()+1, data, size);
+	return write(address, buf, wait);
+}
+
 esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, uint8_t data, TickType_t wait){
 	std::vector<uint8_t> buffer(2);
 	buffer[0] = reg;
