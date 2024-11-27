@@ -1,0 +1,49 @@
+#ifndef PERSE_ROVER_CAMERA_H
+#define PERSE_ROVER_CAMERA_H
+
+#include <esp_camera.h>
+#include "Periphery/I2C.h"
+
+class Camera : public Object {
+	GENERATED_BODY(Camera, Object)
+
+public:
+	Camera(camera_config_t config = {}, I2C* i2c = nullptr, std::function<void(sensor_t*)> sensorConfig = {});
+
+	~Camera() override;
+
+	camera_fb_t* getFrame();
+	void releaseFrame();
+
+	void setRes(framesize_t res);
+	framesize_t getRes() const;
+
+	pixformat_t getFormat() const;
+	void setFormat(pixformat_t format);
+
+	esp_err_t init();
+	void deinit();
+	bool isInited();
+
+private:
+	bool inited = false;
+	framesize_t resWait;
+	pixformat_t formatWait;
+
+	camera_fb_t* frame = nullptr;
+
+	framesize_t res = FRAMESIZE_INVALID;
+	pixformat_t format = PIXFORMAT_RGB444;
+
+	static constexpr int MaxFailedFrames = 100;
+	int failedFrames = 0;
+
+
+	camera_config_t config;
+	StrongObjectPtr<I2C> i2c;
+	StrongObjectPtr<GPIO> gpio;
+	std::function<void(sensor_t*)> sensorConfig;
+};
+
+
+#endif //PERSE_ROVER_CAMERA_H
