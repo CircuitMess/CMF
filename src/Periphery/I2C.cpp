@@ -17,7 +17,8 @@ I2C::I2C(I2CPort port, gpio_num_t sda, gpio_num_t scl) noexcept : Super(), port(
 		.scl_io_num = scl,
 		.sda_pullup_en = false,
 		.scl_pullup_en = false,
-		.master = {.clk_speed = 400000} // TODO: maybe make this configurable in the future
+		.master = {.clk_speed = 400000}, // TODO: maybe make this configurable in the future
+		.clk_flags = I2C_SCLK_SRC_FLAG_FOR_NOMAL
 	};
 
 	ESP_ERROR_CHECK(i2c_driver_install(this->port, I2C_MODE_MASTER, 0, 0, 0));

@@ -5,6 +5,12 @@
 
 #define DJB_SEED 5381
 
+/**
+ * @brief A hash function used to calculate a hash of a character given a starting value (seed).
+ * @param start Starting value / seed.
+ * @param character Subject of hash calculation.
+ * @return The DJB hash calculated with the starting seed and given character.
+ */
 static inline constexpr uint32_t DJB_SH(uint32_t start, uint8_t character) noexcept {
 	return (start << 5) + start + character;
 }
@@ -42,6 +48,10 @@ static inline constexpr uint32_t DJB_SH(uint32_t start, uint8_t character) noexc
 #define DJB_SH_31(a) DJB_SH(DJB_SH_30(a), (a)[30])
 #define DJB_SH_32(a) DJB_SH(DJB_SH_31(a), (a)[31])
 
+/**
+ * @brief Macro used to calculate a hash of a C-style string
+ * @param a String for hash calculation
+ */
 #define STRING_HASH(a) ( 										\
     (void)(sizeof(int[(sizeof(a) > 33 ? -1 : 1)])), 			\
     (sizeof(a) == 1) ? DJB_SEED : 								\
@@ -80,7 +90,11 @@ static inline constexpr uint32_t DJB_SH(uint32_t start, uint8_t character) noexc
     (sizeof(a) == 33) ? DJB_SH_32(a) : 							\
     0)															\
 
-    #define STD_STRING_HASH(a) ( 								\
+/**
+ * @brief Macro used to calculate a hash of a C++ STD string
+ * @param a String for hash calculation
+ */
+#define STD_STRING_HASH(a) ( 								    \
     (void)(sizeof(int[(a.size() > 33 ? -1 : 1)])), 			    \
     (a.size() == 1) ? DJB_SEED : 								\
     (a.size() == 2) ? DJB_SH_1(a) : 							\
