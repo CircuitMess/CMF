@@ -10,7 +10,7 @@ Object::Object() noexcept : id(ObjectIndex++){
 	destroyMutex.lock();
 }
 
-void Object::postInitProperties() noexcept {}
+void Object::postInitProperties() noexcept{}
 
 bool Object::canDelete() noexcept{
 	return destroyMutex.try_lock();
@@ -18,9 +18,11 @@ bool Object::canDelete() noexcept{
 
 void Object::destroy() noexcept{
 	markedForDestroy = true;
+
+	onDestroy();
 }
 
-void Object::onDestroy() noexcept {
+void Object::onDestroy() noexcept{
 	forEachChild([](Object* child){
 		if(isValid(child)){
 			return false;
@@ -31,7 +33,6 @@ void Object::onDestroy() noexcept {
 			child->setOwner(ApplicationStatics::getApplication());
 		}else{
 			child->destroy();
-			child->onDestroy();
 		}
 
 		return false;
@@ -40,7 +41,7 @@ void Object::onDestroy() noexcept {
 	destroyMutex.unlock();
 }
 
-void Object::setOwner(Object* object) noexcept {
+void Object::setOwner(Object* object) noexcept{
 	Object* oldOwner = nullptr;
 
 	{
@@ -62,13 +63,13 @@ void Object::setOwner(Object* object) noexcept {
 	onOwnerChanged(oldOwner);
 }
 
-void Object::onOwnerChanged(Object* oldOwner) noexcept {}
+void Object::onOwnerChanged(Object* oldOwner) noexcept{}
 
-void Object::onChildAdded(Object* child) noexcept {}
+void Object::onChildAdded(Object* child) noexcept{}
 
-void Object::onChildRemoved(Object* child) noexcept {}
+void Object::onChildRemoved(Object* child) noexcept{}
 
-void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept {
+void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept{
 	std::lock_guard lock(ownershipMutex);
 
 	for(const WeakObjectPtr<Object>& child : childrenObjects){
@@ -82,7 +83,7 @@ void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept
 	}
 }
 
-void Object::setInstigator(Object* object) noexcept {
+void Object::setInstigator(Object* object) noexcept{
 	Object* oldInstigator = nullptr;
 
 	{
@@ -93,9 +94,9 @@ void Object::setInstigator(Object* object) noexcept {
 	onInstigatorChanged(oldInstigator);
 }
 
-void Object::onInstigatorChanged(Object* oldInstigator) noexcept {}
+void Object::onInstigatorChanged(Object* oldInstigator) noexcept{}
 
-void Object::scanEvents(TickType_t wait) noexcept {
+void Object::scanEvents(TickType_t wait) noexcept{
 	if(!eventScanningMutex.try_lock()){
 		CMF_LOG(CMF, Warning, "Circular object ownership detected. Object: %s, Owner: %s", getName().c_str(), getOwner()->getName().c_str());
 		eventScanningMutex.unlock();
@@ -127,7 +128,7 @@ void Object::scanEvents(TickType_t wait) noexcept {
 	eventScanningMutex.unlock();
 }
 
-void Object::registerEventHandle(EventHandleBase* handle) noexcept {
+void Object::registerEventHandle(EventHandleBase* handle) noexcept{
 	static uint32_t eventIndex = 0;
 
 	if(handle == nullptr){
@@ -149,7 +150,7 @@ void Object::registerEventHandle(EventHandleBase* handle) noexcept {
 	ownedEventHandles.insert(container);
 }
 
-void Object::unregisterEventHandle(EventHandleBase* handle) noexcept {
+void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 	std::lock_guard lock(eventHandleMutex);
 
 	for(const EventHandleContainer& container : ownedEventHandles){
@@ -162,15 +163,15 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept {
 	}
 }
 
-TickType_t Object::getEventScanningTime() const noexcept {
+TickType_t Object::getEventScanningTime() const noexcept{
 	return 0;
 }
 
-Archive& Object::serialize(Archive& archive) noexcept {
+Archive& Object::serialize(Archive& archive) noexcept{
 	return archive;
 }
 
-Application* Object::getApp() noexcept {
+Application* Object::getApp() noexcept{
 	return ApplicationStatics::getApplication();
 }
 
@@ -180,7 +181,7 @@ Object* Object::getOutermostOwner() const noexcept{
 		return nullptr;
 	}
 
-	while(outermost != nullptr && outermost->getOwner() != nullptr) {
+	while(outermost != nullptr && outermost->getOwner() != nullptr){
 		outermost = outermost->getOwner();
 	}
 
@@ -193,14 +194,14 @@ Object* Object::getOutermostInstigator() const noexcept{
 		return nullptr;
 	}
 
-	while(outermost != nullptr && outermost->getInstigator() != nullptr) {
+	while(outermost != nullptr && outermost->getInstigator() != nullptr){
 		outermost = outermost->getInstigator();
 	}
 
 	return outermost;
 }
 
-inline void Object::registerChild(Object* child) noexcept {
+inline void Object::registerChild(Object* child) noexcept{
 	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	WeakObjectPtr<Object> newChild = child;
 	if(!newChild.isValid()){
@@ -211,7 +212,7 @@ inline void Object::registerChild(Object* child) noexcept {
 	onChildAdded(child);
 }
 
-inline void Object::removeChild(Object* child) noexcept {
+inline void Object::removeChild(Object* child) noexcept{
 	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	if(child == nullptr){
 		return;
