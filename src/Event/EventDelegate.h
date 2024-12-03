@@ -13,12 +13,11 @@ public:
 	/**
 	 * @brief Broadcast function that is public and accessible to anyone.
 	 * @param args The arguments being broadcast.
-	 * @param wait The wait time per function to trigger the callback.
 	 * @param caller The optional caller of the function.
 	 * @return True if successful, false otherwise.
 	 */
-	inline bool blockingBroadcast(const Args&... args, TickType_t wait = portMAX_DELAY, Object* caller = nullptr) noexcept {
-		return Event<Args...>::_broadcast(args..., wait);
+	inline bool blockingBroadcast(const Args&... args, Object* caller = nullptr) noexcept {
+		return Event<Args...>::_broadcast(args...);
 	}
 };
 

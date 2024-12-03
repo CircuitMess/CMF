@@ -1837,14 +1837,12 @@ public:
 		return *this;
 	}
 
-	// TODO the wait time might not be necessary
 	/**
 	 * @brief Call function queues an argument std::tuple into the call queue for the callback functions to be called with in the next scan call.
-	 * @param wait The maximum wait time for the queue push to succeed.
 	 * @param args The arguments for the next event call.
 	 * @return True if successful, false otherwise.
 	 */
-	inline bool call(TickType_t wait, const Args&... args) noexcept {
+	inline bool call(const Args&... args) noexcept {
 		return callQueue.push(std::tuple<Args...>(args...));
 	}
 

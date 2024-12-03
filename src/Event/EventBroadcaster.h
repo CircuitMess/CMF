@@ -73,16 +73,15 @@ protected:
 	/**
 	 * @brief Blocking broadcast implementation, ensuring that only the owner of the event can trigger a broadcast.
 	 * @param args The arguments being broadcast.
-	 * @param wait The maximum waiting time for the broadcast to trigger each bound callback function.
 	 * @param caller The caller object.
 	 * @return True if successful, false otherwise.
 	 */
-	inline bool blockingBroadcast(const Args&... args, TickType_t wait = portMAX_DELAY, const Object* caller = nullptr) noexcept {
+	inline bool blockingBroadcast(const Args&... args, const Object* caller = nullptr) noexcept {
 		if(caller != owningObject){
 			return false;
 		}
 
-		return Event<Args...>::_broadcast(args..., wait);
+		return Event<Args...>::_broadcast(args...);
 	}
 
 private:
@@ -92,13 +91,7 @@ private:
 /**
  * @brief Broadcast macro with maximum wait time possible used instead of direct functions to ensure the object being called from is passed to the broadcast.
  */
-#define broadcast(...) blockingBroadcast(__VA_ARGS__ __VA_OPT__(,) portMAX_DELAY, this)
-
-/**
- * @brief Broadcast macro with user-specified wait time used instead of direct functions to ensure the object being called from is passed to the broadcast.
- * @param wait The wait time.
- */
-#define waitBroadcast(wait, ...) blockingBroadcast(__VA_ARGS__ __VA_OPT__(,) wait, this)
+#define broadcast(...) blockingBroadcast(__VA_ARGS__ __VA_OPT__(,) this)
 
 /**
  * @brief Macro used to declare custom events as a member variable of an object, ensures that only the owning object type has visibility to the owning object type.
