@@ -122,10 +122,9 @@ protected:
 	/**
 	 * @brief Internal broadcast function used by the derived classes. Calls all bound function callbacks with the given arguments.
 	 * @param args Arguments passed to the bound function callbacks.
-	 * @param wait Max wait time per function to call the event handle of a bound function, triggering an execution of said function in its own thread when scanning events.
 	 * @return True if all callback calls were successful, false otherwise.
 	 */
-	inline bool _broadcast(const Args&... args, TickType_t wait = portMAX_DELAY) noexcept {
+	inline bool _broadcast(const Args&... args) noexcept {
 		std::lock_guard guard(accessMutex);
 
 		bool succeeded = true;
@@ -135,8 +134,7 @@ protected:
 				continue;
 			}
 
-			// TODO change this so that the wait time is for the entire broadcast and not only per-call wait
-			succeeded &= container.handle->call(wait, args...);
+			succeeded &= container.handle->call(args...);
 		}
 
 		return succeeded;

@@ -65,8 +65,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 			continue;
 		}
 
-		child->setOwner(nullptr);
-		child->onDestroy();
+		child->destroy();
 	}
 }
 
