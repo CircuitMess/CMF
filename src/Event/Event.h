@@ -118,7 +118,7 @@ public:
 		});
 	}
 
-private:
+protected:
 	/**
 	 * @brief Internal broadcast function used by the derived classes. Calls all bound function callbacks with the given arguments.
 	 * @param args Arguments passed to the bound function callbacks.
