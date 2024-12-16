@@ -45,7 +45,7 @@ void AsyncEntity::setOwner(Object* object) noexcept{
 	Super::setOwner(nullptr);
 
 	if(object != nullptr && hasBegun()){
-		CMF_LOG(LogCMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Async entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
+		CMF_LOG(CMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Async entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
 	}
 }
 
@@ -147,8 +147,7 @@ void AsyncEntity::tickHandle() noexcept{
 			continue;
 		}
 
-		child->setOwner(nullptr);
-		child->onDestroy();
+		child->destroy();
 	}
 
 	if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
@@ -162,8 +161,6 @@ void AsyncEntity::tickHandle() noexcept{
 			}
 
 			child->destroy();
-			child->onDestroy();
-			child->setOwner(nullptr);
 
 			return false;
 		});
@@ -181,8 +178,8 @@ void AsyncEntity::tickHandle() noexcept{
 		}
 
 		end(reason);
-		onDestroy();
+		destroy();
+	}else{
+		lastTickTime = currentTickTime;
 	}
-
-	lastTickTime = currentTickTime;
 }

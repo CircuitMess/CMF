@@ -17,7 +17,8 @@ I2C::I2C(I2CPort port, gpio_num_t sda, gpio_num_t scl) noexcept : Super(), port(
 		.scl_io_num = scl,
 		.sda_pullup_en = false,
 		.scl_pullup_en = false,
-		.master = {.clk_speed = 400000} // TODO: maybe make this configurable in the future
+		.master = {.clk_speed = 400000}, // TODO: maybe make this configurable in the future
+		.clk_flags = I2C_SCLK_SRC_FLAG_FOR_NOMAL
 	};
 
 	ESP_ERROR_CHECK(i2c_driver_install(this->port, I2C_MODE_MASTER, 0, 0, 0));
@@ -33,15 +34,15 @@ I2CPort I2C::getPort() const noexcept{
 }
 
 void I2C::scan(TickType_t timeout) noexcept{
-	CMF_LOG(LogCMF, Verbose, "I2C scan:");
+	CMF_LOG(CMF, Verbose, "I2C scan:");
 
 	for(size_t i = 0; i < 127; ++i){
 		if(probe(i, timeout) == ESP_OK){
-			CMF_LOG(LogCMF, Verbose, "Found device on address 0x%x", i);
+			CMF_LOG(CMF, Verbose, "Found device on address 0x%x", i);
 		}
 	}
 
-	CMF_LOG(LogCMF, Verbose, "I2C scan done.");
+	CMF_LOG(CMF, Verbose, "I2C scan done.");
 }
 
 esp_err_t I2C::probe(uint8_t address, TickType_t timeout) noexcept{
@@ -105,6 +106,13 @@ esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, const std::vector<uin
 	memcpy(buffer.data() + 1, data.data(), data.size());
 
 	return write(address, buffer, wait);
+}
+
+esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, const uint8_t* data, size_t size, TickType_t wait){
+	std::vector<uint8_t> buf(size+1);
+	buf[0] = reg;
+	memcpy(buf.data()+1, data, size);
+	return write(address, buf, wait);
 }
 
 esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, uint8_t data, TickType_t wait){

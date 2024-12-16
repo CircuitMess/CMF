@@ -19,7 +19,7 @@ Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threa
 
 Threaded::~Threaded() noexcept{
 	if(state != State::Stopped){
-		CMF_LOG(LogCMF, LogLevel::Error, "Thread was destroyed before being stopped.");
+		CMF_LOG(CMF, LogLevel::Error, "Thread was destroyed before being stopped.");
 		abort();
 	}
 
@@ -53,18 +53,18 @@ void Threaded::start() noexcept{
 
 	auto function = [](void* arg) -> void {
 		if(arg == nullptr){
-			CMF_LOG(LogCMF, Error, "Thread native callback started with invalid thread pointer.");
+			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
 			vTaskDelete(nullptr);
 			return;
 		}
 
-		if(!isValid((Threaded*) arg)){
-			CMF_LOG(LogCMF, Error, "Thread native callback started with invalid thread pointer.");
+		if(!isValid(static_cast<Threaded *>(arg))){
+			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
 			vTaskDelete(nullptr);
 			return;
 		}
 
-		((Threaded*) arg)->threadFunction();
+		static_cast<Threaded *>(arg)->threadFunction();
 	};
 
 	if(core == -1){
