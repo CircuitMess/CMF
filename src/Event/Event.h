@@ -65,7 +65,7 @@ public:
 	 * @param function Function being bound.
 	 */
 	template<typename O, typename F>
-	inline void bind(O* object, F&& function) noexcept {
+	inline void bind(O* object, F&& function) noexcept requires (!std::constructible_from<std::function<void(Args...)>, F>){
 		if(object == nullptr || function == nullptr){
 			return;
 		}
@@ -85,8 +85,11 @@ public:
 	 * @param object Object instance of which the function is being bound.
 	 * @param function Function being bound, in a std::function wrapper.
 	 */
-	inline void bind(Object* object, const std::function<void(Args...)>& function) noexcept {
-		if(object == nullptr || function == nullptr){
+	template<typename F>
+	inline void bind(Object* object, F&& function) noexcept requires std::constructible_from<std::function<void(Args...)>, F> {
+		std::function<void(Args...)> func(function);
+
+		if(object == nullptr || func == nullptr){
 			return;
 		}
 
@@ -94,7 +97,7 @@ public:
 
 		HandleContainer container;
 		container.handle = new EventHandle<Args...>();
-		container.handle->bind(object, function);
+		container.handle->bind(object, func);
 		container.owningObject = object;
 
 		handles.insert(container);
