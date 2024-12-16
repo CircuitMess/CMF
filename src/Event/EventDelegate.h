@@ -16,7 +16,12 @@ public:
 	 * @param caller The optional caller of the function.
 	 * @return True if successful, false otherwise.
 	 */
-	inline bool blockingBroadcast(const Args&... args, Object* caller = nullptr) noexcept {
+	inline bool blockingBroadcast(const Args&... args, Object* caller = nullptr) noexcept{
+		return _broadcast(args...);
+	}
+
+private:
+	virtual inline bool _broadcast(const Args&... args) noexcept override{
 		return Event<Args...>::_broadcast(args...);
 	}
 };

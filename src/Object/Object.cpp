@@ -145,17 +145,26 @@ void Object::registerEventHandle(EventHandleBase* handle) noexcept{
 		if(handle->probe(portMAX_DELAY)){
 			readyEventHandles.push(handle);
 		}
-	}, threadName, 0, 256);
+	}, threadName, 0, 1576);
 
 	ownedEventHandles.insert(container);
 }
 
 void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
+	if(handle == nullptr) {
+		return;
+	}
+
 	std::lock_guard lock(eventHandleMutex);
 
 	for(const EventHandleContainer& container : ownedEventHandles){
+		if(container.ownedEventHandle == nullptr) {
+			continue;
+		}
+
 		if(container.ownedEventHandle == handle){
 			container.eventThread->setInterval(portMAX_DELAY);
+			container.ownedEventHandle->unblock();
 			container.eventThread->pause();
 			ownedEventHandles.erase(container);
 			break;

@@ -124,7 +124,7 @@ protected:
 	 * @param args Arguments passed to the bound function callbacks.
 	 * @return True if all callback calls were successful, false otherwise.
 	 */
-	inline bool _broadcast(const Args&... args) noexcept {
+	virtual inline bool _broadcast(const Args&... args) noexcept {
 		std::lock_guard guard(accessMutex);
 
 		bool succeeded = true;

@@ -1767,6 +1767,11 @@ public:
 	 * @param wait The wait time for the queued event pop.
 	 */
 	inline virtual void scan(TickType_t wait) noexcept = 0;
+
+	/**
+	* @brief A function used to unblock all threads waiting for this event.
+	*/
+	inline virtual void unblock() noexcept = 0;
 };
 
 /**
@@ -1817,12 +1822,15 @@ public:
 	}
 
 	/**
-	 * @brief Bind function binds a std::function wrapped function to the event as a callback paired with owning object instance..
-	 * @param object Owning object instance.
-	 * @param function Function being bound.
+	 * @brief Bind function binds a std::function to the event as a callback paired with the owning object instance.
+	 * @tparam O The type of object the function is a member of.
+	 * @tparam F The type of function being bound.
+	 * @param object The instance of object owning the function.
+	 * @param function The function reference being bound.
 	 * @return Reference to this.
 	 */
-	inline EventHandle& bind(Object* object, const std::function<void(Args...)>& function) noexcept {
+	template<typename O, typename F> requires (std::same_as<F, std::function<void(Args...)>> || std::same_as<F, std::function<void(Args...)>&> || std::same_as<F, const std::function<void(Args...)>&>)
+	inline EventHandle& bind(O* object, F&& function) noexcept {
 		if(owningObject.isValid()){
 			owningObject->unregisterEventHandle(this);
 		}
@@ -1882,6 +1890,13 @@ public:
 
 			wait = std::max((uint64_t)0, (uint64_t) (wait - (millis() - beginTime)));
 		}
+	}
+
+	/**
+	* @brief  Unblock the queue multithreaded safety to unblock all threads waiting on it.
+	*/
+	inline virtual void unblock() noexcept override {
+		callQueue.setKillPill(true);
 	}
 
 private:
