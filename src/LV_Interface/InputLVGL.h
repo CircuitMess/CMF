@@ -10,7 +10,7 @@
 class InputLVGL : public Object {
 	GENERATED_BODY(InputLVGL, Object)
 public:
-	InputLVGL();
+	InputLVGL() = default;
 
 	InputLVGL(ButtonInput* bi, std::map<Enum<int>, lv_key_t> keyMap, std::map<lv_key_t, lv_key_t> vertRemap = {});
 

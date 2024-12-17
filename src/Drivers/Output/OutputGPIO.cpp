@@ -1,7 +1,7 @@
 #include "OutputGPIO.h"
 #include "Log/Log.h"
 
-OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIO> gpio) noexcept : OutputDriver(outputs), gpio(std::move(gpio)){
+OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept : OutputDriver(outputs), gpio(std::move(gpio)){
 
 }
 
