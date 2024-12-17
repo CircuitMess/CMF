@@ -80,7 +80,6 @@ public:
 
 	void tick(float deltaTime) noexcept override{
 		Super::tick(deltaTime);
-		printf("InputDriver tick\n");
 	}
 
 protected:

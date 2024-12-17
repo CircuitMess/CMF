@@ -28,11 +28,9 @@ LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) :
 
 void LVGL::begin() noexcept{
 	SyncEntity::begin();
-	printf("LVGL beginara\n");
 }
 
 void LVGL::tick(float deltaTime) noexcept{
-	printf("tickeroni\n");
 	if(currentScreen && currentScreen->loaded){
 		currentScreen->loop();
 	}
