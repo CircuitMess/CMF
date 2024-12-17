@@ -34,9 +34,9 @@ void ButtonInput::tick(float deltaTime) noexcept{
 
 		bool state = (bool) pin.driver->read(pin.port);
 		if(state){
-			released(btn);
-		}else{
 			pressed(btn);
+		}else{
+			released(btn);
 		}
 	}
 
