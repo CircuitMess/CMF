@@ -1,6 +1,12 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
+void ButtonInput::reg(std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
+	for(auto& r: registrations){
+		reg(r.first, r.second);
+	}
+}
+
 void ButtonInput::reg(Enum<int> button, InputPin pin) noexcept{
 	inputSources.insert(StrongObjectPtr<InputDriverBase>(pin.driver));
 	buttons[button] = pin;

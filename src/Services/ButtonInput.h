@@ -16,6 +16,7 @@ public:
 	DECLARE_EVENT(ButtonInputEvent, ButtonInput, Enum<int>, Action)
 	ButtonInputEvent event = ButtonInputEvent(this);
 
+	void reg(std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept;
 
 	void reg(Enum<int> button, InputPin pin) noexcept;
 
