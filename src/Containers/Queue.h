@@ -240,7 +240,7 @@ public:
 	}
 
 private:
-	static constexpr size_t DefaultSize = 32;
+	static constexpr size_t DefaultSize = 16;
 	T* buffer;
 	Allocator allocator = Allocator();
 	size_t bufferSize;

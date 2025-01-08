@@ -18,6 +18,5 @@ void OutputGPIO::performRegister(OutputPinDef output) noexcept {
 	const auto pin = (gpio_num_t) output.port;
 	gpio->setMode(pin, GPIOMode::Output);
 	//setting initial state
-	getInversions()[output.port] = output.inverted;
 	write((gpio_num_t) output.port, false);
 }
