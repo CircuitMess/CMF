@@ -8,11 +8,13 @@
 #include <memory>
 #include "FS/RawCache.h"
 #include "FS/FileArchive.h"
+#include "Object/Object.h"
 
-class FSLVGL {
+class FSLVGL : public Object {
+	GENERATED_BODY(FSLVGL, Object)
 public:
-	FSLVGL(char letter, FileCache* cache = nullptr);
-	virtual ~FSLVGL();
+	FSLVGL(char letter = 'S', FileCache* cache = nullptr);
+	~FSLVGL() override;
 
 	void loadCache();
 	void unloadCache();

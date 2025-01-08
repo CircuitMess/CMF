@@ -13,6 +13,7 @@ public:
 	InputLVGL() = default;
 
 	InputLVGL(ButtonInput* bi, std::map<Enum<int>, lv_key_t> keyMap, std::map<lv_key_t, lv_key_t> vertRemap = {});
+	void postInitProperties() noexcept override;
 
 	void read(lv_indev_t* drv, lv_indev_data_t* data);
 	static InputLVGL* getInstance();
@@ -24,6 +25,8 @@ public:
 private:
 	const std::map<Enum<int>, lv_key_t> keyMap;
 	const std::map<lv_key_t, lv_key_t> vertRemap;
+
+	ButtonInput* bi;
 	lv_indev_t* inputDevice;
 
 	void onButtonInput(Enum<int> btn, ButtonInput::Action btnAction);

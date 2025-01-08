@@ -14,16 +14,17 @@ const std::map<lv_key_t, lv_key_t> InputLVGL::vertRemap = {{ LV_KEY_LEFT,    LV_
 InputLVGL* InputLVGL::instance = nullptr;
 
 InputLVGL::InputLVGL(ButtonInput* bi, std::map<Enum<int>, lv_key_t> keyMap, std::map<lv_key_t, lv_key_t> vertRemap) :
-		keyMap(std::move(keyMap)), vertRemap(std::move(vertRemap)){
+		keyMap(std::move(keyMap)), vertRemap(std::move(vertRemap)), bi(bi){
 	instance = this;
 
 	inputDevice = lv_indev_create();
 	lv_indev_set_type(inputDevice, LV_INDEV_TYPE_ENCODER);
 	lv_indev_set_read_cb(inputDevice, [](lv_indev_t* drv, lv_indev_data_t* data){ InputLVGL::getInstance()->read(drv, data); });
 	lv_indev_set_long_press_time(inputDevice, 350);
+}
 
+void InputLVGL::postInitProperties() noexcept{
 	bi->event.bind(this, &InputLVGL::onButtonInput);
-
 }
 
 void InputLVGL::read(lv_indev_t* drv, lv_indev_data_t* data){
