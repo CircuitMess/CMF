@@ -9,46 +9,61 @@ struct OutputPinDef {
 	int port;
 	bool inverted;
 
-	bool operator==(const OutputPinDef& rhs) const{
+	bool operator==(const OutputPinDef& rhs) const noexcept{
 		return port == rhs.port && inverted == rhs.inverted;
 	}
 
-	bool operator!=(const OutputPinDef& rhs) const{
+	bool operator!=(const OutputPinDef& rhs) const noexcept{
 		return !(rhs == *this);
 	}
+};
 
+class OutputDriverBase : public SyncEntity {
+	GENERATED_BODY(OutputDriverBase, SyncEntity)
+
+public:
+	virtual float getState(int port) const noexcept{ return 0.0f; }
+
+	virtual void write(int port, float value) noexcept{ }
+
+	virtual void write(int port, bool value) noexcept{
+		write(port, value ? 1.0f : 0.0f);
+	}
+
+	virtual void send() noexcept{ }
+
+	virtual void performWrite(int port, float value) noexcept{ }
 };
 
 struct OutputPin {
-	Object* driver;
+	OutputDriverBase* driver;
 	int port;
 };
 
 template<typename T = OutputPinDef> requires std::derived_from<T, OutputPinDef>
-class OutputDriver : public SyncEntity {
-	GENERATED_BODY(OutputDriver, SyncEntity);
+class OutputDriver : public OutputDriverBase {
+	TEMPLATE_ATTRIBUTES(T)
+	GENERATED_BODY(OutputDriver, OutputDriverBase)
 
 public:
-	virtual float getState(int port) const noexcept{
+	virtual float getState(int port) const noexcept override{
 		if(!states.contains(port)){
-			CMF_LOG(CMF, Error, "Output port %d not registered", port);
 			return 0;
 		}
 		return states.at(port);
 	}
 
-	void write(int port, float value) noexcept{
+	virtual void write(int port, float value) noexcept override{
 		states[port] = value;
 		performWrite(port, value);
 	}
 
-	void write(int port, bool value) noexcept{
-		write(port, value ? 1.f : 0.f);
+	void registerOutput(T pinDef) noexcept{
+		outputs.emplace_back(pinDef);
+		performRegister(pinDef);
 	}
 
-	virtual void send() noexcept{}
-
-	void removeOutput(int port){
+	void removeOutput(int port) noexcept{
 		auto it = std::remove_if(outputs.begin(), outputs.end(), [port](const T& pinDef){
 			return pinDef.port == port;
 		});
@@ -60,7 +75,7 @@ public:
 		outputs.erase(it, outputs.end());
 	}
 
-	void removeOutput(T output){
+	void removeOutput(T output) noexcept{
 		auto it = std::remove(outputs.begin(), outputs.end(), output);
 		for(auto i = it; i != outputs.end(); ++i){
 			performDeregister(*i);
@@ -71,38 +86,36 @@ public:
 	}
 
 protected:
-	OutputDriver() = default;
+	OutputDriver() noexcept = default;
 
-	OutputDriver(const std::vector<T>& outputs) : outputs(outputs){
+	OutputDriver(const std::vector<T>& outputs) noexcept : outputs(outputs){
 
 	}
 
-	std::vector<T>& getOutputs(){
+	std::vector<T>& getOutputs() noexcept{
 		return outputs;
 	}
 
-	std::map<int, float>& getStates(){
+	std::map<int, float>& getStates() noexcept{
 		return states;
 	}
 
-	std::map<int, bool>& getInversions(){
+	std::map<int, bool>& getInversions() noexcept{
 		return inversions;
 	}
 
 private:
 	void postInitProperties() noexcept override final{
-		SyncEntity::postInitProperties();
+		Super::postInitProperties();
 
 		for(const auto& output: outputs){
 			performRegister(output);
 		}
 	}
 
-	virtual void performRegister(T output){}
+	virtual void performRegister(T output) noexcept{ }
 
-	virtual void performDeregister(T output){}
-
-	virtual void performWrite(int port, float value){}
+	virtual void performDeregister(T output) noexcept{ }
 
 	std::vector<T> outputs;
 

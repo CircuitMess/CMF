@@ -7,32 +7,71 @@
 
 class Object;
 
+/**
+ * @brief Class registry is used internally by CMF to track all existing object classes by their ID.
+ */
 class ClassRegistry {
 public:
+	/**
+	 * @brief Deleted default constructor.
+	 */
 	virtual ~ClassRegistry() noexcept = default;
 
+	/**
+	 * @param ID ID of the wanted class.
+	 * @return The class matching the given ID. If no class matches it, returns nullptr.
+	 */
 	const class Class* getClass(uint64_t ID) const noexcept;
+
+	/**
+	 * @brief Registers a class, called by each class when constructed.
+	 * Each class is constructed only once statically for each Object type.
+	 * @param cls 
+	 */
 	void registerClass(const Class* cls) noexcept;
 
 private:
 	std::map<uint64_t, const Class*> classes;
 };
 
+/**
+ * @brief Class distinguishes the Objects.
+ * Each object has a unique class which is implemented uniquely depending on the object.
+ * Classes are mainly used for Object casting and construction.
+ */
 class Class {
 	friend class Object;
 
 public:
+	/**
+	 * @brief Default destructor.
+	 */
 	virtual ~Class() = default;
 
+	/**
+	 * @return A default object represented by this class.
+	 */
 	virtual Object* createDefaultObject() const noexcept;
 
+	/**
+	 * @return The ID of the class. Each class has a unique ID
+	 * depending on the name of the object it represents and the templates types of that object.
+	 */
 	uint64_t getID() const noexcept;
 
+	/**
+	 * @tparam Type The type of interface that the object represented by this class implements.
+	 * @return True if the represented object implements the template interface.
+	 */
 	template<typename Type>
 	static inline constexpr bool implements() noexcept {
 		return false;
 	}
 
+	/**
+	 * @param ID ID of the given class.
+	 * @return The class matching the ID from the ClassRegistry.
+	 */
 	static inline const Class* getClasByID(uint64_t ID) noexcept {
 		if(registry == nullptr){
 			return nullptr;
@@ -41,6 +80,9 @@ public:
 		return registry->getClass(ID);
 	}
 
+	/**
+	 * @return The name of the object type the class represents.
+	 */
 	inline virtual constexpr std::string getName() const noexcept{
 		return "Object";
 	}
@@ -49,6 +91,11 @@ protected:
 	static inline ClassRegistry* registry = nullptr;
 
 protected:
+	/**
+	 * @brief Constructor of the class with given ID. The ID is generated partially at compile time,
+	 * and partially at the beginning of the runtime statically.
+	 * @param ID The generated ID of the class.
+	 */
 	explicit Class(uint64_t ID) noexcept;
 
 private:
