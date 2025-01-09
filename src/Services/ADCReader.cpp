@@ -4,7 +4,14 @@
 
 DEFINE_LOG(ADCReader)
 
-ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, ADCFilter* filter, adc_cali_handle_t cali) : filter(filter), cali(cali){
+ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibration, Object* filter){
+
+	if(filter != nullptr){
+		if(filter->isA(ADCFilter::staticClass())){
+			this->filter = filter;
+		}
+	}
+
 	adc_unit_t unit;
 	adc_channel_t chan;
 	auto err = adc_oneshot_io_to_channel(gpio, &unit, &chan);
@@ -17,11 +24,38 @@ ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, ADCFilter* 
 	this->chan = chan;
 	adc = &ADCUnit::getADCUnit(unit);
 	adc->config(chan, config);
+
+	if(calibration){
+		esp_err_t ret = ESP_FAIL;
+
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+		CMF_LOG(ADCReader, Info, "calibration scheme version is %s", "Curve Fitting");
+		adc_cali_curve_fitting_config_t cali_config = {
+				.unit_id = unit,
+				.chan = chan,
+				.atten = config.atten,
+				.bitwidth = config.bitwidth,
+		};
+		ret = adc_cali_create_scheme_curve_fitting(&cali_config, &cali_handle);
+
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+		CMF_LOG(ADCReader, Info, "calibration scheme version is %s", "Line Fitting");
+		adc_cali_line_fitting_config_t cali_config = {
+			.unit_id = unit,
+			.atten = config.atten,
+			.bitwidth = config.bitwidth,
+		};
+		ret = adc_cali_create_scheme_line_fitting(&cali_config, &cali_handle);
+#endif
+		if(ret != ESP_OK){
+			CMF_LOG(ADCReader, Warning, "Calibration failed");
+		}
+	}
 }
 
 float ADCReader::sample(){
 	int raw = 0;
-	if(adc->read(chan, raw, cali) != ESP_OK){
+	if(adc->read(chan, raw, cali_handle) != ESP_OK){
 		return getValue();
 	}
 

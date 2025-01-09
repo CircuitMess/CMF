@@ -2,7 +2,7 @@
 
 static const char* TAG = "ADC";
 
-ADCUnit* ADCUnit::units[2] = { nullptr };
+ADCUnit* ADCUnit::units[SOC_ADC_PERIPH_NUM] = { nullptr };
 
 ADCUnit::ADCUnit(adc_unit_t unit) : unit(unit){
 	const adc_oneshot_unit_init_cfg_t config = {
@@ -21,7 +21,7 @@ void ADCUnit::config(adc_channel_t chan, const adc_oneshot_chan_cfg_t& cfg){
 	ESP_ERROR_CHECK(adc_oneshot_config_channel(hndl, chan, &cfg));
 }
 
-adc_unit_t ADCUnit::getUnit() const{
+adc_unit_t ADCUnit::getUnitID() const{
 	return unit;
 }
 
