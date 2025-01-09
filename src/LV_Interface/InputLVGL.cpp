@@ -55,5 +55,3 @@ lv_indev_t* InputLVGL::getIndev() const{
 void InputLVGL::setVertNav(bool vertNav){
 	InputLVGL::vertNav = vertNav;
 }
-
-

@@ -175,11 +175,11 @@ public:
 	 * @return True if successful, false otherwise.
 	 */
 	inline bool push(const T& value) noexcept {
-		std::lock_guard guard(accessMutex);
-
 		if(full() && !reserve(bufferSize * 2)){
 			return false;
 		}
+
+		std::lock_guard guard(accessMutex);
 
 		buffer[end] = T(value);
 
@@ -196,11 +196,11 @@ public:
 	 * @return True if successful, false otherwise.
 	 */
 	inline bool push(T&& value) noexcept {
-		std::lock_guard guard(accessMutex);
-
 		if(full() && !reserve(bufferSize * 2)){
 			return false;
 		}
+
+		std::lock_guard guard(accessMutex);
 
 		buffer[end] = T(std::move(value));
 
@@ -209,6 +209,50 @@ public:
 		xSemaphoreGive(waitSemaphore);
 
 		return true;
+	}
+
+	/**
+	 * @brief Checks if a value is present in the queue.
+	 * @param value The value being checked.
+	 * @return True if queue contains the given value.
+	 */
+	inline bool check(const T& value) const noexcept {
+		std::lock_guard guard(accessMutex);
+
+		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
+			if(buffer[i] == value) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @brief Removes the given value from the queue no matter the location.
+	 * @param value The value being removed.
+	 */
+	inline void remove(const T& value) noexcept {
+		std::lock_guard guard(accessMutex);
+
+		bool found = true;
+		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
+			if(buffer[i] == value){
+				found = false;
+				buffer[i].~T();
+				continue;
+			}
+
+			if(!found){
+				continue;
+			}
+
+			buffer[i-1] = buffer[i];
+		}
+
+		if(found){
+			--end;
+		}
 	}
 
 	/**

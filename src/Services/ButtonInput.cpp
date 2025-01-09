@@ -40,6 +40,7 @@ void ButtonInput::tick(float deltaTime) noexcept{
 		}
 	}
 
+	// TODO this shouldnt be here, look at the documentation for ticking delay
 	delayMillis(SleepTime);
 }
 

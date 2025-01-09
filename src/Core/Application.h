@@ -9,6 +9,7 @@
 #include "Memory/ObjectMemory.h"
 #include "Misc/Singleton.h"
 #include "Object/Interface.h"
+#include "Event/EventScanner.h"
 
 /**
  * @brief The base class used to define the core applications,
@@ -57,6 +58,11 @@ public:
 	 * @return The type of garbage collector the application uses.
 	 */
 	virtual SubclassOf<GarbageCollector> getGarbageCollectorClass() const noexcept;
+
+	/**
+	 * @return The EventScanner instance for this application.
+	 */
+	inline constexpr EventScanner* getEventScanner() const noexcept { return eventScanner.get(); }
 
 	/**
 	 * @brief Registers a singleton to the application.
@@ -351,6 +357,7 @@ private:
 	std::set<StrongObjectPtr<Object>> devices;
 	std::set<StrongObjectPtr<Object>> drivers;
 	std::set<StrongObjectPtr<Object>> services;
+	StrongObjectPtr<EventScanner> eventScanner;
 };
 
 #endif //CMF_APPLICATION_H

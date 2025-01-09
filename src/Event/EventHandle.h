@@ -1769,9 +1769,14 @@ public:
 	inline virtual void scan(TickType_t wait) noexcept = 0;
 
 	/**
-	* @brief A function used to unblock all threads waiting for this event.
-	*/
+	 * @brief A function used to unblock all threads waiting for this event.
+	 */
 	inline virtual void unblock() noexcept = 0;
+
+	/**
+	 * @return The object owning the handle, responsible for its scanning and lifetime.
+	 */
+	inline virtual  Object* getOwningObject() const noexcept { return nullptr; }
 };
 
 /**
@@ -1793,7 +1798,7 @@ public:
 	/**
 	 * @return The object owning the handle, responsible for its scanning and lifetime.
 	 */
-	Object* getOwningObject() const noexcept {
+	virtual Object* getOwningObject() const noexcept override {
 		return *owningObject;
 	}
 

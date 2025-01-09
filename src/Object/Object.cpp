@@ -128,26 +128,20 @@ void Object::scanEvents(TickType_t wait) noexcept{
 	eventScanningMutex.unlock();
 }
 
-void Object::registerEventHandle(EventHandleBase* handle) noexcept{
-	static uint32_t eventIndex = 0;
-
+void Object::registerEventHandle(EventHandleBase* handle) const noexcept{
 	if(handle == nullptr){
 		return;
 	}
 
-	std::lock_guard lock(eventHandleMutex);
+	if(handle->getOwningObject() != this){
+		return;
+	}
 
-	const std::string threadName = getName().append("_EventHandle").append(std::to_string(eventIndex++)).append("_Thread");
-
-	EventHandleContainer container = {};
-	container.ownedEventHandle = handle;
-	container.eventThread = newObject<Threaded>(this, [this, handle](){
-		if(handle->probe(portMAX_DELAY)){
-			readyEventHandles.push(handle);
+	if(const Application* app = getApp()){
+		if(EventScanner* scanner = app->getEventScanner()){
+			scanner->registerHandle(handle);
 		}
-	}, threadName, 0, 1576);
-
-	ownedEventHandles.insert(container);
+	}
 }
 
 void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
@@ -155,21 +149,23 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 		return;
 	}
 
-	std::lock_guard lock(eventHandleMutex);
+	if(handle->getOwningObject() != this){
+		return;
+	}
 
-	for(const EventHandleContainer& container : ownedEventHandles){
-		if(container.ownedEventHandle == nullptr) {
-			continue;
-		}
+	readyEventHandles.remove(handle);
 
-		if(container.ownedEventHandle == handle){
-			container.eventThread->setInterval(portMAX_DELAY);
-			container.ownedEventHandle->unblock();
-			container.eventThread->pause();
-			ownedEventHandles.erase(container);
-			break;
+	if(const Application* app = getApp()){
+		if(EventScanner* scanner = app->getEventScanner()){
+			scanner->unregisterHandle(handle);
 		}
 	}
+}
+
+void Object::readyEventHandle(EventHandleBase *handle) noexcept{
+	std::lock_guard lock(eventHandleMutex);
+
+	readyEventHandles.push(handle);
 }
 
 TickType_t Object::getEventScanningTime() const noexcept{
