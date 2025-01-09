@@ -69,7 +69,11 @@ public:
 	 * @return The size of the queue.
 	 */
 	inline size_t size() const noexcept {
-		return end - begin + 1;
+		if(begin > end){
+			return begin + bufferSize - end;
+		}
+
+		return end - begin;
 	}
 
 	/**
@@ -92,11 +96,7 @@ public:
 	 * @return True if size equals capacity. False otherwise.
 	 */
 	inline bool full() const noexcept {
-		if(begin > end){
-			return end + bufferSize - begin >= bufferSize - 1;
-		}
-
-		return end - begin >= bufferSize - 1;
+		return size() >= bufferSize - 1;
 	}
 
 	/**
