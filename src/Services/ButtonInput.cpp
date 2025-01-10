@@ -1,6 +1,8 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
+ButtonInput::ButtonInput() : AsyncEntity(SleepTime / portTICK_PERIOD_MS, 4*1024, 6, 0){}
+
 void ButtonInput::reg(std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
 	for(auto& r: registrations){
 		reg(r.first, r.second);
@@ -39,9 +41,6 @@ void ButtonInput::tick(float deltaTime) noexcept{
 			released(btn);
 		}
 	}
-
-	// TODO this shouldnt be here, look at the documentation for ticking delay
-	delayMillis(SleepTime);
 }
 
 void ButtonInput::pressed(int btn){

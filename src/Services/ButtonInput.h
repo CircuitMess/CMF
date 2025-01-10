@@ -9,6 +9,7 @@ class ButtonInput : public AsyncEntity {
 	GENERATED_BODY(ButtonInput, AsyncEntity);
 
 public:
+	ButtonInput();
 	enum class Action : uint8_t {
 		Release, Press
 	};
