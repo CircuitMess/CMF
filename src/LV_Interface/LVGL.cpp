@@ -8,7 +8,7 @@
 #include <draw/sw/blend/lv_draw_sw_blend_private.h>
 #include <themes/lv_theme_private.h>
 
-LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : display(display){
+LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : AsyncEntity(0, 8192, 5, 1), display(display){
 	lv_init();
 
 	lv_tick_set_cb(xTaskGetTickCount);
@@ -24,10 +24,6 @@ LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) :
 	if(themeInit){
 		lv_display_set_theme(lvDisplay, themeInit(lvDisplay));
 	}
-}
-
-void LVGL::begin() noexcept{
-	SyncEntity::begin();
 }
 
 void LVGL::tick(float deltaTime) noexcept{

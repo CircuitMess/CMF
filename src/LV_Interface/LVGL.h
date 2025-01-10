@@ -4,10 +4,10 @@
 #include <lvgl.h>
 #include "LVScreen.h"
 #include "Devices/Display.h"
-#include "Entity/SyncEntity.h"
+#include "Entity/AsyncEntity.h"
 
-class LVGL : public SyncEntity {
-	GENERATED_BODY(LVGL, SyncEntity)
+class LVGL : public AsyncEntity {
+	GENERATED_BODY(LVGL, AsyncEntity)
 
 public:
 	LVGL() = default;
@@ -24,7 +24,6 @@ public:
 	static void drawImage(const char* src);
 
 	void resetDisplayRefreshTimer();
-	void begin() noexcept override;
 
 private:
 	Display* display;
