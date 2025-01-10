@@ -1,5 +1,5 @@
-#ifndef PERSE_ROVER_CAMERA_H
-#define PERSE_ROVER_CAMERA_H
+#ifndef CMF_CAMERA_H
+#define CMF_CAMERA_H
 
 #include <esp_camera.h>
 #include "Periphery/I2C.h"
@@ -38,7 +38,6 @@ private:
 	static constexpr int MaxFailedFrames = 100;
 	int failedFrames = 0;
 
-
 	camera_config_t config;
 	StrongObjectPtr<I2C> i2c;
 	StrongObjectPtr<GPIO> gpio;
@@ -46,4 +45,4 @@ private:
 };
 
 
-#endif //PERSE_ROVER_CAMERA_H
+#endif //CMF_CAMERA_H
