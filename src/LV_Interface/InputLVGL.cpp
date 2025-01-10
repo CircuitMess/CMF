@@ -3,14 +3,6 @@
 #include "Services/ButtonInput.h"
 #include "Core/Application.h"
 
-/*const std::map<Input::Button, lv_key_t> InputLVGL::keyMap = {{ Input::Button::A,    LV_KEY_LEFT },
-															 { Input::Button::B,  LV_KEY_RIGHT },
-															 { Input::Button::C,     LV_KEY_ENTER },
-															 { Input::Button::D,     LV_KEY_ESC }};
-
-const std::map<lv_key_t, lv_key_t> InputLVGL::vertRemap = {{ LV_KEY_LEFT,    LV_KEY_UP },
-														   { LV_KEY_RIGHT,  LV_KEY_DOWN }};*/
-
 InputLVGL* InputLVGL::instance = nullptr;
 
 InputLVGL::InputLVGL(ButtonInput* bi, std::map<Enum<int>, lv_key_t> keyMap, std::map<lv_key_t, lv_key_t> vertRemap) :
