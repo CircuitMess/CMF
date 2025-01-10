@@ -18,8 +18,8 @@ struct InputPinDef {
 	}
 };
 
-class InputDriverBase : public SyncEntity {
-	GENERATED_BODY(InputDriverBase, SyncEntity)
+class InputDriverBase : public Object {
+	GENERATED_BODY(InputDriverBase, Object)
 
 public:
 	virtual void scan() noexcept{}
@@ -69,17 +69,6 @@ public:
 			states.erase(i->port);
 		}
 		inputs.erase(it, inputs.end());
-	}
-
-
-	void begin() noexcept override{
-		Super::begin();
-
-		scan();
-	}
-
-	void tick(float deltaTime) noexcept override{
-		Super::tick(deltaTime);
 	}
 
 protected:
