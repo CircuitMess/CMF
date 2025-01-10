@@ -147,8 +147,7 @@ void AsyncEntity::tickHandle() noexcept{
 			continue;
 		}
 
-		child->setOwner(nullptr);
-		child->onDestroy();
+		child->destroy();
 	}
 
 	if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
@@ -162,8 +161,6 @@ void AsyncEntity::tickHandle() noexcept{
 			}
 
 			child->destroy();
-			child->onDestroy();
-			child->setOwner(nullptr);
 
 			return false;
 		});
@@ -181,8 +178,8 @@ void AsyncEntity::tickHandle() noexcept{
 		}
 
 		end(reason);
-		onDestroy();
+		destroy();
+	}else{
+		lastTickTime = currentTickTime;
 	}
-
-	lastTickTime = currentTickTime;
 }

@@ -1,7 +1,7 @@
 #include "InputGPIO.h"
 #include "Log/Log.h"
 
-InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) : InputDriver(inputs), gpio(std::move(gpio)){
+InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) noexcept : InputDriver(inputs), gpio(std::move(gpio)){
 
 }
 
@@ -13,7 +13,7 @@ void InputGPIO::scan() noexcept{
 	});
 }
 
-void InputGPIO::performRegister(GPIOPinDef input){
+void InputGPIO::performRegister(GPIOPinDef input) noexcept{
 	const auto pin = (gpio_num_t) input.port;
 	gpio->setMode(pin, GPIOMode::Input);
 	switch(input.pullMode){

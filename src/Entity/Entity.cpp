@@ -7,9 +7,7 @@ Entity::Entity() noexcept : Super() {
 
 }
 
-Entity::~Entity() noexcept{
-
-}
+Entity::~Entity() noexcept = default;
 
 bool Entity::hasBegun() const noexcept{
 	return begun;

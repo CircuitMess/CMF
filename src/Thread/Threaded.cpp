@@ -58,13 +58,13 @@ void Threaded::start() noexcept{
 			return;
 		}
 
-		if(!isValid((Threaded*) arg)){
+		if(!isValid(static_cast<Threaded *>(arg))){
 			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
 			vTaskDelete(nullptr);
 			return;
 		}
 
-		((Threaded*) arg)->threadFunction();
+		static_cast<Threaded *>(arg)->threadFunction();
 	};
 
 	if(core == -1){
