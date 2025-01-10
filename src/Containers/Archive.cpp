@@ -588,8 +588,9 @@ Archive& OutArchive::operator << (std::string& data) noexcept {
 
 	for(size_t i = 0; i < size; ++i){
 		char c;
-		popData<char>(c);
-		data += c;
+		if(popData<char>(c)){
+			data += c;
+		}
 	}
 
 	return *this;
