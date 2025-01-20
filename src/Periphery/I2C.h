@@ -44,6 +44,7 @@ public:
 	esp_err_t write_read(uint8_t address, uint8_t writeData, uint8_t& readData, TickType_t wait = portMAX_DELAY);
 
 	esp_err_t writeRegister(uint8_t address, uint8_t reg, const std::vector<uint8_t>& data, TickType_t wait = portMAX_DELAY);
+	esp_err_t writeRegister(uint8_t address, uint8_t reg, const uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
 	esp_err_t writeRegister(uint8_t address, uint8_t reg, uint8_t data, TickType_t wait = portMAX_DELAY);
 	esp_err_t writeRegister(uint8_t address, uint8_t reg, std::initializer_list<uint8_t> data, TickType_t wait = portMAX_DELAY);
 

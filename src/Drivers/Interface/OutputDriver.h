@@ -26,7 +26,7 @@ public:
 
 	virtual void write(int port, float value) noexcept{ }
 
-	virtual void write(int port, bool value) noexcept{
+	void write(int port, bool value) noexcept{
 		write(port, value ? 1.0f : 0.0f);
 	}
 
@@ -53,13 +53,14 @@ public:
 		return states.at(port);
 	}
 
-	virtual void write(int port, float value) noexcept override{
+	virtual void write(int port, float value) noexcept override final{
 		states[port] = value;
 		performWrite(port, value);
 	}
 
 	void registerOutput(T pinDef) noexcept{
 		outputs.emplace_back(pinDef);
+		inversions[pinDef.port] = pinDef.inverted;
 		performRegister(pinDef);
 	}
 
@@ -109,6 +110,7 @@ private:
 		Super::postInitProperties();
 
 		for(const auto& output: outputs){
+			inversions[output.port] = output.inverted;
 			performRegister(output);
 		}
 	}
