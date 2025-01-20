@@ -40,10 +40,6 @@ void SyncEntity::tick(float deltaTime) noexcept {
 
 	std::set<Object*> childrenToRemove;
 	forEachChild([&childrenToRemove](Object* child) {
-		if(!isValid(child)){
-			return false;
-		}
-
 		if(!isValid(child) && !child->canDelete()){
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
 				EndReason reason = EndReason::GarbageCollected;

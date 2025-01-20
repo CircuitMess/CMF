@@ -123,25 +123,113 @@ public:
 	 */
 	void registerLifetimeObject(Object* object) noexcept;
 
+	/**
+	 * @brief
+	 * @tparam T
+	 * @param fn
+	 * @return
+	 */
+	template<typename T>
+	T* getPeriphery(const std::function<bool(const Object*)>& fn =
+	[](const Object* periph) {return cast<T>(periph) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
+
+		for(const StrongObjectPtr<Object>& periph : periphery){
+			if(fn(*periph)){
+				return cast<T>(*periph);
+			}
+		}
+
+		return nullptr;
+	}
+
+	/**
+	 * @brief
+	 * @tparam T
+	 * @param fn
+	 * @return
+	 */
+	template<typename T>
+	T* getDevice(const std::function<bool(const Object*)>& fn =
+	[](const Object* device) {return cast<T>(device) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
+
+		for(const StrongObjectPtr<Object>& device : devices){
+			if(fn(*device)){
+				return cast<T>(*device);
+			}
+		}
+
+		return nullptr;
+	}
+
+	/**
+	 * @brief
+	 * @tparam T
+	 * @param fn
+	 * @return
+	 */
+	template<typename T>
+	T* getService() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& service : services){
+			if(!service.isValid()){
+				continue;
+			}
+
+			if(T* serviceObject = cast<T>(*service)){
+				return serviceObject;
+			}
+		}
+
+		return nullptr;
+	}
+
+	/**
+	 * @brief
+	 * @tparam T
+	 * @param fn
+	 * @return
+	 */
+	template<typename T>
+	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
+		for(const StrongObjectPtr<Object>& driver : drivers){
+			if(!driver.isValid()){
+				continue;
+			}
+
+			if(T* driverObject = cast<T>(*driver)){
+				return driverObject;
+			}
+		}
+
+		return nullptr;
+	}
+
 protected:
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	virtual void postInitProperties() noexcept override;
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	virtual void begin() noexcept override;
 
 	/**
-	 * @brief 
+	 * @brief
 	 * @param deltaTime The time passed since the last tick call.
 	 */
 	virtual void tick(float deltaTime) noexcept override;
 
 	/**
-	 * @brief 
+	 * @brief
 	 * @param reason The reason why the entity instance stopped ticking and is getting destroyed.
 	 */
 	virtual void end(EndReason reason) noexcept override;
@@ -157,11 +245,11 @@ protected:
 	virtual TickType_t getTickingInterval() const noexcept override;
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @tparam Args 
-	 * @param args 
-	 * @return 
+	 * @brief
+	 * @tparam T
+	 * @tparam Args
+	 * @param args
+	 * @return
 	 */
 	template<typename T, typename ...Args>
 	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
@@ -176,34 +264,11 @@ protected:
 	}
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @param fn 
-	 * @return 
-	 */
-	template<typename T>
-	T* getPeriphery(const std::function<bool(const Object*)>& fn =
-			[](const Object* periph) {return cast<T>(periph) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
-		if(!fn){
-			return nullptr;
-		}
-
-		for(const StrongObjectPtr<Object>& periph : periphery){
-			if(fn(*periph)){
-				return cast<T>(*periph);
-			}
-		}
-
-		return nullptr;
-	}
-
-	/**
-	 * @brief 
-	 * @tparam T 
-	 * @tparam Args 
-	 * @param args 
-	 * @return 
+	 * @brief
+	 * @tparam T
+	 * @tparam Args
+	 * @param args
+	 * @return
 	 */
 	template<typename T, typename ...Args>
 	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
@@ -218,34 +283,11 @@ protected:
 	}
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @param fn 
-	 * @return 
-	 */
-	template<typename T>
-	T* getDevice(const std::function<bool(const Object*)>& fn =
-			[](const Object* device) {return cast<T>(device) != nullptr;})
-			const noexcept requires(std::derived_from<T, Object>) {
-		if(!fn){
-			return nullptr;
-		}
-
-		for(const StrongObjectPtr<Object>& device : devices){
-			if(fn(*device)){
-				return cast<T>(*device);
-			}
-		}
-
-		return nullptr;
-	}
-
-	/**
-	 * @brief 
-	 * @tparam T 
-	 * @tparam Args 
-	 * @param args 
-	 * @return 
+	 * @brief
+	 * @tparam T
+	 * @tparam Args
+	 * @param args
+	 * @return
 	 */
 	template<typename T, typename ...Args>
 	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Object>){
@@ -270,31 +312,11 @@ protected:
 	}
 
 	/**
-	 * @brief 
-	 * @tparam T 
-	 * @return 
-	 */
-	template<typename T>
-	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& driver : drivers){
-			if(!driver.isValid()){
-				continue;
-			}
-
-			if(T* driverObject = cast<T>(*driver)){
-				return driverObject;
-			}
-		}
-
-		return nullptr;
-	}
-
-	/**
-	 * @brief 
-	 * @tparam T 
-	 * @tparam Args 
-	 * @param args 
-	 * @return 
+	 * @brief
+	 * @tparam T
+	 * @tparam Args
+	 * @param args
+	 * @return
 	 */
 	template<typename T, typename ...Args>
 	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Object>){
@@ -316,26 +338,6 @@ protected:
 		services.insert(*object);
 
 		return *object;
-	}
-
-	/**
-	 * @brief 
-	 * @tparam T
-	 * @return 
-	 */
-	template<typename T>
-	T* getService() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& service : services){
-			if(!service.isValid()){
-				continue;
-			}
-
-			if(T* serviceObject = cast<T>(*service)){
-				return serviceObject;
-			}
-		}
-
-		return nullptr;
 	}
 
 private:
