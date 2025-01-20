@@ -10,6 +10,7 @@ class ButtonInput : public AsyncEntity {
 
 public:
 	ButtonInput();
+
 	enum class Action : uint8_t {
 		Release, Press
 	};

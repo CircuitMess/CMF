@@ -41,6 +41,8 @@ void ButtonInput::tick(float deltaTime) noexcept{
 			released(btn);
 		}
 	}
+
+	delayMillis(SleepTime);
 }
 
 void ButtonInput::pressed(int btn){
