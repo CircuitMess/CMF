@@ -5,11 +5,8 @@
 DEFINE_LOG(ADCReader)
 
 ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibration, Object* filter){
-
-	if(filter != nullptr){
-		if(filter->isA(ADCFilter::staticClass())){
-			this->filter = filter;
-		}
+	if(filter != nullptr && filter->isA(ADCFilter::staticClass())){
+		this->filter = filter;
 	}
 
 	adc_unit_t unit;
@@ -22,7 +19,7 @@ ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibr
 	}
 
 	this->chan = chan;
-	adc = &ADCUnit::getADCUnit(unit);
+	adc = ADCUnit::getADCUnit(unit);
 	adc->config(chan, config);
 
 	if(calibration){
@@ -65,7 +62,7 @@ float ADCReader::sample(){
 }
 
 float ADCReader::getValue() const{
-	if(filter){
+	if(filter.isValid()){
 		return filter->apply(value);
 	}
 

@@ -4,11 +4,15 @@
 #include "Object/Object.h"
 #include <esp_adc/adc_oneshot.h>
 
-class ADCUnit {
-public:
-	static ADCUnit& getADCUnit(adc_unit_t unit);
+class ADCUnit : public Object {
+	GENERATED_BODY(ADCUnit, Object)
 
-	~ADCUnit();
+public:
+	static ADCUnit* getADCUnit(adc_unit_t unit);
+
+	explicit ADCUnit(adc_unit_t unit = ADC_UNIT_1);
+
+	virtual ~ADCUnit() override;
 
 	adc_unit_t getUnitID() const;
 
@@ -17,12 +21,10 @@ public:
 	esp_err_t read(adc_channel_t chan, int& valueOut, adc_cali_handle_t cali = nullptr) const;
 
 private:
-	explicit ADCUnit(adc_unit_t unit = ADC_UNIT_1);
-
 	adc_oneshot_unit_handle_t hndl;
 	const adc_unit_t unit;
 
-	static ADCUnit* units[SOC_ADC_PERIPH_NUM];
+	static StrongObjectPtr<ADCUnit> units[SOC_ADC_PERIPH_NUM];
 };
 
 #endif //CODEE_FIRMWARE_ADC_H

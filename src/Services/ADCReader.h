@@ -54,7 +54,7 @@ public:
 	float getValue() const;
 
 private:
-	ADCUnit* adc;
+	StrongObjectPtr<ADCUnit> adc;
 	adc_channel_t chan;
 	StrongObjectPtr<ADCFilter> filter;
 	adc_cali_handle_t cali_handle = nullptr;
