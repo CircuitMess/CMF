@@ -5,7 +5,7 @@
 #include <driver/ledc.h>
 
 /**
- * OutputPinDef.port represents an independently controlled PWM channel,
+ * OutputPinDef.port represents an independently controlled LEDC channel,
  * while OutputPWMPinDef.pin is its attached GPIO
  */
 struct OutputPWMPinDef : OutputPinDef {
