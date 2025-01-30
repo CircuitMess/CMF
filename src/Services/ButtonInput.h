@@ -9,6 +9,8 @@ class ButtonInput : public AsyncEntity {
 	GENERATED_BODY(ButtonInput, AsyncEntity);
 
 public:
+	ButtonInput();
+
 	enum class Action : uint8_t {
 		Release, Press
 	};
@@ -28,7 +30,6 @@ protected:
 private:
 	void pressed(int btn);
 	void released(int btn);
-
 
 	std::set<StrongObjectPtr<InputDriverBase>> inputSources;
 

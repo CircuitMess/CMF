@@ -1,0 +1,7 @@
+menu "CMF"
+
+config CMF_GRAPHICS
+	bool "Include graphics extension"
+	default "y"
+
+endmenu

@@ -3,7 +3,7 @@
 #include "Core/Application.h"
 
 Camera::Camera(camera_config_t config, I2C* i2c, std::function<void(sensor_t*)> sensorConfig) : config(config), i2c(i2c), sensorConfig(sensorConfig){
-	gpio = ApplicationStatics::getApplication()->getPeriphery<GPIO>();
+	gpio = ApplicationStatics::getApplication()->getPeriphery<GPIOPeriph>();
 	gpio->setMode((gpio_num_t) config.pin_pwdn, GPIOMode::Output);
 	gpio->write((gpio_num_t) config.pin_pwdn, true);
 
