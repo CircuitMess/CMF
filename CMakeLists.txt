@@ -23,7 +23,7 @@ set(EXCLUDED_ITEMS
         CACHE INTERNAL "" FORCE)
 
 foreach(SRC IN LISTS SRC_DIRS)
-    file(GLOB_RECURSE DIR_SOURCES "${SRC}/**.h" "${SRC}/**.cpp" "${SRC}/**.hpp" "${SRC}/**.inl")
+    file(GLOB_RECURSE DIR_SOURCES "${SRC}/*/**.h" "${SRC}/*/**.cpp" "${SRC}/*/**.hpp" "${SRC}/*/**.inl" "${SRC}/**.h" "${SRC}/**.cpp" "${SRC}/**.hpp" "${SRC}/**.inl")
     list(APPEND SOURCES ${DIR_SOURCES})
 endforeach()
 
@@ -38,9 +38,9 @@ if (CONFIG_CMF_GRAPHICS)
     list(APPEND SOURCES ${GRAPHICS_SOURCES})
 endif()
 
-file(GLOB_RECURSE LIBS "lib/*/src/**.cpp" "lib/*/src/**.c")
+file(GLOB_RECURSE LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib/*/src/**.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/lib/*/src/**.c")
 
-set(LIBS_INCL "lib/glm/glm" CACHE INTERNAL "" FORCE)
+set(LIBS_INCL "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm/glm" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libhelix-aac/src" CACHE INTERNAL "" FORCE)
 
 set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" "esp_adc" CACHE INTERNAL "" FORCE)
 
