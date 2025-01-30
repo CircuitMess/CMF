@@ -11,7 +11,7 @@ void OutputGPIO::performWrite(int port, float value) noexcept{
 		CMF_LOG(CMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
-	gpio->write(pin, (bool) value ^ getInversions()[port]);
+	gpio->write(pin, (bool) value);
 }
 
 void OutputGPIO::performRegister(OutputPinDef output) noexcept {

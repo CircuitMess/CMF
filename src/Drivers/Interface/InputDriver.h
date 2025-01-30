@@ -43,11 +43,12 @@ public:
 			CMF_LOG(CMF, Error, "Input port %d not registered", port);
 			return 0;
 		}
-		return states.at(port);
+		return states.at(port) ^ inversions.at(port);
 	}
 
 	void registerInput(T pinDef) noexcept{
 		inputs.emplace_back(pinDef);
+		inversions[pinDef.port] = pinDef.inverted;
 		performRegister(pinDef);
 	}
 
@@ -58,6 +59,7 @@ public:
 		for(auto i = it; i != inputs.end(); ++i){
 			performDeregister(*i);
 			states.erase(i->port);
+			inversions.erase(i->port);
 		}
 		inputs.erase(it, inputs.end());
 	}
@@ -67,6 +69,7 @@ public:
 		for(auto i = it; i != inputs.end(); ++i){
 			performDeregister(*i);
 			states.erase(i->port);
+			inversions.erase(i->port);
 		}
 		inputs.erase(it, inputs.end());
 	}
@@ -92,11 +95,16 @@ protected:
 		return states;
 	}
 
+	std::map<int, bool>& getInversions() noexcept{
+		return inversions;
+	}
+
 private:
 	virtual void postInitProperties() noexcept override final{
 		Super::postInitProperties();
 
 		for(const auto& input: inputs){
+			inversions[input.port] = input.inverted;
 			performRegister(input);
 		}
 	}
@@ -112,6 +120,12 @@ private:
 	 * key = port[int] , value = state[bool]
 	 */
 	std::map<int, bool> states;
+
+	/**
+	 * Map of inversion settings for each port.
+	 * key = port[int], value = inversion[bool]
+	 */
+	std::map<int, bool> inversions;
 };
 
 #endif //CMF_INPUTDRIVER_H
