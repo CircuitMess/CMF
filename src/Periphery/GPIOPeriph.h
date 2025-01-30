@@ -1,5 +1,5 @@
-#ifndef CMF_GPIO_H
-#define CMF_GPIO_H
+#ifndef CMF_GPIOPERIPH_H
+#define CMF_GPIOPERIPH_H
 
 #include "Object/Object.h"
 #include "driver/gpio.h"
@@ -12,8 +12,8 @@ enum class GPIOMode : uint8_t {
 /**
  * Stateless wrapper for GPIO functions.
  */
-class GPIO : public Object {
-	GENERATED_BODY(GPIO, Object)
+class GPIOPeriph : public Object {
+	GENERATED_BODY(GPIOPeriph, Object)
 
 public:
 	void setMode(gpio_num_t gpioNum, GPIOMode mode);
@@ -27,4 +27,4 @@ public:
 	void setPulldown(gpio_num_t gpioNum, bool pulledDown);
 };
 
-#endif //CMF_GPIO_H
+#endif //CMF_GPIOPERIPH_H

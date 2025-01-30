@@ -1,7 +1,7 @@
 #include "InputGPIO.h"
 #include "Log/Log.h"
 
-InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) noexcept : InputDriver(inputs), gpio(std::move(gpio)){
+InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept : InputDriver(inputs), gpio(std::move(gpio)){
 
 }
 

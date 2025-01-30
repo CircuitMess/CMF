@@ -3,6 +3,7 @@
 
 #include <esp_camera.h>
 #include "Periphery/I2C.h"
+#include "Periphery/GPIOPeriph.h"
 
 class Camera : public Object {
 	GENERATED_BODY(Camera, Object)
@@ -40,7 +41,7 @@ private:
 
 	camera_config_t config;
 	StrongObjectPtr<I2C> i2c;
-	StrongObjectPtr<GPIO> gpio;
+	StrongObjectPtr<GPIOPeriph> gpio;
 	std::function<void(sensor_t*)> sensorConfig;
 };
 

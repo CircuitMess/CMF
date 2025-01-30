@@ -5,6 +5,9 @@
 #include <mutex>
 #include "EventHandle.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
+#include "Statics/ApplicationStatics.h"
+#include "EventScanner.h"
+#include "Core/Application.h"
 
 /**
  * @brief Event class is used to declare event instances to which object function can be bound and executed as callbacks when the event is triggered.
@@ -138,6 +141,12 @@ protected:
 			}
 
 			succeeded &= container.handle->call(args...);
+		}
+
+		if(const Application* app = ApplicationStatics::getApplication()){
+			if(const EventScanner* scanner = app->getEventScanner()){
+				scanner->unlock();
+			}
 		}
 
 		return succeeded;
