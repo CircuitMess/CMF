@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_OUTPUTPWM_H
-#define CMF_TEMPLATE_OUTPUTPWM_H
+#ifndef CMF_OUTPUTPWM_H
+#define CMF_OUTPUTPWM_H
 
 #include "Drivers/Interface/OutputDriver.h"
 #include <driver/ledc.h>
@@ -62,9 +62,6 @@ private:
 
 	std::map<int, gpio_num_t> gpios;
 
-//	std::map<int, bool> attached;
-
-
 	static constexpr uint32_t DefaultFreq = 5000;    //placeholder, usually changed before attaching to a channel or pin
 
 	static constexpr ledc_timer_bit_t DRAM_ATTR DutyResDefault = LEDC_TIMER_10_BIT;
@@ -86,5 +83,4 @@ private:
 
 };
 
-
-#endif //CMF_TEMPLATE_OUTPUTPWM_H
+#endif //CMF_OUTPUTPWM_H

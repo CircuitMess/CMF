@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_MOTORS_H
-#define CMF_TEMPLATE_MOTORS_H
+#ifndef CMF_MOTORS_H
+#define CMF_MOTORS_H
 
 #include "Entity/AsyncEntity.h"
 #include "Drivers/Interface/OutputDriver.h"
@@ -7,8 +7,9 @@
 #include "Drivers/Output/OutputPWM.h"
 #include <cmath>
 
+template<typename Motor>
 struct MotorDef {
-	int motor;
+	Motor motor;
 	OutputPin digitalPin;
 	OutputPin analogPin;
 };
@@ -23,7 +24,7 @@ public:
 
 	Motors() = default;
 
-	Motors(std::vector<MotorDef> motors, Object* easer = newObject<MotorsEaser>().get()) : AsyncEntity(10 / portTICK_PERIOD_MS, 3 * 1024), motorDefs(motors){
+	Motors(const std::vector<MotorDef<Motor>>& motors, Object* easer = newObject<MotorsEaser>().get()) : Super(10 / portTICK_PERIOD_MS, 3 * 1024), motorDefs(motors){
 		if(!easer->isA(MotorsEaser::staticClass())){
 			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
 			this->easer = newObject<MotorsEaser>().get();
@@ -33,13 +34,13 @@ public:
 		this->easer = easer;
 	}
 
-	void reg(MotorDef motor){
+	void reg(MotorDef<Motor> motor){
 		motor.digitalPin.driver->write(motor.digitalPin.port, false);
 		motor.analogPin.driver->write(motor.analogPin.port, false);
 
-		motorPins[(Motor) motor.motor] = { motor.digitalPin, motor.analogPin };
-		currentValues[(Motor) motor.motor] = 0;
-		targetValues[(Motor) motor.motor] = 0;
+		motorPins[motor.motor] = { motor.digitalPin, motor.analogPin };
+		currentValues[motor.motor] = 0;
+		targetValues[motor.motor] = 0;
 
 	}
 
@@ -77,14 +78,14 @@ protected:
 
 			const Motor motor = motorPin.first;
 
-			if(std::round(currentValues[(Motor) motor]) == std::round(targetValues[(Motor) motor])) continue;
+			if(std::round(currentValues[motor]) == std::round(targetValues[motor])) continue;
 
 
 			float oldValue = currentValues[motor];
 			float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), -100.f, 100.f);
 
 
-			currentValues[(Motor) motor] = newValue;
+			currentValues[motor] = newValue;
 
 			if(std::round(newValue) != std::round(oldValue)){
 				const MotorPins& pins = motorPin.second;
@@ -118,6 +119,7 @@ protected:
 
 	void postInitProperties() noexcept override{
 		Super::postInitProperties();
+
 		for(const auto& motor: motorDefs){
 			reg(motor);
 		}
@@ -126,7 +128,7 @@ protected:
 private:
 	StrongObjectPtr<MotorsEaser> easer = nullptr;
 
-	const std::vector<MotorDef> motorDefs;
+	const std::vector<MotorDef<Motor>> motorDefs;
 
 	/**
 	 * Map of current motor values.
@@ -144,4 +146,4 @@ private:
 	std::map<Motor, MotorPins> motorPins;
 };
 
-#endif //CMF_TEMPLATE_MOTORS_H
+#endif //CMF_MOTORS_H

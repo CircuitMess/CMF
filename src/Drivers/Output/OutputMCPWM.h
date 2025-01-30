@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_OUTPUTMCPWM_H
-#define CMF_TEMPLATE_OUTPUTMCPWM_H
+#ifndef CMF_OUTPUTMCPWM_H
+#define CMF_OUTPUTMCPWM_H
 
 #include "Drivers/Interface/OutputDriver.h"
 #include "driver/mcpwm_prelude.h"
@@ -25,7 +25,7 @@ class OutputMCPWM : public OutputDriver<OutputMCPWMPinDef> {
 public:
 	OutputMCPWM() = default;
 
-	OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs);
+	explicit OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs);
 
 	void enable(int port);
 
@@ -54,5 +54,4 @@ private:
 
 };
 
-
-#endif //CMF_TEMPLATE_OUTPUTMCPWM_H
+#endif //CMF_OUTPUTMCPWM_H

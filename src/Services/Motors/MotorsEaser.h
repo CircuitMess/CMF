@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_MOTORSEASER_H
-#define CMF_TEMPLATE_MOTORSEASER_H
+#ifndef CMF_MOTORSEASER_H
+#define CMF_MOTORSEASER_H
 
 #include "Object/Object.h"
 
@@ -17,7 +17,7 @@ public:
 class LinearEaser : public MotorsEaser {
 	GENERATED_BODY(LinearEaser, MotorsEaser)
 public:
-	explicit LinearEaser(const float easeStrength = DefaultEaseStrength) : easeStrength(easeStrength){}
+	explicit LinearEaser(const float easeStrength = DefaultEaseStrength) : Super(), easeStrength(easeStrength){}
 
 	float easeValue(float dt, float currentValue, float targetValue) override{
 		float direction = (currentValue < targetValue) ? 1 : -1;
@@ -31,4 +31,4 @@ private:
 	static constexpr float DefaultEaseStrength = 200; //value change per second, easing speed
 };
 
-#endif //CMF_TEMPLATE_MOTORSEASER_H
+#endif //CMF_MOTORSEASER_H

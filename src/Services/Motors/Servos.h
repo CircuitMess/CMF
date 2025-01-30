@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_SERVOS_H
-#define CMF_TEMPLATE_SERVOS_H
+#ifndef CMF_SERVOS_H
+#define CMF_SERVOS_H
 
 #include "Drivers/Interface/OutputDriver.h"
 #include "Entity/AsyncEntity.h"
@@ -8,8 +8,9 @@
 
 DEFINE_LOG(Servos)
 
+template<typename Servo>
 struct ServoDef {
-	int motor;
+	Servo motor;
 	OutputPin pin;
 };
 
@@ -20,7 +21,7 @@ class Servos : public AsyncEntity {
 public:
 	Servos() = default;
 
-	Servos(std::vector<ServoDef> servos, Object* easer = newObject<MotorsEaser>().get()) : AsyncEntity(10 / portTICK_PERIOD_MS, 3 * 1024), servoDefs(servos){
+	Servos(const std::vector<ServoDef<Servo>>& servos, Object* easer = newObject<MotorsEaser>().get()) : Super(10 / portTICK_PERIOD_MS, 3 * 1024), servoDefs(servos){
 		if(!easer->isA(MotorsEaser::staticClass())){
 			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
 			this->easer = newObject<MotorsEaser>().get();
@@ -112,14 +113,14 @@ protected:
 		Super::postInitProperties();
 
 		for(const auto& motor: servoDefs){
-			reg((Servo) motor.motor, motor.pin);
+			reg(motor.motor, motor.pin);
 		}
 	}
 
 private:
 	StrongObjectPtr<MotorsEaser> easer = nullptr;
 
-	const std::vector<ServoDef> servoDefs;
+	const std::vector<ServoDef<Servo>> servoDefs;
 
 	/**
 	 * Map of current motor values.
@@ -132,5 +133,4 @@ private:
 	std::map<Servo, OutputPin> pins;
 };
 
-
-#endif //CMF_TEMPLATE_SERVOS_H
+#endif //CMF_SERVOS_H
