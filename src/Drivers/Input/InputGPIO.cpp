@@ -9,7 +9,7 @@ void InputGPIO::scan() noexcept{
 	Super::scan();
 	forEachInput([this](const GPIOPinDef& input){
 		const auto pin = (gpio_num_t) input.port;
-		getStates()[input.port] = gpio->read(pin) ^ input.inverted;
+		getStates()[input.port] = gpio->read(pin);
 	});
 }
 

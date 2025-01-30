@@ -19,7 +19,7 @@ void InputTouchGPIO::scan() noexcept{
 	const auto touchStatus = touch_pad_get_status();
 
 	forEachInput([this, &touchStatus](const TouchPinDef& input){
-		getStates()[input.port] = (touchStatus & (1UL << input.port)) ^ input.inverted;
+		getStates()[input.port] = (touchStatus & (1UL << input.port));
 	});
 }
 

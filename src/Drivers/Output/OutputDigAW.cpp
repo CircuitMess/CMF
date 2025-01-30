@@ -9,7 +9,7 @@ void OutputDigAW::performWrite(int port, float value) noexcept{
 		CMF_LOG(CMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
-	aw9523->write(port, (bool)value ^ getInversions()[port]);
+	aw9523->write(port, (bool)value);
 }
 
 void OutputDigAW::performRegister(OutputPinDef output) noexcept{
