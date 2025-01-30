@@ -2,19 +2,21 @@
 
 DEFINE_LOG(AACSource)
 
-void AACSource::open(std::string path){
+void AACSource::open(const std::string& path){
 	file = std::ifstream(path);
 	if(!file.is_open()){
 		CMF_LOG(AACSource, LogLevel::Error, "Failed to open file %s", path.c_str());
 		return;
 	}
 
-	if(decoder){
+	if(decoder == nullptr){
 		AACFreeDecoder(decoder);
 	}
+
 	decoder = AACInitDecoder();
+
 	if(decoder == nullptr){
-		CMF_LOG(AACSource, LogLevel::Error,"Libhelix AAC decoder failed to initialize.");
+		CMF_LOG(AACSource, LogLevel::Error, "Libhelix AAC decoder failed to initialize.");
 		return;
 	}
 }
@@ -68,13 +70,13 @@ size_t AACSource::getData(uint8_t* buffer, size_t bytes){
 			break;
 		}
 
-		unsigned char* inBuffer = (unsigned char*) fillBuffer.data();
+		unsigned char* inBuffer = reinterpret_cast<unsigned char *>(fillBuffer.data());
 
 		const int bytesRemainingBefore = bytesRemaining;
 
 		dataBuffer.resize(dataBuffer.size() + DecodeOutBufferSize, 0);
 
-		if(int ret = AACDecode(decoder, &inBuffer, &bytesRemaining, reinterpret_cast<SampleType*>(dataBuffer.data() + dataBuffer.size() - DecodeOutBufferSize))){
+		if(const int ret = AACDecode(decoder, &inBuffer, &bytesRemaining, reinterpret_cast<SampleType*>(dataBuffer.data() + dataBuffer.size() - DecodeOutBufferSize))){
 			CMF_LOG(AACSource, LogLevel::Error, "AAC decoding error %d", ret);
 			return 0;
 		}

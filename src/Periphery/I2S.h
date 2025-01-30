@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_I2S_H
-#define CMF_TEMPLATE_I2S_H
+#ifndef CMF_I2S_H
+#define CMF_I2S_H
 
 #include "Object/Object.h"
 #include <driver/i2s_std.h>
@@ -24,5 +24,4 @@ private:
 	i2s_chan_handle_t tx_chan;
 };
 
-
-#endif //CMF_TEMPLATE_I2S_H
+#endif //CMF_I2S_H

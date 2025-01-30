@@ -1,10 +1,10 @@
-#ifndef CMF_TEMPLATE_AUDIO_H
-#define CMF_TEMPLATE_AUDIO_H
+#ifndef CMF_AUDIO_H
+#define CMF_AUDIO_H
 
+#include <optional>
 #include "Entity/AsyncEntity.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "AudioSource.h"
-#include <optional>
 #include "Periphery/I2S.h"
 
 class Audio : public AsyncEntity {
@@ -19,7 +19,7 @@ public:
 
 	~Audio() override;
 
-	void play(std::string path);
+	void play(const std::string& path);
 
 	void stop();
 
@@ -47,5 +47,4 @@ private:
 	float gain = 1.0f;
 };
 
-
-#endif //CMF_TEMPLATE_AUDIO_H
+#endif //CMF_AUDIO_H

@@ -1,9 +1,9 @@
-#ifndef CMF_TEMPLATE_AUDIOSOURCE_H
-#define CMF_TEMPLATE_AUDIOSOURCE_H
+#ifndef CMF_AUDIOSOURCE_H
+#define CMF_AUDIOSOURCE_H
 
-#include "Object/Object.h"
 #include <fstream>
 #include "Log/Log.h"
+#include "Object/Object.h"
 
 DEFINE_LOG(AudioSource)
 
@@ -11,13 +11,9 @@ class AudioSource : public Object {
 	GENERATED_BODY(AudioSource, Object)
 public:
 
-	virtual void open(std::string path){
+	virtual void open(const std::string& path){};
 
-	};
-
-	virtual void close(){
-
-	};
+	virtual void close(){};
 
 	/**
 	 * Pull data from decoder.
@@ -30,5 +26,4 @@ public:
 	}
 };
 
-
-#endif //CMF_TEMPLATE_AUDIOSOURCE_H
+#endif //CMF_AUDIOSOURCE_H

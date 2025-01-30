@@ -1,10 +1,8 @@
 #ifndef CMF_OBJECTPTR_H
 #define CMF_OBJECTPTR_H
 
-#include <concepts>
 #include <type_traits>
 #include "Memory/Cast.h"
-#include "Object/Object.h"
 #include "Memory/ObjectManager.h"
 
 /**
