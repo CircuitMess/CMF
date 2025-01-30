@@ -18,8 +18,8 @@ struct OutputPinDef {
 	}
 };
 
-class OutputDriverBase : public SyncEntity {
-	GENERATED_BODY(OutputDriverBase, SyncEntity)
+class OutputDriverBase : public Object {
+	GENERATED_BODY(OutputDriverBase, Object)
 
 public:
 	virtual float getState(int port) const noexcept{ return 0.0f; }
@@ -55,7 +55,7 @@ public:
 
 	virtual void write(int port, float value) noexcept override final{
 		states[port] = value;
-		performWrite(port, value);
+		performWrite(port, getInversions()[port] ? 1.0 - value : value);
 	}
 
 	void registerOutput(T pinDef) noexcept{

@@ -191,13 +191,18 @@ public:
 	 * @brief Registers the event handle owner by this object to the object for future scanning and execution.
 	 * @param handle The handle being registered.
 	 */
-	void registerEventHandle(class EventHandleBase* handle) noexcept;
+	void registerEventHandle(class EventHandleBase* handle) const noexcept;
 
 	/**
 	 * @brief Removes a registered handle from this object.
 	 * @param handle The handle being removed.
 	 */
 	void unregisterEventHandle(EventHandleBase* handle) noexcept;
+
+	/**
+	 * @brief Sets an event handle which is ready for callback execution
+	 */
+	void readyEventHandle(EventHandleBase* handle) noexcept;
 
 	/**
 	 * @return The maximum time the object can spend scanning and executing events.
@@ -253,16 +258,6 @@ private:
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator;
 
-	struct EventHandleContainer {
-		EventHandleBase* ownedEventHandle = nullptr;
-		StrongObjectPtr<class Threaded> eventThread = nullptr;
-
-		inline constexpr bool operator < (const EventHandleContainer& other) const noexcept{
-			return ownedEventHandle < other.ownedEventHandle;
-		}
-	};
-
-	std::set<EventHandleContainer> ownedEventHandles;
 	Queue<EventHandleBase*> readyEventHandles;
 
 	// Thread safety

@@ -1,5 +1,8 @@
 dependencies:
+  LovyanGFX:
+    git: https://github.com/lovyan03/LovyanGFX.git
 
+  lvgl/lvgl: ">=9.2.0"
   espressif/esp32-camera: ">=2.0.15"
 
   idf:

@@ -1,7 +1,7 @@
 #include "OutputGPIO.h"
 #include "Log/Log.h"
 
-OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIO> gpio) noexcept : OutputDriver(outputs), gpio(std::move(gpio)){
+OutputGPIO::OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept : OutputDriver(outputs), gpio(std::move(gpio)){
 
 }
 
@@ -11,7 +11,7 @@ void OutputGPIO::performWrite(int port, float value) noexcept{
 		CMF_LOG(CMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
-	gpio->write(pin, (bool) value ^ getInversions()[port]);
+	gpio->write(pin, (bool) value);
 }
 
 void OutputGPIO::performRegister(OutputPinDef output) noexcept {

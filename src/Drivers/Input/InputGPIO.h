@@ -2,7 +2,7 @@
 #define CMF_INPUTGPIO_H
 
 #include "Drivers/Interface/InputDriver.h"
-#include "Periphery/GPIO.h"
+#include "Periphery/GPIOPeriph.h"
 
 enum class PullMode : uint8_t {
 	None, Up, Down
@@ -17,14 +17,14 @@ class InputGPIO : public InputDriver<GPIOPinDef> {
 
 public:
 	InputGPIO() noexcept = default;
-	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) noexcept;
+	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept;
 
 private:
 	void scan() noexcept override;
 
 	void performRegister(GPIOPinDef input) noexcept override;
 
-	StrongObjectPtr<GPIO> gpio;
+	StrongObjectPtr<GPIOPeriph> gpio;
 };
 
 #endif //CMF_INPUTGPIO_H

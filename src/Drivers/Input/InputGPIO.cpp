@@ -1,7 +1,7 @@
 #include "InputGPIO.h"
 #include "Log/Log.h"
 
-InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO> gpio) noexcept : InputDriver(inputs), gpio(std::move(gpio)){
+InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept : InputDriver(inputs), gpio(std::move(gpio)){
 
 }
 
@@ -9,7 +9,7 @@ void InputGPIO::scan() noexcept{
 	Super::scan();
 	forEachInput([this](const GPIOPinDef& input){
 		const auto pin = (gpio_num_t) input.port;
-		getStates()[input.port] = gpio->read(pin) ^ input.inverted;
+		getStates()[input.port] = gpio->read(pin);
 	});
 }
 

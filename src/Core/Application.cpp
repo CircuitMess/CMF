@@ -18,6 +18,8 @@ void Application::registerLifetimeObject(Object* object) noexcept{
 
 void Application::postInitProperties() noexcept {
 	Super::postInitProperties();
+
+	eventScanner = newObject<EventScanner>();
 }
 
 void Application::begin() noexcept {

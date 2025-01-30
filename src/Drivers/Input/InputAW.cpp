@@ -8,7 +8,7 @@ void InputAW::scan() noexcept{
 	const auto inputReg = aw9523->readAll();
 
 	forEachInput([this, &inputReg](const InputPinDef& input){
-		getStates()[input.port] = (inputReg & (1 << input.port)) ^ input.inverted;
+		getStates()[input.port] = (inputReg & (1 << input.port));
 	});
 }
 
