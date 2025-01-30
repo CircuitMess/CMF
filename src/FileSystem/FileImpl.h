@@ -1,7 +1,6 @@
 #ifndef CMF_FILEIMPL_H
 #define CMF_FILEIMPL_H
 
-#include <string>
 #include <memory>
 
 class FileImpl;
@@ -31,8 +30,6 @@ public:
 
 	virtual bool seek(int pos, int mode) = 0;
 	virtual size_t pos() const = 0;
-
 };
-
 
 #endif //CMF_FILEIMPL_H

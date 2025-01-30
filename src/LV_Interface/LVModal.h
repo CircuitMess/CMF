@@ -1,5 +1,5 @@
-#ifndef CHATTER_FIRMWARE_LVMODAL_H
-#define CHATTER_FIRMWARE_LVMODAL_H
+#ifndef CMF_LVMODAL_H
+#define CMF_LVMODAL_H
 
 #include "LVObject.h"
 
@@ -22,8 +22,6 @@ private:
 	lv_obj_t* container;
 
 	lv_group_t* oldGroup;
-
 };
 
-
-#endif //CHATTER_FIRMWARE_LVMODAL_H
+#endif //CMF_LVMODAL_H

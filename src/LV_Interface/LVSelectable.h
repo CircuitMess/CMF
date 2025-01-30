@@ -1,5 +1,5 @@
-#ifndef CHATTER_FIRMWARE_LVSELECTABLE_H
-#define CHATTER_FIRMWARE_LVSELECTABLE_H
+#ifndef CMF_LVSELECTABLE_H
+#define CMF_LVSELECTABLE_H
 
 #include <lvgl.h>
 #include "LVObject.h"
@@ -25,5 +25,4 @@ private:
 	bool active = false;
 };
 
-
-#endif //CHATTER_FIRMWARE_LVSELECTABLE_H
+#endif //CMF_LVSELECTABLE_H

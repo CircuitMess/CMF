@@ -34,6 +34,6 @@ bool SPIFFS::init(){
 }
 
 File SPIFFS::open(const char* path, const char* mode){
-	std::string p = std::string(SPIFFS::Prefix) + std::string(path);
+	const std::string p = std::string(SPIFFS::Prefix) + std::string(path);
 	return FSFileImpl::open(p.c_str(), mode);
 }

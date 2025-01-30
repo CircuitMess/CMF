@@ -1,6 +1,7 @@
 #ifndef CMF_RAWCACHE_H
 #define CMF_RAWCACHE_H
 
+#include <unordered_map>
 #include <vector>
 #include "FileCache.h"
 
@@ -21,8 +22,6 @@ private:
 
 	bool loaded = false;
 	std::unordered_map<std::string, File> files;
-
 };
-
 
 #endif //CMF_RAWCACHE_H

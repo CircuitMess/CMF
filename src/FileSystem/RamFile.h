@@ -2,7 +2,6 @@
 #define CMF_RAMFILE_H
 
 #include <cstdint>
-#include <vector>
 #include <cstddef>
 #include <string>
 #include "FileImpl.h"
@@ -35,8 +34,6 @@ private:
 	std::string filePath;
 	size_t fileSize = 0;
 	bool borrowed = false;
-
 };
-
 
 #endif //CMF_RAMFILE_H

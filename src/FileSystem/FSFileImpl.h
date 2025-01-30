@@ -26,7 +26,6 @@ public:
 	bool seek(int pos, int mode) override;
 	size_t pos() const override;
 
-
 private:
 	FILE* file = nullptr;
 	std::string filePath;
@@ -35,7 +34,6 @@ private:
 	mutable bool written = false;
 
 	void stat() const;
-
 };
 
 #endif //CMF_FSFILEIMPL_H

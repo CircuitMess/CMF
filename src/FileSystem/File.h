@@ -1,5 +1,5 @@
-#ifndef BIT_FIRMWARE_FILE_H
-#define BIT_FIRMWARE_FILE_H
+#ifndef CMF_FILE_H
+#define CMF_FILE_H
 
 #include "FileImpl.h"
 #include <fstream>
@@ -32,9 +32,6 @@ public:
 
 protected:
 	FileImplPtr impl;
-
-
 };
 
-
-#endif //BIT_FIRMWARE_FILE_H
+#endif //CMF_FILE_H

@@ -1,6 +1,7 @@
-#include <esp_log.h>
 #include "FileArchive.h"
-#include "FS/RamFile.h"
+#include <vector>
+#include <esp_log.h>
+#include "FileSystem/RamFile.h"
 
 static const char* TAG = "FileArchive";
 
@@ -32,7 +33,7 @@ FileArchive::FileArchive(File file, const std::unordered_set<std::string>& exclu
 
 		if(name.empty()) break;
 
-		uint32_t size = 0;
+		size_t size = 0;
 		file.read((uint8_t*) &size, 4);
 
 		if(!excluded.contains(name)){

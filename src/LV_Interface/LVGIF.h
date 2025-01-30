@@ -1,5 +1,5 @@
-#ifndef LVGL_CPP_LVGIF_H
-#define LVGL_CPP_LVGIF_H
+#ifndef CMF_LVGIF_H
+#define CMF_LVGIF_H
 
 #include "LVObject.h"
 #include <vector>
@@ -42,5 +42,4 @@ private:
 	std::function<void()> cb;
 };
 
-
-#endif //LVGL_CPP_LVGIF_H
+#endif //CMF_LVGIF_H

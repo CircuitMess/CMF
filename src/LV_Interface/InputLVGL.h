@@ -1,5 +1,5 @@
-#ifndef CLOCKSTAR_FIRMWARE_INPUTLVGL_H
-#define CLOCKSTAR_FIRMWARE_INPUTLVGL_H
+#ifndef CMF_INPUTLVGL_H
+#define CMF_INPUTLVGL_H
 
 #include <lvgl.h>
 #include <map>
@@ -38,5 +38,4 @@ private:
 	static InputLVGL* instance;
 };
 
-
-#endif //CLOCKSTAR_FIRMWARE_INPUTLVGL_H
+#endif //CMF_INPUTLVGL_H

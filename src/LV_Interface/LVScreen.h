@@ -1,5 +1,5 @@
-#ifndef BATCONTROLLER_FIRMWARE_LVSCREEN_H
-#define BATCONTROLLER_FIRMWARE_LVSCREEN_H
+#ifndef CMF_LVSCREEN_H
+#define CMF_LVSCREEN_H
 
 #include "LVObject.h"
 #include <unordered_set>
@@ -37,8 +37,6 @@ private:
 
 	friend LVGL;
 	virtual void loop();
-
 };
 
-
-#endif //BATCONTROLLER_FIRMWARE_LVSCREEN_H
+#endif //CMF_LVSCREEN_H

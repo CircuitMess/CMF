@@ -1,5 +1,5 @@
-#ifndef CLOCKSTAR_FIRMWARE_LVGL_H
-#define CLOCKSTAR_FIRMWARE_LVGL_H
+#ifndef CMF_LVGL_H
+#define CMF_LVGL_H
 
 #include <lvgl.h>
 #include "LVScreen.h"
@@ -35,8 +35,6 @@ private:
 	static void flush(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map);
 
 	std::unique_ptr<LVScreen> currentScreen;
-
 };
 
-
-#endif //CLOCKSTAR_FIRMWARE_LVGL_H
+#endif //CMF_LVGL_H

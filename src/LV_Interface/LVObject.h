@@ -1,5 +1,5 @@
-#ifndef BATCONTROLLER_FIRMWARE_LVOBJECT_H
-#define BATCONTROLLER_FIRMWARE_LVOBJECT_H
+#ifndef CMF_LVOBJECT_H
+#define CMF_LVOBJECT_H
 
 #include <lvgl.h>
 
@@ -20,5 +20,4 @@ private:
 	bool deleting = false;
 };
 
-
-#endif //BATCONTROLLER_FIRMWARE_LVOBJECT_H
+#endif //CMF_LVOBJECT_H

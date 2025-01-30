@@ -13,8 +13,6 @@ private:
 	static constexpr const char* Prefix = "/spiffs";
 
 	static bool inited;
-
 };
-
 
 #endif //CMF_SPIFFS_H

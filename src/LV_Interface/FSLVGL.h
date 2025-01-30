@@ -1,13 +1,13 @@
-#ifndef CLOCKSTAR_FIRMWARE_FSLVGL_H
-#define CLOCKSTAR_FIRMWARE_FSLVGL_H
+#ifndef CMF_FSLVGL_H
+#define CMF_FSLVGL_H
 
 #include <lvgl.h>
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
 #include <memory>
-#include "FS/RawCache.h"
-#include "FS/FileArchive.h"
+#include "FileSystem/RawCache.h"
+#include "FileSystem/FileArchive.h"
 #include "Object/Object.h"
 
 class FSLVGL : public Object {
@@ -38,8 +38,6 @@ private:
 	void* lvDirOpen(const char* path);
 	lv_fs_res_t lvDirRead(void* dir, char* fn, uint32_t fnLen);
 	lv_fs_res_t lvDirClose(void* dir);
-
 };
 
-
-#endif //CLOCKSTAR_FIRMWARE_FSLVGL_H
+#endif //CMF_FSLVGL_H

@@ -1,8 +1,7 @@
-#ifndef CLOCKSTAR_FIRMWARE_LVSTYLE_H
-#define CLOCKSTAR_FIRMWARE_LVSTYLE_H
+#ifndef CMF_LVSTYLE_H
+#define CMF_LVSTYLE_H
 
 #include <lvgl.h>
-
 
 class LVStyle {
 public:
@@ -15,5 +14,4 @@ private:
 	lv_style_t style{};
 };
 
-
-#endif //CLOCKSTAR_FIRMWARE_LVSTYLE_H
+#endif //CMF_LVSTYLE_H

@@ -1,6 +1,7 @@
 #ifndef CMF_ARCHIVECACHE_H
 #define CMF_ARCHIVECACHE_H
 
+#include <vector>
 #include "FileCache.h"
 #include "FileArchive.h"
 
@@ -18,8 +19,6 @@ private:
 
 	bool loaded = false;
 	std::unordered_map<std::string, FileArchive> archives;
-
 };
-
 
 #endif //CMF_ARCHIVECACHE_H

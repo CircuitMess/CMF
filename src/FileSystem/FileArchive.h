@@ -1,10 +1,9 @@
 #ifndef CMF_FILEARCHIVE_H
 #define CMF_FILEARCHIVE_H
 
-#include <vector>
 #include <unordered_map>
 #include <string>
-#include "FS/File.h"
+#include "FileSystem/File.h"
 #include <unordered_set>
 
 class FileArchive {
@@ -25,8 +24,6 @@ private:
 
 	bool externalData = false;
 	uint8_t* data = nullptr;
-
 };
-
 
 #endif //CMF_FILEARCHIVE_H
