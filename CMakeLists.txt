@@ -42,6 +42,6 @@ file(GLOB_RECURSE LIBS "lib/*/src/**.cpp" "lib/*/src/**.c")
 
 set(LIBS_INCL "lib/glm/glm" CACHE INTERNAL "" FORCE)
 
-set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" CACHE INTERNAL "" FORCE)
+set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" "esp_adc" CACHE INTERNAL "" FORCE)
 
 idf_component_register(SRCS ${SOURCES}  ${LIBS} INCLUDE_DIRS "src"  ${LIBS_INCL} REQUIRES ${REQUIRED_COMPONENTS})
