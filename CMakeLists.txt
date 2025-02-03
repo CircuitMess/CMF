@@ -42,6 +42,6 @@ file(GLOB_RECURSE LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib/*/src/**.cpp" "${CMAKE_C
 
 set(LIBS_INCL "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm/glm" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libhelix-aac/src" CACHE INTERNAL "" FORCE)
 
-set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" "esp_adc" CACHE INTERNAL "" FORCE)
+set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" "esp_adc" "esp_wifi" CACHE INTERNAL "" FORCE)
 
 idf_component_register(SRCS ${SOURCES}  ${LIBS} INCLUDE_DIRS "src"  ${LIBS_INCL} REQUIRES ${REQUIRED_COMPONENTS})
