@@ -73,7 +73,7 @@ public:
 	 * @return The created singleton if successful, nullptr otherwise.
 	 */
 	template<typename T, typename = std::enable_if<std::derived_from<T, Singleton>, T>::type>
-	T* registerSingleton(const Class* cls = nullptr) const noexcept {
+	T* registerSingleton(const Class* cls = nullptr) noexcept {
 		if(T* existingSingleton = getSingleton<T>(cls)){
 			return existingSingleton;
 		}
@@ -90,7 +90,7 @@ public:
 			return nullptr;
 		}
 
-		singletons.insert(newSingleton);
+		singletons.insert(cast<Singleton>(newSingleton.get()));
 		return *newSingleton;
 	}
 

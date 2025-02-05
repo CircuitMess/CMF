@@ -11,10 +11,10 @@ public:
 	OutputDigAW() = default;
 	OutputDigAW(const std::vector<OutputPinDef>& outputs, AW9523* aw9523);
 
-private:
 	void performWrite(int port, float value) noexcept override;
 	void performRegister(OutputPinDef output) noexcept override;
 
+private:
 	StrongObjectPtr<AW9523> aw9523;
 };
 

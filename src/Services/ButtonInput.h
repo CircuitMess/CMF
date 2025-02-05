@@ -1,5 +1,5 @@
-#ifndef CMF_TEMPLATE_BUTTONINPUT_H
-#define CMF_TEMPLATE_BUTTONINPUT_H
+#ifndef CMF_BUTTONINPUT_H
+#define CMF_BUTTONINPUT_H
 
 #include "Drivers/Interface/InputDriver.h"
 #include "Entity/AsyncEntity.h"
@@ -16,9 +16,9 @@ public:
 	};
 
 	DECLARE_EVENT(ButtonInputEvent, ButtonInput, Enum<int>, Action)
-	ButtonInputEvent event = ButtonInputEvent(this);
+	ButtonInputEvent OnButtonEvent = ButtonInputEvent(this);
 
-	void reg(std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept;
+	void reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept;
 
 	void reg(Enum<int> button, InputPin pin) noexcept;
 
@@ -41,4 +41,4 @@ private:
 	static constexpr uint64_t DebounceTime = 5; // [ms]
 };
 
-#endif //CMF_TEMPLATE_BUTTONINPUT_H
+#endif //CMF_BUTTONINPUT_H

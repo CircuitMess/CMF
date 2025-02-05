@@ -3,7 +3,7 @@
 
 ButtonInput::ButtonInput() : AsyncEntity(SleepTime / portTICK_PERIOD_MS, 4*1024, 6, 0){}
 
-void ButtonInput::reg(std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
+void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
 	for(auto& r: registrations){
 		reg(r.first, r.second);
 	}
@@ -63,7 +63,7 @@ void ButtonInput::pressed(int btn){
 	btnState[btn] = true;
 	dbTime[btn] = 0;
 
-	event.broadcast(btn, Action::Press);
+	OnButtonEvent.broadcast(btn, Action::Press);
 }
 
 void ButtonInput::released(int btn){
@@ -84,5 +84,5 @@ void ButtonInput::released(int btn){
 	btnState[btn] = false;
 	dbTime[btn] = 0;
 
-	event.broadcast(btn, Action::Release);
+	OnButtonEvent.broadcast(btn, Action::Release);
 }
