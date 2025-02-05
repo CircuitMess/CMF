@@ -39,7 +39,7 @@ void WiFi::startAccessPoint(const std::string& name, const std::string& password
         .ap = {
             .channel = channel,
             .authmode = WIFI_AUTH_WPA2_PSK,
-            .ssid_hidden = true,
+            .ssid_hidden = false,
             .max_connection = maxConnections,
         },
     };
