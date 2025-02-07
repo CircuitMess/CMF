@@ -2,6 +2,7 @@
 #define CMF_ARCHIVE_H
 
 #include <queue>
+#include <queue>
 #include <string>
 
 /**
@@ -31,6 +32,8 @@ public:
 	 * @param queue Queue containing the archive data. Queue is empty after constructor finishes execution.
 	 */
 	Archive(std::queue<uint8_t>&& queue) noexcept;
+
+	inline size_t size() const noexcept { return byteBuffer.size(); }
 
 	/**
 	 * @brief Default destructor.
