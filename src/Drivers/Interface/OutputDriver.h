@@ -36,8 +36,8 @@ public:
 };
 
 struct OutputPin {
-	OutputDriverBase* driver;
-	int port;
+	OutputDriverBase* driver = nullptr;
+	int port = -1;
 };
 
 template<typename T = OutputPinDef> requires std::derived_from<T, OutputPinDef>
