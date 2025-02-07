@@ -41,19 +41,8 @@ protected:
 	virtual void tick(float deltaTime) noexcept override;
 
 private:
-	DECLARE_EVENT(StartingTypeSetEvent, StateMachine);
-	StartingTypeSetEvent onStartingTypeSet = StartingTypeSetEvent(this);
-
-private:
 	SubclassOf<State> startingStateType;
 	StrongObjectPtr<State> current;
-
-private:
-	/**
-	 * @brief Event callback, triggers the tick when called, called after the starting state type is set.
-	 * Creates the current state object from the set starting type.
-	 */
-	void onStartingTypeSetCallback() noexcept;
 };
 
 #endif //CMF_STATEMACHINE_H

@@ -1,12 +1,10 @@
 #include "StateMachine.h"
 #include "Memory/ObjectMemory.h"
 
-StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 2048) {
-	onStartingTypeSet.bind(this, &StateMachine::onStartingTypeSetCallback);
-}
+StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 3072) {}
 
 TickType_t StateMachine::getEventScanningTime() const noexcept{
-	return current.isValid() ? 0 : portMAX_DELAY;
+	return 0;
 }
 
 void StateMachine::setStartingStateType(const SubclassOf<State>& type) noexcept{
@@ -19,7 +17,6 @@ void StateMachine::setStartingStateType(const SubclassOf<State>& type) noexcept{
 	}
 
 	startingStateType = type;
-	onStartingTypeSet.broadcast();
 }
 
 void StateMachine::tick(float deltaTime) noexcept{
@@ -35,11 +32,7 @@ void StateMachine::tick(float deltaTime) noexcept{
 			current = newObject<State>(*nextStateType, this);
 			current->onTransitionFrom(previousType);
 		}
-	}
-}
-
-void StateMachine::onStartingTypeSetCallback() noexcept{
-	if(!current.isValid() && startingStateType != nullptr){
+	}else if(startingStateType != nullptr) {
 		current = newObject<State>(*startingStateType, this);
 	}
 }
