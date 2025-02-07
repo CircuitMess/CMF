@@ -32,6 +32,7 @@ public:
 
 	virtual void send() noexcept{ }
 
+protected:
 	virtual void performWrite(int port, float value) noexcept{ }
 };
 
