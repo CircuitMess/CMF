@@ -127,6 +127,8 @@ inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, 
 	}
 
 	object->serialize(archive);
+
+	return object;
 }
 
 /**
