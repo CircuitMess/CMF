@@ -353,7 +353,7 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
 }
 
 void WiFi::createNetif() const noexcept {
-    if(type != WiFiType::AccessPoint || type != WiFiType::Station) {
+    if(type != WiFiType::AccessPoint && type != WiFiType::Station) {
         CMF_LOG(WiFi, LogLevel::Warning, "Attempted to create a netif for a WiFi type that is not yet supported.");
         return;
     }
