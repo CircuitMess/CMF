@@ -188,6 +188,18 @@ void WiFi::setTargetParameters(const std::string& ssid, const std::string& passw
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &cfg_wifi));
 }
 
+std::vector<wifi_ap_record_t> WiFi::getAPRecords(size_t maxScanSize) const noexcept {
+    std::vector<wifi_ap_record_t> result(maxScanSize);
+
+    memset(result.data(), 0, maxScanSize * sizeof(wifi_ap_record_t));
+
+    uint16_t number = maxScanSize;
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, result.data()));
+    result.resize(number);
+
+    return result;
+}
+
 void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
     CMF_LOG(WiFi, LogLevel::Info, "WiFi native event received: %ld", id);
 

@@ -72,6 +72,7 @@ public:
     void disconnect() const noexcept;
     int getConnectionRSSI() const noexcept;
     void setTargetParameters(const std::string& ssid, const std::string& password) const noexcept;
+    std::vector<wifi_ap_record_t> getAPRecords(size_t maxScanSize) const noexcept;
 
 private:
     WiFiType type;
