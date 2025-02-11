@@ -1,7 +1,7 @@
 #include "StateMachine.h"
 #include "Memory/ObjectMemory.h"
 
-StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 3072) {}
+StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 4 * 1024) {}
 
 TickType_t StateMachine::getEventScanningTime() const noexcept{
 	return 0;
