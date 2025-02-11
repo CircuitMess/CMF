@@ -182,8 +182,8 @@ public:
 	}
 
 	void reg(const std::vector<std::pair<Monos, OutputPin>>& monoRegs){
-		for(const auto& reg: monoRegs){
-			reg(reg.first, reg.second);
+		for(const auto& entry: monoRegs){
+			reg(entry.first, entry.second);
 		}
 	}
 
@@ -192,8 +192,8 @@ public:
 	}
 
 	void reg(const std::vector<std::tuple<RGBs, OutputPin, OutputPin, OutputPin>>& rgbRegs){
-		for(const auto& reg: rgbRegs){
-			reg(std::get<0>(reg), std::get<1>(reg), std::get<2>(reg), std::get<3>(reg));
+		for(const auto& entry: rgbRegs){
+			reg(std::get<0>(entry), std::get<1>(entry), std::get<2>(entry), std::get<3>(entry));
 		}
 	}
 
