@@ -181,8 +181,20 @@ public:
 		monos->reg(led, { pin });
 	}
 
+	void reg(const std::vector<std::pair<Monos, OutputPin>>& monoRegs){
+		for(const auto& reg: monoRegs){
+			reg(reg.first, reg.second);
+		}
+	}
+
 	void reg(RGBs led, OutputPin pin_r, OutputPin pin_g, OutputPin pin_b) noexcept{
 		rgbs->reg(led, { pin_r, pin_g, pin_b });
+	}
+
+	void reg(const std::vector<std::tuple<RGBs, OutputPin, OutputPin, OutputPin>>& rgbRegs){
+		for(const auto& reg: rgbRegs){
+			reg(std::get<0>(reg), std::get<1>(reg), std::get<2>(reg), std::get<3>(reg));
+		}
 	}
 
 	void off(Monos led) noexcept{
