@@ -1,12 +1,11 @@
 #include "ADCReader.h"
 #include <algorithm>
+#include <utility>
 #include "Log/Log.h"
 
 DEFINE_LOG(ADCReader)
 
-ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibration, StrongObjectPtr<ADCFilter> filter){
-	this->filter = StrongObjectPtr<ADCFilter>{filter};
-
+ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibration, StrongObjectPtr<ADCFilter> filter) : filter(std::move(filter)){
 	adc_unit_t unit;
 	adc_channel_t chan;
 	auto err = adc_oneshot_io_to_channel(gpio, &unit, &chan);
