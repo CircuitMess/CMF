@@ -7,6 +7,9 @@
 
 class Object;
 
+template<typename T>
+class StrongObjectPtr;
+
 /**
  * @brief Class registry is used internally by CMF to track all existing object classes by their ID.
  */
@@ -51,7 +54,7 @@ public:
 	/**
 	 * @return A default object represented by this class.
 	 */
-	virtual Object* createDefaultObject() const noexcept;
+	virtual StrongObjectPtr<Object> createDefaultObject() const noexcept;
 
 	/**
 	 * @return The ID of the class. Each class has a unique ID

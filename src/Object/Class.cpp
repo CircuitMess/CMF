@@ -1,5 +1,6 @@
 #include "Class.h"
 #include "Object.h"
+#include "Memory/SmartPtr/StrongObjectPtr.h"
 
 const Class* ClassRegistry::getClass(uint64_t ID) const noexcept{
 	if(!classes.contains(ID)){
@@ -29,8 +30,12 @@ Class::Class(uint64_t ID) noexcept : classID(ID) {
 	registry->registerClass(this);
 }
 
-Object* Class::createDefaultObject()  const noexcept {
+StrongObjectPtr<Object> Class::createDefaultObject()  const noexcept {
 	void* temp = operator new(sizeof(Object));
 	memset(temp, 0, sizeof(Object));
+
+	// This is used to make sure the new object is valid in its constructor
+	StrongObjectPtr<Object> tempPtr = static_cast<Object*>(temp);
+
 	return new(temp) Object();
 }

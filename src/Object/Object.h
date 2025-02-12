@@ -318,9 +318,12 @@ private:																													                                \
 			return std::is_same<__Type, __T>::value;																		                                \
 		}                                                                    												                                \
                                                                        														                                \
-        inline virtual Object* createDefaultObject() const noexcept override {  											                                \
+        inline virtual StrongObjectPtr<Object> createDefaultObject() const noexcept override {  											                \
 			void* temp = operator new(sizeof(ObjectName));																	                                \
 			memset(temp, 0, sizeof(ObjectName));																			                                \
+																																							\
+			StrongObjectPtr<ObjectName> tempPtr = static_cast<ObjectName*>(temp);																			\
+																																							\
 			return new(temp) ObjectName();																					                                \
 		}                                                                    												                                \
 																															                                \

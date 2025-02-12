@@ -40,12 +40,10 @@ public:
 			return;
 		}
 
-		Object* object = cls->createDefaultObject();
+		Object* object = cls->createDefaultObject().get();
 		if(object->isA<T>()){
 			subclass = cls;
 		}
-
-		delete object;
 	}
 
 	/**

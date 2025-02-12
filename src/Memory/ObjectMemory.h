@@ -65,6 +65,10 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 	// TODO change this to better support with API
 	void* temp = operator new(sizeof(T));
 	memset(temp, 0, sizeof(T));
+
+	// This is used to make sure the new object is valid in its constructor
+	StrongObjectPtr<T> tempPtr = static_cast<T*>(temp);
+
 	StrongObjectPtr<T> newObject = new(temp) T(args...);
 
 	initObject(cast<Object>(newObject.get()), owner);
@@ -85,7 +89,7 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
 		return nullptr;
 	}
 
-	StrongObjectPtr<T> newObjectPtr = cast<T>(cls->createDefaultObject());
+	StrongObjectPtr<T> newObjectPtr = cast<T>(cls->createDefaultObject().get());
 	if(!newObjectPtr.isValid()){
 		return nullptr;
 	}
