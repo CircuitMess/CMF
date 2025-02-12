@@ -32,12 +32,13 @@ public:
 
 	virtual void send() noexcept{ }
 
+protected:
 	virtual void performWrite(int port, float value) noexcept{ }
 };
 
 struct OutputPin {
-	OutputDriverBase* driver;
-	int port;
+	OutputDriverBase* driver = nullptr;
+	int port = -1;
 };
 
 template<typename T = OutputPinDef> requires std::derived_from<T, OutputPinDef>

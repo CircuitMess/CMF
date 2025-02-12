@@ -9,7 +9,7 @@
 class ADCFilter : public Object {
 	GENERATED_BODY(ADCFilter, Object)
 public:
-	virtual uint16_t apply(uint16_t sample){
+	virtual float apply(float sample){
 		return sample;
 	};
 };
@@ -19,20 +19,27 @@ class EMA_ADCFilter : public ADCFilter {
 public:
 	EMA_ADCFilter(float factor = 1.0) : factor(factor){};
 
-	uint16_t apply(uint16_t sample) override{
-		if(last == UINT16_MAX){
+	float apply(float sample) override{
+		if(last == -1){
 			last = sample;
 			return last;
 		}
 
-		const auto val = (uint16_t) (factor * sample + (1.0f - factor) * last);
+		const auto val = factor * sample + (1.0f - factor) * last;
 		last = sample;
 		return val;
 	}
 
+	/**
+	 * Resets EMA filter and takes a fresh sample on the next call.
+	 */
+	void reset(){
+		last = -1;
+	}
+
 private:
 	float factor;
-	uint16_t last = UINT16_MAX;
+	float last = -1;
 };
 
 class ADCReader : public Object {
@@ -45,7 +52,7 @@ public:
 	 * @param cali Turn on/off internal ESP calibration
 	 * @param filter optional filter applied after reading, must be an ADCFilter implementation
 	 */
-	ADCReader(gpio_num_t gpio = GPIO_NUM_NC, adc_oneshot_chan_cfg_t config = {}, bool calibration = false, Object* filter = nullptr);
+	ADCReader(gpio_num_t gpio = GPIO_NUM_NC, adc_oneshot_chan_cfg_t config = {}, bool calibration = false, StrongObjectPtr<ADCFilter> filter = nullptr);
 
 	/** Sample and return new value. */
 	float sample();
