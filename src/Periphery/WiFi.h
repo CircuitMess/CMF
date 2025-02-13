@@ -31,10 +31,10 @@ public:
     DECLARE_EVENT(StationStopEvent, WiFi);
     StationStopEvent OnStationStop{this};
 
-    DECLARE_EVENT(StationConnectedEvent, WiFi, std::string, std::string, uint8_t, wifi_auth_mode_t, uint16_t);
+    DECLARE_EVENT(StationConnectedEvent, WiFi, /*std::string, std::string,*/ uint8_t, wifi_auth_mode_t, uint16_t);
     StationConnectedEvent OnStationConnected{this};
 
-    DECLARE_EVENT(StationDisconnectedEvent, WiFi, std::string, std::string, uint8_t, int8_t);
+    DECLARE_EVENT(StationDisconnectedEvent, WiFi, /*std::string, std::string,*/ uint8_t, int8_t);
     StationDisconnectedEvent OnStationDisconnected{this};
 
     DECLARE_EVENT(StationAuthModeChangedEvent, WiFi, wifi_auth_mode_t, wifi_auth_mode_t);
@@ -47,10 +47,10 @@ public:
     DECLARE_EVENT(AccessPointStopEvent, WiFi);
     AccessPointStopEvent OnAccessPointStop{this};
 
-    DECLARE_EVENT(AccessPointConnectionEvent, WiFi, std::string, uint8_t, bool);
+    DECLARE_EVENT(AccessPointConnectionEvent, WiFi, /*std::string,*/ uint8_t, bool);
     AccessPointConnectionEvent OnAccessPointConnection{this};
 
-    DECLARE_EVENT(AccessPointDisconnectionEvent, WiFi, std::string, uint8_t, bool, uint8_t);
+    DECLARE_EVENT(AccessPointDisconnectionEvent, WiFi, /*std::string,*/ uint8_t, bool, uint8_t);
     AccessPointDisconnectionEvent OnAccessPointDisconnection{this};
 
 public:

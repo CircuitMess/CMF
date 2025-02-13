@@ -1,6 +1,6 @@
 #include "Application.h"
 
-Application::Application() noexcept : Super() {
+Application::Application() noexcept : Super(0, 12 * 1024) {
 	if(ApplicationInstance == nullptr){
 		ApplicationInstance = this;
 	}

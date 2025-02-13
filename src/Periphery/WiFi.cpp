@@ -238,10 +238,10 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
                 break;
             }
 
-            const std::string ssid(reinterpret_cast<const char *>(connected->ssid), connected->ssid_len);
-            const std::string bssid(reinterpret_cast<const char *>(connected->bssid), 6);
+            //const std::string ssid(reinterpret_cast<const char*>(connected->ssid), connected->ssid_len);
+            //const std::string bssid(reinterpret_cast<const char*>(connected->bssid), 6);
 
-            OnStationConnected.broadcast(ssid, bssid, connected->channel, connected->authmode, connected->aid);
+            OnStationConnected.broadcast(/*ssid, bssid,*/ connected->channel, connected->authmode, connected->aid);
 
             break;
         }
@@ -251,10 +251,10 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
                 break;
             }
 
-            const std::string ssid(reinterpret_cast<const char *>(disconnected->ssid), disconnected->ssid_len);
-            const std::string bssid(reinterpret_cast<const char *>(disconnected->bssid), 6);
+            //const std::string ssid(reinterpret_cast<const char*>(disconnected->ssid), disconnected->ssid_len);
+            //const std::string bssid(reinterpret_cast<const char*>(disconnected->bssid), 6);
 
-            OnStationDisconnected.broadcast(ssid, bssid, disconnected->reason, disconnected->rssi);
+            OnStationDisconnected.broadcast(/*ssid, bssid,*/ disconnected->reason, disconnected->rssi);
 
             break;
         }
@@ -300,9 +300,9 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
                 break;
             }
 
-            const std::string mac(reinterpret_cast<const char *>(connected->mac), 6);
+            //const std::string mac(reinterpret_cast<const char *>(connected->mac), 6);
 
-            OnAccessPointConnection.broadcast(mac, connected->aid, connected->is_mesh_child);
+            OnAccessPointConnection.broadcast(/*mac,*/ connected->aid, connected->is_mesh_child);
 
             break;
         }
@@ -312,9 +312,9 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
                 break;
             }
 
-            const std::string mac(reinterpret_cast<const char *>(disconnected->mac), 6);
+            //const std::string mac(reinterpret_cast<const char *>(disconnected->mac), 6);
 
-            OnAccessPointDisconnection.broadcast(mac, disconnected->aid, disconnected->is_mesh_child, disconnected->reason);
+            OnAccessPointDisconnection.broadcast(/*mac,*/ disconnected->aid, disconnected->is_mesh_child, disconnected->reason);
 
             break;
         }
