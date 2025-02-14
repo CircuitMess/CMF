@@ -6,17 +6,19 @@
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
 
-Object::Object() noexcept : id(ObjectIndex++){
-	destroyMutex.lock();
-}
+Object::Object() noexcept : id(ObjectIndex++){}
 
 void Object::postInitProperties() noexcept{}
 
 bool Object::canDelete() noexcept{
-	return destroyMutex.try_lock();
+	std::lock_guard lock(destroyMutex);
+
+	return canBeDeleted;
 }
 
 void Object::destroy() noexcept{
+	std::lock_guard lock(destroyMutex);
+
 	markedForDestroy = true;
 
 	onDestroy();
@@ -38,7 +40,7 @@ void Object::onDestroy() noexcept{
 		return false;
 	});
 
-	destroyMutex.unlock();
+	canBeDeleted = true;
 }
 
 void Object::setOwner(Object* object) noexcept{

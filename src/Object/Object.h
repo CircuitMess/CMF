@@ -254,6 +254,7 @@ private:
 	const uint32_t id;
 
 	std::atomic<bool> markedForDestroy;
+	std::atomic<bool> canBeDeleted;
 	WeakObjectPtr<Object> owner;
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator;
