@@ -9,7 +9,7 @@ void AACSource::open(const std::string& path){
 		return;
 	}
 
-	if(decoder == nullptr){
+	if(decoder){
 		AACFreeDecoder(decoder);
 	}
 
