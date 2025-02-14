@@ -3,6 +3,8 @@
 
 #include "ObjectPtr.h"
 
+#include <Log/Log.h>
+
 /**
  * @brief Strong object pointer holds a strong reference to an instance of an object,
  * which works towards keeping the object from being destroyed.
@@ -39,6 +41,26 @@ public:
 	 * @param other The weak object pointer being moved.
 	 */
 	inline constexpr StrongObjectPtr(ObjectPtr<T, false>&& other) noexcept : ObjectPtr<T, true>(std::move(other)) {}
+
+	/**
+	 * @brief Copy constructor for an object pointer with different object type,
+	 * and same or different lifetime management. The other pointer is invalidated.
+	 * @tparam _T The object type of the object pointer being copied.
+	 * @tparam _KeepAlive The lifetime management type of the object pointer being copied.
+	 * @param other The object pointer being copied.
+	 */
+	template<typename _T, bool _KeepAlive>
+	inline constexpr StrongObjectPtr(const ObjectPtr<_T, _KeepAlive>& other) noexcept : ObjectPtr<T, true>(other) {}
+
+	/**
+	 * @brief Move constructor for an object pointer with different object type,
+	 * and same or different lifetime management. The other pointer is invalidated.
+	 * @tparam _T The object type of the object pointer being moved.
+	 * @tparam _KeepAlive The lifetime management type of the object pointer being copied.
+	 * @param other The object pointer being copied.
+	 */
+	template<typename _T, bool _KeepAlive>
+	inline constexpr StrongObjectPtr(ObjectPtr<_T, _KeepAlive>&& other) noexcept : ObjectPtr<T, true>(std::move(other)) {}
 
 	/**
 	 * @brief Constructor from a raw object pointer.

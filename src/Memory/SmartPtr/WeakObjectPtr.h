@@ -41,6 +41,26 @@ public:
 	inline constexpr WeakObjectPtr(ObjectPtr<T, true>&& other) noexcept : ObjectPtr<T, false>(std::move(other)) {}
 
 	/**
+	 * @brief Copy constructor for an object pointer with different object type,
+	 * and same or different lifetime management. The other pointer is invalidated.
+	 * @tparam _T The object type of the object pointer being copied.
+	 * @tparam _KeepAlive The lifetime management type of the object pointer being copied.
+	 * @param other The object pointer being copied.
+	 */
+	template<typename _T, bool _KeepAlive>
+	inline constexpr WeakObjectPtr(const ObjectPtr<_T, _KeepAlive>& other) noexcept : ObjectPtr<T, false>(other) {}
+
+	/**
+	 * @brief Move constructor for an object pointer with different object type,
+	 * and same or different lifetime management. The other pointer is invalidated.
+	 * @tparam _T The object type of the object pointer being moved.
+	 * @tparam _KeepAlive The lifetime management type of the object pointer being copied.
+	 * @param other The object pointer being copied.
+	 */
+	template<typename _T, bool _KeepAlive>
+	inline constexpr WeakObjectPtr(ObjectPtr<_T, _KeepAlive>&& other) noexcept : ObjectPtr<T, false>(std::move(other)) {}
+
+	/**
 	 * @brief Constructor from a raw object pointer.
 	 * @param object Object being pointed to.
 	 */
