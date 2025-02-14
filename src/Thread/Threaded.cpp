@@ -68,9 +68,11 @@ void Threaded::start() noexcept{
 	};
 
 	if(core == -1){
-		xTaskCreate(function, name.c_str(), stackSize, this, priority, &task);
+		const auto ret = xTaskCreate(function, name.c_str(), stackSize, this, priority, &task);
+		assert(ret == pdPASS);
 	}else{
-		xTaskCreatePinnedToCore(function, name.c_str(), stackSize, this, priority, &task, core);
+		const auto ret = xTaskCreatePinnedToCore(function, name.c_str(), stackSize, this, priority, &task, core);
+		assert(ret == pdPASS);
 	}
 }
 
