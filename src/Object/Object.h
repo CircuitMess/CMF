@@ -293,6 +293,8 @@ protected:																																			        \
 	inline static constexpr uint32_t __getTemplateHash() noexcept { return TemplateTypesInfo<T1, ##__VA_ARGS__>::TypesHash(); }						        \
 private:																																			        \
 
+#define TEMPLATED_TYPE(...) __VA_ARGS__
+
 /**
  * @brief Macro used by classes that extend objects (templated and not) to generate functionality needed for class distinguishing, casting and inheritance functionality.
  * This macro should be defined at the beginning of the class in the header file.
