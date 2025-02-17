@@ -10,8 +10,7 @@ class LEDFadeFunction : public LEDFunction<LED, DataT> {
 public:
 	LEDFadeFunction() = default;
 
-	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount) : start(start), end(end), period(period), count(loopsCount){
-	}
+	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount) : start(start), end(end), period(period), count(loopsCount){}
 
 	DataT getValue() const noexcept override{
 		float t = 0.5 * cos(2 * M_PI * timeCounter / period) + 0.5;

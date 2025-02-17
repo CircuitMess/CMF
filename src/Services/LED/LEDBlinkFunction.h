@@ -16,8 +16,7 @@ public:
 	 * @param period - On/Off blink period in seconds
 	 * @param count - number of blink cycles to be repeated, or 0 for infinite blinks
 	 */
-	LEDBlinkFunction(DataT value, float period, uint32_t count = 0) : value(value), count(count), period(period){
-	}
+	LEDBlinkFunction(DataT value, float period, uint32_t count = 0) : value(value), count(count), period(period){}
 
 	DataT getValue() const noexcept override{
 		if(state) return value;
@@ -27,7 +26,6 @@ public:
 
 	bool isDone() const noexcept override{
 		if(count != 0 && elapsedCount >= count){
-			printf("done\n");
 			return true;
 		}
 

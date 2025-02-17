@@ -9,7 +9,7 @@
 #include "Memory/ObjectMemory.h"
 #include "Object/SubclassOf.h"
 
-template<typename LED = int, typename DataT = float>
+template<typename LED, typename DataT>
 class LEDFunction : public SyncEntity {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
 	GENERATED_BODY(LEDFunction, SyncEntity)
@@ -185,7 +185,7 @@ class LED : public AsyncEntity {
 	GENERATED_BODY(LED, AsyncEntity)
 
 public:
-	LED() : AsyncEntity(2 / portTICK_PERIOD_MS, 4 * 1024, 8, 0){
+	LED() noexcept : Super(2 / portTICK_PERIOD_MS, 4 * 1024, 8, 0){
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 	}
