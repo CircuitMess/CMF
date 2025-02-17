@@ -1,7 +1,23 @@
 menu "CMF"
 
-config CMF_GRAPHICS
-	bool "Include graphics extension"
-	default "y"
+config CMF_LVGL
+    bool "Include LVGL extension"
+    default "n"
+
+config CMF_LGFX
+    bool "Include LGFX extension"
+    default "n"
+
+config CMF_AUDIO
+    bool "Include audio extension"
+    default "n"
+
+config CMF_CAMERA
+    bool "Include camera extension"
+    default "n"
+
+config CMF_WIFI
+    bool "Include WiFi extension"
+    default "n"
 
 endmenu
