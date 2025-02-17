@@ -2,10 +2,14 @@
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
 
+DEFINE_LOG(Camera)
+
 Camera::Camera(camera_config_t config, I2C* i2c, std::function<void(sensor_t*)> sensorConfig) : config(config), i2c(i2c), sensorConfig(sensorConfig){
-	gpio = ApplicationStatics::getApplication()->getPeriphery<GPIOPeriph>();
-	gpio->setMode((gpio_num_t) config.pin_pwdn, GPIOMode::Output);
-	gpio->write((gpio_num_t) config.pin_pwdn, true);
+	if(config.pin_pwdn >= 0){
+		gpio = ApplicationStatics::getApplication()->getPeriphery<GPIOPeriph>();
+		gpio->setMode((gpio_num_t) config.pin_pwdn, GPIOMode::Output);
+		gpio->write((gpio_num_t) config.pin_pwdn, true);
+	}
 
 	resWait = config.frame_size;
 	formatWait = config.pixel_format;
@@ -25,8 +29,6 @@ esp_err_t Camera::init(){
 	format = formatWait;
 	res = resWait;
 
-	config.pin_pwdn = -1;
-
 	config.frame_size = res;
 	config.pixel_format = format;
 
@@ -43,7 +45,7 @@ esp_err_t Camera::init(){
 	if(err == ESP_ERR_NOT_FOUND){
 		return err;
 	}else if(err != ESP_OK){
-		printf("Camera init failed with error 0x%x: %s\n", err, esp_err_to_name(err));
+		CMF_LOG(Camera, LogLevel::Error, "Camera init failed with error 0x%x: %s\n", err, esp_err_to_name(err));
 		return err;
 	}
 
@@ -80,8 +82,14 @@ void Camera::deinit(){
 }
 
 camera_fb_t* Camera::getFrame(){
-	if(!inited) return nullptr;
-	if(frame) return nullptr;
+	if(!inited){
+		CMF_LOG(Camera, LogLevel::Error, "Camera not inited before getFrame()");
+		return nullptr;
+	}
+	if(frame){
+		CMF_LOG(Camera, LogLevel::Error, "Previous camera frame not released before getFrame()");
+		return nullptr;
+	}
 
 	frame = esp_camera_fb_get();
 
