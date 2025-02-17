@@ -18,7 +18,7 @@
 class Threaded : public Object {
 	GENERATED_BODY(Threaded, Object)
 
-public:
+protected:
 	/**
 	 * @brief Constructs a thread without a callback.
 	 * @param threadName Name of the thread.
@@ -29,6 +29,7 @@ public:
 	 */
 	explicit Threaded(const std::string& threadName = "", TickType_t interval = 0, size_t threadStackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 
+public:
 	/**
 	 * @brief Constructs a thread with a callback function that is called one per loop cycle.
 	 * @param fn Callback function.
