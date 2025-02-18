@@ -36,7 +36,7 @@ void OutputPWM::attach(int port){
 			.timer_sel      = getTimer(port),
 			.duty           = 0,
 			.hpoint         = 0,
-			.flags = { .output_invert = getInversions()[port] }
+			.flags = { .output_invert = false } //this is accounted for in parent abstraction
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
