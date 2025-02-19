@@ -36,7 +36,7 @@ void OutputPWM::attach(int port){
 			.timer_sel      = getTimer(port),
 			.duty           = 0,
 			.hpoint         = 0,
-			.flags = { .output_invert = getInversions()[port] }
+			.flags = { .output_invert = false } //this is accounted for in parent abstraction
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
@@ -66,6 +66,9 @@ void OutputPWM::performWrite(int port, float value) noexcept{
 
 void OutputPWM::performRegister(OutputPWMPinDef output) noexcept{
 	gpios[output.port] = output.pin;
+
+	gpio_reset_pin(output.pin);
+	gpio_set_direction(output.pin, GPIO_MODE_OUTPUT);
 
 	const ledc_timer_config_t ledc_timer = {
 			.speed_mode       = getSpeedMode(output.port),

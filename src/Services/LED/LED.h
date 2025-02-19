@@ -16,6 +16,7 @@ class LEDFunction : public SyncEntity {
 
 public:
 	virtual bool isDone() const noexcept{ return true; }
+
 	virtual DataT getValue() const noexcept{ return {}; }
 };
 
@@ -70,22 +71,24 @@ public:
 		}
 	}
 
-	void set(LED led, const SubclassOf<LEDFunction<LED, DataT>>& functionClass, bool temp = false) noexcept{
+	void set(LED led, StrongObjectPtr<LEDFunction<LED, DataT>> function, bool temp = false) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
 			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return;
 		}
 
-		RegisteredFunction regFunc = { newObject<LEDFunction<LED, DataT>>(*functionClass, this), temp };
+		function->setOwner(this);
+
+		RegisteredFunction regFunc = { std::move(function), temp };
 
 		if(currentFunctions.contains(led)){
 			if(!currentFunctions[led].isTemporary){
-				prevFunctions[led] = currentFunctions[led];
+				prevFunctions[led] = std::move(currentFunctions[led]);
 			}
 		}
 
-		currentFunctions[led] = regFunc;
+		currentFunctions[led] = std::move(regFunc);
 	}
 
 	DataT getValue(LED led) noexcept requires (std::same_as<DataT, float>){
@@ -118,20 +121,29 @@ public:
 
 		std::lock_guard guard(accessMutex);
 
-		for(auto& [led, func]: currentFunctions){
-			const DataT level = func.function->getValue();
-			internalOn(led, level);
+		for(auto it = currentFunctions.begin(); it != currentFunctions.end();){
+			const auto& func = it->second;
+			const auto& led = it->first;
 
-			if(!func.function->isDone()) continue;
+			if(!func.function->isDone()){
+				const DataT level = func.function->getValue();
+				internalOn(led, level);
+
+				++it;
+				continue;
+			}
 
 			if(prevFunctions.contains(led)){
 				currentFunctions[led].function = std::move(prevFunctions[led].function);
 				currentFunctions[led].isTemporary = prevFunctions[led].isTemporary;
 				prevFunctions.erase(led);
+				++it;
 			}else if(prevStates.contains(led)){
 				internalOn(led, prevStates[led]);
+				it = currentFunctions.erase(it);
 			}else{
 				internalOff(led);
+				it = currentFunctions.erase(it);
 			}
 		}
 	}
@@ -169,10 +181,11 @@ private:
 
 template<typename Monos, typename RGBs>
 class LED : public AsyncEntity {
+	TEMPLATE_ATTRIBUTES(Monos, RGBs)
 	GENERATED_BODY(LED, AsyncEntity)
 
 public:
-	LED() noexcept : Super(30) {
+	LED() noexcept : Super(30, 4 * 1024, 8, 0) {
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 	}
@@ -213,12 +226,12 @@ public:
 		rgbs->on(led, level);
 	}
 
-	void set(Monos led, const SubclassOf<LEDFunction<Monos, float>>& functionClass, bool temp = false) noexcept{
-		monos->set(led, functionClass, temp);
+	void set(Monos led, StrongObjectPtr<LEDFunction<Monos, float>> function, bool temp = false) noexcept{
+		monos->set(led, std::move(function), temp);
 	}
 
-	void set(RGBs led, const SubclassOf<LEDFunction<RGBs, glm::vec3>>& functionClass, bool temp = false) noexcept{
-		rgbs->set(led, functionClass, temp);
+	void set(RGBs led, StrongObjectPtr<LEDFunction<RGBs, glm::vec3>> function, bool temp = false) noexcept{
+		rgbs->set(led, std::move(function), temp);
 	}
 
 	float getValue(Monos led) noexcept{

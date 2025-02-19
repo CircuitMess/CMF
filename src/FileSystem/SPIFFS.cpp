@@ -10,10 +10,11 @@ bool SPIFFS::inited = false;
 bool SPIFFS::init(){
 	if(inited) return true;
 
+	//TODO - expose this config to user
 	esp_vfs_spiffs_conf_t conf = {
 			.base_path = Prefix,
 			.partition_label = "storage",
-			.max_files = 8,
+			.max_files = 16,
 			.format_if_mount_failed = false
 	};
 
