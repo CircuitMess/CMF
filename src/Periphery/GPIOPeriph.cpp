@@ -1,6 +1,7 @@
 #include "GPIOPeriph.h"
 
 void GPIOPeriph::setMode(gpio_num_t gpioNum, GPIOMode mode){
+	gpio_reset_pin(gpioNum);
 	switch(mode){
 		case GPIOMode::Input:
 			gpio_set_direction(gpioNum, GPIO_MODE_INPUT);

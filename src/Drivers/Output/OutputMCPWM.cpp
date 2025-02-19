@@ -1,5 +1,6 @@
 #include "OutputMCPWM.h"
 #include "Log/Log.h"
+#include <driver/gpio.h>
 
 DEFINE_LOG(OutputMCPWM)
 
@@ -17,6 +18,9 @@ void OutputMCPWM::performRegister(OutputMCPWMPinDef output) noexcept{
 		CMF_LOG(OutputMCPWM, LogLevel::Error, "MCPWM minimum pulse width bigger than maximum (%lu > %lu)", output.MinPulseWidth, output.MaxPulseWidth);
 		return;
 	}
+
+	gpio_reset_pin(output.pin);
+	gpio_set_direction(output.pin, GPIO_MODE_OUTPUT);
 
 	auto& state = states[output.port];
 
