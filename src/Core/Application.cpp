@@ -1,6 +1,6 @@
 #include "Application.h"
 
-Application::Application() noexcept : Super(0, 12 * 1024) {
+Application::Application(TickType_t interval /*= 0*/, size_t stackSize /*= 12 * 1024*/) noexcept : Super(interval, stackSize) {
 	if(ApplicationInstance == nullptr){
 		ApplicationInstance = this;
 	}

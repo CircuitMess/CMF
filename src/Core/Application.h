@@ -25,7 +25,7 @@ public:
 	/**
 	 * @brief The default constructor. Sets the static instance pointer to the first constructed instance of the Application class that is still alive.
 	 */
-	Application() noexcept;
+	Application(TickType_t interval = 0, size_t stackSize = 12 * 1024) noexcept;
 
 	/**
 	 * @brief Deleted copy constructor.
