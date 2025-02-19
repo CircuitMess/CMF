@@ -33,10 +33,10 @@ public:
 
 	void reg(Servo servo, OutputPin pin){
 		pins[servo] = pin;
-		currentValues[servo] = 0;
-		targetValues[servo] = 0;
+		currentValues[servo] = 0.5f;
+		targetValues[servo] = 0.5f;
 
-		pin.driver->write(pin.port, false);
+		pin.driver->write(pin.port, 0.5f);
 	}
 
 	/**
