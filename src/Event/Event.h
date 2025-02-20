@@ -135,7 +135,7 @@ protected:
 
 		bool succeeded = true;
 
-		for(HandleContainer container : handles){
+		for(const HandleContainer& container : handles){
 			if(container.handle == nullptr || !container.owningObject.isValid()){
 				continue;
 			}
