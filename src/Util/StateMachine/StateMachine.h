@@ -30,7 +30,14 @@ public:
 	 * @brief Sets the starting state type and triggers the state machine to start ticking.
 	 * @param type The type of the starting state.
 	 */
-	void setStartingStateType(const SubclassOf<State>& type) noexcept;
+	template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, State>, T>::type>
+	void setStartingStateType(Args&&... args) noexcept{
+		if(current.isValid()){
+			return;
+		}
+
+		current = newObject<T>(this, std::forward<Args>(args)...);
+	}
 
 protected:
 	/**
