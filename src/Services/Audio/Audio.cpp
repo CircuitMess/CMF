@@ -7,15 +7,13 @@ Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source, OutputPin enablePin) : Au
 	this->enablePin = enablePin;
 }
 
-Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source) : AsyncEntity(0, 18 * 1024, 7, 1), i2s(std::move(i2s)){
+Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source) : AsyncEntity(0, 4 * 1024, 7, 1), i2s(std::move(i2s)){
 	if(!source->isA<AudioSource>()){
 		CMF_LOG(Audio, LogLevel::Error, "Given source isn't an AudioSource instance!");
 		abort();
 	}
 
 	this->source = cast<AudioSource>(source);
-
-	dataBuf.resize(BufSize, 0);
 
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, true);

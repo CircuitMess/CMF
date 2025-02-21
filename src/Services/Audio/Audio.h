@@ -38,11 +38,11 @@ private:
 
 	bool enabled = true;
 
-	std::vector<int16_t> dataBuf;
+	static constexpr size_t BufSize = 1024;
+	std::array<int16_t, BufSize> dataBuf;
 
 	bool playing = false;
 
-	static constexpr size_t BufSize = 1024;
 
 	float gain = 1.0f;
 };
