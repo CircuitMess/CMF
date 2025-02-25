@@ -59,6 +59,7 @@ protected:
 
 private:
 	bool begun;
+	std::mutex beginMutex;
 };
 
 #endif //CMF_ENTITY_H
