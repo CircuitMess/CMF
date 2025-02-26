@@ -22,6 +22,10 @@ uint64_t Class::getID() const noexcept{
 	return classID;
 }
 
+bool Class::isA(const Class *other) const noexcept {
+	return other->getID() == getID();
+}
+
 Class::Class(uint64_t ID) noexcept : classID(ID) {
 	if(registry == nullptr){
 		registry = new ClassRegistry();

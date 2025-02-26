@@ -72,6 +72,23 @@ public:
 	}
 
 	/**
+	 * @brief Checks if this class is of type given in the parameter, or derived from it.
+	 * @param other The type class being compared to.
+	 * @return True if same type or derived from it, false otherwise.
+	 */
+	virtual bool isA(const Class* other) const noexcept;
+
+	/**
+	 * @brief Checks if this class is of type given in the template, or derived from it.
+	 * @tparam __T The type of Object being compared to. Has to have a static implementation of 'staticClass()' function.
+	 * @return True if same type or derived from it, false otherwise.
+	 */
+	template<typename __T>
+	inline bool isA() const noexcept{
+		return isA(__T::staticClass());
+	}
+
+	/**
 	 * @param ID ID of the given class.
 	 * @return The class matching the ID from the ClassRegistry.
 	 */

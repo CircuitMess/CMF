@@ -12,6 +12,11 @@ Archive::Archive(std::queue<uint8_t>&& queue) noexcept : byteBuffer(std::move(qu
 
 void Archive::toByteArray(std::vector<uint8_t>& buffer) const noexcept {
 	buffer.clear();
+
+	if(buffer.capacity() < byteBuffer.size()) {
+		buffer.reserve(byteBuffer.size());
+	}
+
 	std::queue<uint8_t> bufferCopy = byteBuffer;
 
 	while(!bufferCopy.empty()){

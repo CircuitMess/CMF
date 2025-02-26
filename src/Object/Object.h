@@ -71,7 +71,7 @@ public:
 
 	/**
 	 * @brief Checks if this object is of type given in the template, or derived from it.
-	 * @tparam __T The type being compared to. Has to to have a static implementation of 'staticClass()' function.
+	 * @tparam __T The type being compared to. Has to have a static implementation of 'staticClass()' function.
 	 * @return True if same type or derived from it, false otherwise.
 	 */
 	template<typename __T>
@@ -320,6 +320,15 @@ private:																													                                \
 		inline static constexpr bool implements() noexcept {                 												                                \
 			return std::is_same<__Type, __T>::value;																		                                \
 		}                                                                    												                                \
+																																							\
+		inline virtual bool isA(const Class* other) const noexcept override {													                            \
+			return other->getID() == Class::getID() || SuperObject::staticClass()->isA(other);																\
+		}																														                            \
+																																							\
+		template<typename __Type>																									                        \
+		inline bool isA() const noexcept {																						                            \
+			return isA(__Type::staticClass());																						                        \
+		}																																					\
                                                                        														                                \
         inline virtual StrongObjectPtr<Object> createDefaultObject() const noexcept override {  											                \
 			void* temp = operator new(sizeof(ObjectName));																	                                \
@@ -352,7 +361,16 @@ private:																													                                \
 		inline static constexpr bool implements() noexcept {                 												                                \
 			return std::is_same<__Type, __T>::value || Inherited::template implements<__Type>();							                                \
 		}																													                                \
-																															                                \
+																																							\
+		inline virtual bool isA(const Class* other) const noexcept override {													                            \
+			return other->getID() == Class::getID() || Inherited::isA(other) || SuperObject::staticClass()->isA(other);										\
+		}																														                            \
+																																							\
+		template<typename __Type>																									                        \
+		inline bool isA() const noexcept {																						                            \
+			return isA(__Type::staticClass());																												\
+		}																																					\
+																																							\
 	protected:																												                                \
 		explicit inline __##ObjectName##_Class(uint64_t ID) noexcept : __##ObjectName##_Class<__Types...>(ID) {}			                                \
 	};																														                                \
