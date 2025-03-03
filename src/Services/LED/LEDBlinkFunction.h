@@ -13,10 +13,16 @@ public:
 
 	/**
 	 * @param value - ON value for blinking
-	 * @param period - On/Off blink period in seconds
+	 * @param period - blink period in seconds
+	 * @param onTime - blink duration in seconds, will be repeated every period, must be less than period!
 	 * @param count - number of blink cycles to be repeated, or 0 for infinite blinks
 	 */
-	LEDBlinkFunction(DataT value, float period, uint32_t count = 0) : value(value), count(count), period(period){}
+	LEDBlinkFunction(DataT value, float period, float onTime, uint32_t count = 0) : value(value), count(count), period(period), onTime(onTime){
+		if(onTime >= period){
+			CMF_LOG(CMF, LogLevel::Error, "Blink on-time must be less than period!");
+			invalidConfig = true;
+		}
+	}
 
 	DataT getValue() const noexcept override{
 		if(state) return value;
@@ -34,10 +40,12 @@ public:
 
 private:
 	void tick(float deltaTime) noexcept override{
+		if(invalidConfig) return;
+
 		timer += deltaTime;
 
 		state = false;
-		if(fmodf(timer, period) <= period / 2){
+		if(fmodf(timer, period) <= onTime){
 			state = true;
 		}
 
@@ -47,10 +55,13 @@ private:
 	DataT value;
 	uint32_t count;
 	float period;
+	float onTime;
 
 	float timer = 0;
 	uint32_t elapsedCount = 0;
 	bool state = false;
+
+	bool invalidConfig = false;
 };
 
 #endif //CMF_LEDBLINKFUNCTION_H

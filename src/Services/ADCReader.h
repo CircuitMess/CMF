@@ -26,7 +26,7 @@ public:
 		}
 
 		const auto val = factor * sample + (1.0f - factor) * last;
-		last = sample;
+		last = val;
 		return val;
 	}
 

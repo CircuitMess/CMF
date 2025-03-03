@@ -9,6 +9,8 @@
 #include "Memory/ObjectMemory.h"
 #include "Object/SubclassOf.h"
 
+DEFINE_LOG(LED)
+
 template<typename LED, typename DataT>
 class LEDFunction : public SyncEntity {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
@@ -121,6 +123,8 @@ public:
 
 		std::lock_guard guard(accessMutex);
 
+		if(currentFunctions.empty()) return;
+
 		for(auto it = currentFunctions.begin(); it != currentFunctions.end();){
 			const auto& func = it->second;
 			const auto& led = it->first;
@@ -151,17 +155,29 @@ public:
 private:
 	void internalOn(LED led, DataT level) noexcept requires (std::same_as<DataT, float>){
 		const auto& pin = outputs[led][0];
+
+		if(!pin.driver){
+			CMF_LOG(CMF, Error, "LED %d driver not set", (int) led);
+			return;
+		}
+
 		pin.driver->write(pin.port, level);
 	}
 
 	void internalOn(LED led, DataT level) noexcept requires (std::same_as<DataT, glm::vec3>){
 		for(int i = 0; i < outputs[led].size(); i++){
+
+			if(!outputs[led][i].driver) continue;
+
 			outputs[led][i].driver->write(outputs[led][i].port, level[i]);
 		}
 	}
 
 	void internalOff(LED led) noexcept{
 		for(const OutputPin& pin: outputs[led]){
+
+			if(!pin.driver) continue;
+
 			pin.driver->write(pin.port, false);
 		}
 	}
@@ -185,7 +201,7 @@ class LED : public AsyncEntity {
 	GENERATED_BODY(LED, AsyncEntity)
 
 public:
-	LED() noexcept : Super(30, 4 * 1024, 8, 0) {
+	LED() noexcept : Super(0, 4 * 1024, 8, 1) {
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 	}
