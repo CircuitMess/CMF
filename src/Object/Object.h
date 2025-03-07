@@ -210,6 +210,11 @@ public:
 	virtual TickType_t getEventScanningTime() const noexcept;
 
 	/**
+	* @param value The maximum allowed time to spend scanning the events for new triggers.
+	*/
+	void setEventScanningTime(TickType_t value) noexcept;
+
+	/**
 	 * @brief Serializes the object to the archive / deserializes the object from the archive.
 	 * @param archive The archive containing the data of the object before serialization / after deserialization.
 	 * @return The reference to the archive after serialization / deserialization.
@@ -252,6 +257,8 @@ private:
 	inline static uint32_t ObjectIndex = 0;
 
 	const uint32_t id;
+
+	TickType_t eventScanningTime;
 
 	std::atomic<bool> markedForDestroy;
 	std::atomic<bool> canBeDeleted;

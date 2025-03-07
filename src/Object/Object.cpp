@@ -171,7 +171,11 @@ void Object::readyEventHandle(EventHandleBase *handle) noexcept{
 }
 
 TickType_t Object::getEventScanningTime() const noexcept{
-	return 0;
+	return eventScanningTime;
+}
+
+void Object::setEventScanningTime(TickType_t value) noexcept {
+	eventScanningTime = value;
 }
 
 Archive& Object::serialize(Archive& archive) noexcept{

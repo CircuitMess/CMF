@@ -25,7 +25,7 @@ public:
 	/**
 	 * @brief The default constructor. Sets the static instance pointer to the first constructed instance of the Application class that is still alive.
 	 */
-	Application(TickType_t interval = 0, size_t stackSize = 12 * 1024) noexcept;
+	Application(TickType_t interval = 0, size_t stackSize = 12 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
 
 	/**
 	 * @brief Deleted copy constructor.
@@ -239,16 +239,6 @@ protected:
 	 * @param reason The reason why the entity instance stopped ticking and is getting destroyed.
 	 */
 	virtual void end(EndReason reason) noexcept override;
-
-	/**
-	 * @return The maximum wait time for receiving events.
-	 */
-	virtual TickType_t getEventScanningTime() const noexcept override;
-
-	/**
-	 * @return The frequency of ticks of the entity instance.
-	 */
-	virtual TickType_t getTickingInterval() const noexcept override;
 
 	/**
 	 * @brief

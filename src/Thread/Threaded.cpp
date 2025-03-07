@@ -141,7 +141,7 @@ void Threaded::threadFunction() noexcept{
 			semaphoreWait = loopInterval - (millis() - lastLoop + 1);
 		}
 
-		if(xSemaphoreTake(pauseSemaphore, semaphoreWait + 1) == pdTRUE){
+		if(xSemaphoreTake(pauseSemaphore, std::max(semaphoreWait, static_cast<TickType_t>(1))) == pdTRUE){
 			stop(0);
 			paused = true;
 			return;

@@ -1,7 +1,7 @@
 #include "StateMachine.h"
 #include "Memory/ObjectMemory.h"
 
-StateMachine::StateMachine(TickType_t interval/* = 0*/) noexcept : Super(interval, 4 * 1024) {}
+StateMachine::StateMachine(TickType_t interval/* = 0*/, size_t stackSize /*= 8 * 1024*/, uint8_t threadPriority /*= 0*/, int8_t cpuCore /*= -1*/) noexcept : Super(interval, stackSize, threadPriority, cpuCore) {}
 
 TickType_t StateMachine::getEventScanningTime() const noexcept{
 	return 0;

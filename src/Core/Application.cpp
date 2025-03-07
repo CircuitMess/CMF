@@ -1,6 +1,6 @@
 #include "Application.h"
 
-Application::Application(TickType_t interval /*= 0*/, size_t stackSize /*= 12 * 1024*/) noexcept : Super(interval, stackSize) {
+Application::Application(TickType_t interval /*= 0*/, size_t stackSize /*= 12 * 1024*/, uint8_t threadPriority /*= 5*/, int8_t cpuCore /*= -1*/) noexcept : Super(interval, stackSize, threadPriority, cpuCore) {
 	if(ApplicationInstance == nullptr){
 		ApplicationInstance = this;
 	}
@@ -48,12 +48,4 @@ void Application::end(EndReason reason) noexcept {
 
 SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexcept{
 	return GarbageCollector::staticClass();
-}
-
-TickType_t Application::getEventScanningTime() const noexcept{
-	return 0;
-}
-
-TickType_t Application::getTickingInterval() const noexcept{
-	return 0;
 }

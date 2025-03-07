@@ -66,21 +66,6 @@ protected:
 	 */
 	virtual void onDestroy() noexcept override;
 
-	/**
-	 * @return The maximum wait time on new events.
-	 */
-	virtual TickType_t getEventScanningTime() const noexcept override;
-
-	/**
-	 * @return The time between tick executions.
-	 */
-	virtual TickType_t getTickingInterval() const noexcept;
-
-	/**
-	 * @param value New ticking interval.
-	 */
-	void setTickingInterval(TickType_t value) noexcept;
-
 private:
 	/**
 	 * @brief The internal tick handle which is running within the native thread.
@@ -91,7 +76,6 @@ private:
 
 private:
 	StrongObjectPtr<Threaded> thread;
-	TickType_t interval;
 	size_t threadStackSize;
 	uint8_t threadPriority;
 	int8_t cpuCore;

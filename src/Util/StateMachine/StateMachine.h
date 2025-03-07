@@ -17,7 +17,7 @@ public:
 	 * @brief Constructs the state machine which starts ticking immediately and waits for the starting state type to be set.
 	 * @param interval The ticking interval of the state machine.
 	 */
-	explicit StateMachine(TickType_t interval = 0) noexcept;
+	explicit StateMachine(TickType_t interval = 0, size_t stackSize = 8 * 1024, uint8_t threadPriority = 0, int8_t cpuCore = -1) noexcept;
 
 	/**
 	 * @brief Sets the event scanning type of the AsyncEntity to 0 if the starting state type is set,
