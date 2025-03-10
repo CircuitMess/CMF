@@ -43,6 +43,7 @@ private:
 
 	bool playing = false;
 
+	SemaphoreHandle_t playSemaphore;
 
 	float gain = 1.0f;
 };

@@ -21,7 +21,7 @@ class Servos : public AsyncEntity {
 public:
 	Servos() = default;
 
-	Servos(const std::vector<ServoDef<Servo>>& servos, Object* easer = newObject<MotorsEaser>().get()) : Super(10 / portTICK_PERIOD_MS, 3 * 1024), servoDefs(servos){
+	Servos(const std::vector<ServoDef<Servo>>& servos, Object* easer = newObject<MotorsEaser>().get()) : Super(0, 3 * 1024, 8, 1), servoDefs(servos){
 		if(!easer->isA(MotorsEaser::staticClass())){
 			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
 			this->easer = newObject<MotorsEaser>().get();
@@ -29,6 +29,9 @@ public:
 		}
 
 		this->easer = easer;
+
+		outputSemaphore = xSemaphoreCreateBinary();
+		xSemaphoreTake(outputSemaphore, 0);
 	}
 
 	void reg(Servo servo, OutputPin pin){
@@ -50,6 +53,8 @@ public:
 		val = std::clamp(val, 0.f, 1.f);
 
 		targetValues[servo] = val;
+
+		xSemaphoreGive(outputSemaphore);
 	}
 
 	float get(Servo servo){
@@ -89,6 +94,10 @@ public:
 protected:
 	void tick(float deltaTime) noexcept override{
 		Super::tick(deltaTime);
+
+		if(!xSemaphoreTake(outputSemaphore, portMAX_DELAY)) {
+			return;
+		}
 
 		for(const auto& motorPin: pins){
 
@@ -131,6 +140,8 @@ private:
 	std::map<Servo, float> targetValues;
 
 	std::map<Servo, OutputPin> pins;
+
+	SemaphoreHandle_t outputSemaphore;
 };
 
 #endif //CMF_SERVOS_H

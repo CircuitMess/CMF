@@ -1,7 +1,7 @@
 #include "EventScanner.h"
 #include "EventHandle.h"
 
-EventScanner::EventScanner() : Super() {
+EventScanner::EventScanner() : Super(0, 4 * 1024, 8) {
     semaphore = xSemaphoreCreateBinary();
 }
 

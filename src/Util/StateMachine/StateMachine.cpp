@@ -3,10 +3,6 @@
 
 StateMachine::StateMachine(TickType_t interval/* = 0*/, size_t stackSize /*= 8 * 1024*/, uint8_t threadPriority /*= 0*/, int8_t cpuCore /*= -1*/) noexcept : Super(interval, stackSize, threadPriority, cpuCore) {}
 
-TickType_t StateMachine::getEventScanningTime() const noexcept{
-	return 0;
-}
-
 void StateMachine::setStartingStateType(const SubclassOf<State>& type) noexcept{
 	if(current.isValid()){
 		return;

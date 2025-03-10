@@ -20,13 +20,6 @@ public:
 	explicit StateMachine(TickType_t interval = 0, size_t stackSize = 8 * 1024, uint8_t threadPriority = 0, int8_t cpuCore = -1) noexcept;
 
 	/**
-	 * @brief Sets the event scanning type of the AsyncEntity to 0 if the starting state type is set,
-	 * otherwise waits indefinitely to avoid ticking without need when no initial state is valid.
-	 * @return The delay when scanning for events. 0 if starting type is set.
-	 */
-	virtual TickType_t getEventScanningTime() const noexcept override;
-
-	/**
 	 * @brief Sets the starting state type and triggers the state machine to start ticking.
 	 * @param type The type of the starting state.
 	 */

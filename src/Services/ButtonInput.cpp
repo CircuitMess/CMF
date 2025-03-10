@@ -1,7 +1,7 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
-ButtonInput::ButtonInput() : AsyncEntity(SleepTime / portTICK_PERIOD_MS, 4*1024, 6, 0){}
+ButtonInput::ButtonInput() : Super(SleepTime / portTICK_PERIOD_MS, 4*1024, 6, 1){}
 
 void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
 	for(auto& r: registrations){

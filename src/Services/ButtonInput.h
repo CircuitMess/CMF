@@ -37,7 +37,8 @@ private:
 
 	std::unordered_map<int, bool> btnState;
 	std::unordered_map<int, uint64_t> dbTime;
-	static constexpr uint64_t SleepTime = 5; // [ms]
+
+	static constexpr uint64_t SleepTime = 10; // [ms]
 	static constexpr uint64_t DebounceTime = 5; // [ms]
 };
 

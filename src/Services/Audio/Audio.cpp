@@ -13,6 +13,9 @@ Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source) : AsyncEntity(0, 4 * 1024
 		abort();
 	}
 
+	playSemaphore = xSemaphoreCreateBinary();
+	xSemaphoreTake(playSemaphore, 0);
+
 	this->source = cast<AudioSource>(source);
 
 	if(enablePin){
@@ -43,6 +46,8 @@ void Audio::play(const std::string& path){
 	source->open(path);
 
 	playing = true;
+
+	xSemaphoreGive(playSemaphore);
 }
 
 void Audio::stop(){
@@ -54,7 +59,13 @@ void Audio::stop(){
 }
 
 void Audio::tick(float deltaTime) noexcept{
-	if(!playing) return;
+	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
+		return;
+	}
+
+	if(!playing) {
+		return;
+	}
 
 	const size_t bytesToTransfer = source->getData((uint8_t*)dataBuf.data(), BufSize * sizeof(int16_t));
 

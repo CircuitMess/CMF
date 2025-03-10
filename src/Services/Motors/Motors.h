@@ -24,7 +24,7 @@ public:
 
 	Motors() = default;
 
-	Motors(const std::vector<MotorDef<Motor>>& motors, Object* easer = newObject<MotorsEaser>().get()) : Super(10 / portTICK_PERIOD_MS, 3 * 1024), motorDefs(motors){
+	Motors(const std::vector<MotorDef<Motor>>& motors, Object* easer = newObject<MotorsEaser>().get()) : Super(0, 3 * 1024, 8, 1), motorDefs(motors){
 		if(!easer->isA(MotorsEaser::staticClass())){
 			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
 			this->easer = newObject<MotorsEaser>().get();
@@ -32,6 +32,9 @@ public:
 		}
 
 		this->easer = easer;
+
+		outputSemaphore = xSemaphoreCreateBinary();
+		xSemaphoreTake(outputSemaphore, 0);
 	}
 
 	void reg(MotorDef<Motor> motor){
@@ -53,6 +56,8 @@ public:
 		val = std::clamp(val, -100.f, 100.f);
 
 		targetValues[motor] = val;
+
+		xSemaphoreGive(outputSemaphore);
 	}
 
 	float get(Motor motor){
@@ -73,6 +78,10 @@ public:
 protected:
 	void tick(float deltaTime) noexcept override{
 		Super::tick(deltaTime);
+
+		if(!xSemaphoreTake(outputSemaphore, portMAX_DELAY)) {
+			return;
+		}
 
 		for(const auto& motorPin: motorPins){
 
@@ -144,6 +153,8 @@ private:
 	};
 
 	std::map<Motor, MotorPins> motorPins;
+
+	SemaphoreHandle_t outputSemaphore;
 };
 
 #endif //CMF_MOTORS_H
