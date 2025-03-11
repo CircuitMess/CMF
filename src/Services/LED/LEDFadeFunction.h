@@ -10,13 +10,15 @@ class LEDFadeFunction : public LEDFunction<LED, DataT> {
 public:
 	LEDFadeFunction() = default;
 
-	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount) : start(start), end(end), period(period), count(loopsCount){}
+	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount, float startDelay = 0) :
+			start(start), end(end), period(period), count(loopsCount), startDelay(startDelay){}
 
 	DataT getValue() const noexcept override{
-		float t = 0.5 * cos(2 * M_PI * timeCounter / period) + 0.5;
+		if(!delayCleared && startDelay) return DataT{};
+
+		float t = -0.5 * cos(2 * M_PI * timeCounter / period) + 0.5;
 
 		return start * (1 - t) + end * t;
-
 	}
 
 	bool isDone() const noexcept override{
@@ -27,12 +29,18 @@ public:
 		return false;
 	}
 
-private:
-public:
 	void tick(float deltaTime) noexcept override{
 		SyncEntity::tick(deltaTime);
 
 		timeCounter += deltaTime;
+
+		if(!delayCleared && startDelay){
+			if(timeCounter < startDelay){
+				return;
+			}
+			delayCleared = true;
+			timeCounter = 0;
+		}
 
 		if(timeCounter > period){
 			elapsedCount++;
@@ -47,6 +55,9 @@ private:
 	float period;
 	uint32_t count;
 	uint32_t elapsedCount = 0;
+	float startDelay = 0;
+
+	bool delayCleared = false;
 
 	float timeCounter;
 };
