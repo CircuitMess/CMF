@@ -31,6 +31,7 @@ esp_err_t Camera::init(){
 
 	config.frame_size = res;
 	config.pixel_format = format;
+	config.sccb_i2c_port = (int)i2c->getPort();
 
 	if(format == PIXFORMAT_JPEG){
 		config.jpeg_quality = 12;
