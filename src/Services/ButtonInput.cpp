@@ -1,7 +1,7 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
-ButtonInput::ButtonInput() : Super(SleepTime / portTICK_PERIOD_MS, 4*1024, 6, 1){}
+ButtonInput::ButtonInput() : Super(SleepTime / portTICK_PERIOD_MS, 4*1024, 4, 1){}
 
 void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
 	for(auto& r: registrations){
@@ -25,6 +25,8 @@ bool ButtonInput::getState(Enum<int> button) noexcept{
 }
 
 void ButtonInput::tick(float deltaTime) noexcept{
+	Super::tick(deltaTime);
+
 	for(auto& source: inputSources){
 		source->scan();
 	}
