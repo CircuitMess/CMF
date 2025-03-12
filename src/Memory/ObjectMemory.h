@@ -122,7 +122,7 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, Object* owner = nullptr) noexcept {
 	OutArchive archive = data;
-	uint32_t classID = 0;
+	uint64_t classID = 0;
 	archive << classID;
 
 	StrongObjectPtr<T> object = newObject<T>(Class::getClasByID(classID), owner);
@@ -133,6 +133,32 @@ inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, 
 	object->serialize(archive);
 
 	return object;
+}
+
+/**
+ * @brief De-serializes an object of type T from a byte array with a given owner.
+ * @tparam T Type of object being de-serialized.
+ * @param data Byte array containing information about the object.
+ * @param owner Owner being set to the created object.
+ * @return True if successful, false if given object is invalid or of wrong type
+ */
+template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+inline bool objectFromByteArray(T* object, const std::vector<uint8_t>& data) noexcept {
+	if(!isValid(object)) {
+		return false;
+	}
+
+	OutArchive archive = data;
+	uint64_t classID = 0;
+	archive << classID;
+
+	if(!object->isA(Class::getClasByID(classID))) {
+		return false;
+	}
+
+	object->serialize(archive);
+
+	return true;
 }
 
 /**
