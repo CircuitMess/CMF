@@ -51,6 +51,10 @@ void Audio::play(const std::string& path){
 }
 
 void Audio::stop(){
+	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
+		return;
+	}
+
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, false);
 	}
@@ -83,6 +87,8 @@ void Audio::tick(float deltaTime) noexcept{
 	}
 
 	i2s->write(reinterpret_cast<uint8_t *>(dataBuf.data()), bytesToTransfer);
+
+	xSemaphoreGive(playSemaphore);
 }
 
 void Audio::setEnabled(bool enabled){
