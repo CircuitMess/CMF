@@ -11,13 +11,19 @@ DEFINE_LOG(Servos)
 template<typename Servo>
 struct ServoDef {
 	Servo motor;
+
+	/**
+	 * Minimum and maximum limit of servo range. (Default 0 - 1.0)
+	 * All values sent to this servo will be mapped to this range before pushing it to hardware.
+	 */
+	std::pair<float, float> allowedRange = { 0, 1 };
 	OutputPin pin;
 };
 
 template<typename Servo>
 class Servos : public AsyncEntity {
 	GENERATED_BODY(Servos, AsyncEntity);
-	TEMPLATE_ATTRIBUTES(Servo)
+TEMPLATE_ATTRIBUTES(Servo)
 public:
 	Servos() = default;
 
@@ -34,12 +40,13 @@ public:
 		xSemaphoreTake(outputSemaphore, 0);
 	}
 
-	void reg(Servo servo, OutputPin pin){
+	void reg(Servo servo, std::pair<float, float> allowedRange, OutputPin pin){
 		pins[servo] = pin;
+		allowedRanges[servo] = allowedRange;
 		currentValues[servo] = 0.5f;
 		targetValues[servo] = 0.5f;
 
-		pin.driver->write(pin.port, 0.5f);
+		pin.driver->write(pin.port, mapToServo(0.5f, servo));
 	}
 
 	/**
@@ -48,7 +55,10 @@ public:
 	 * @param val [0 - 1.0]
 	 */
 	void set(Servo servo, float val){
-		if(!targetValues.count(servo)) return;
+		if(!targetValues.count(servo)){
+			CMF_LOG(Servos, LogLevel::Warning, "!targetValues.count(servo)");
+			return;
+		}
 
 		val = std::clamp(val, 0.f, 1.f);
 
@@ -95,7 +105,7 @@ protected:
 	void tick(float deltaTime) noexcept override{
 		Super::tick(deltaTime);
 
-		if(!xSemaphoreTake(outputSemaphore, portMAX_DELAY)) {
+		if(!xSemaphoreTake(outputSemaphore, portMAX_DELAY)){
 			return;
 		}
 
@@ -103,17 +113,19 @@ protected:
 
 			const Servo motor = motorPin.first;
 
-			if(fabs(currentValues[motor] - targetValues[motor]) < 0.01) continue;
+			if(fabs(currentValues[motor] - targetValues[motor]) < 0.0001) continue;
+
+			xSemaphoreGive(outputSemaphore);
 
 			float oldValue = currentValues[motor];
 			float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), 0.f, 1.f);
 
-			currentValues[motor] = newValue;
 
-			if(fabs(newValue - oldValue) > 0.01){
+			if(fabs(newValue - oldValue) >= 0.0001){
+				currentValues[motor] = newValue;
 				const auto& pin = motorPin.second;
 
-				pin.driver->write(pin.port, newValue);
+				pin.driver->write(pin.port, mapToServo(newValue, motor));
 			}
 		}
 	}
@@ -122,7 +134,7 @@ protected:
 		Super::postInitProperties();
 
 		for(const auto& motor: servoDefs){
-			reg(motor.motor, motor.pin);
+			reg(motor.motor, motor.allowedRange, motor.pin);
 		}
 	}
 
@@ -141,7 +153,20 @@ private:
 
 	std::map<Servo, OutputPin> pins;
 
+	std::map<Servo, std::pair<float, float>> allowedRanges;
+
 	SemaphoreHandle_t outputSemaphore;
+
+	/**
+	 * Map value from 0 - 1 to servo's configured allowed range.
+	 */
+	float mapToServo(float val, Servo servo) const{
+		if(!allowedRanges.contains(servo)) return 0;
+
+		const std::pair<float, float>& range = allowedRanges.at(servo);
+
+		return val * (range.second - range.first) + range.first;
+	}
 };
 
 #endif //CMF_SERVOS_H
