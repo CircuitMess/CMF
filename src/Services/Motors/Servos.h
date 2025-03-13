@@ -23,7 +23,7 @@ struct ServoDef {
 template<typename Servo>
 class Servos : public AsyncEntity {
 	GENERATED_BODY(Servos, AsyncEntity);
-TEMPLATE_ATTRIBUTES(Servo)
+	TEMPLATE_ATTRIBUTES(Servo);
 public:
 	Servos() = default;
 
