@@ -70,7 +70,7 @@ public:
 	 */
 	inline size_t size() const noexcept {
 		if(begin > end){
-			return begin + bufferSize - end;
+			return bufferSize - begin + end + 1;
 		}
 
 		return end - begin;
@@ -96,7 +96,7 @@ public:
 	 * @return True if size equals capacity. False otherwise.
 	 */
 	inline bool full() const noexcept {
-		return size() >= bufferSize - 1;
+		return size() >= bufferSize;
 	}
 
 	/**
