@@ -50,7 +50,11 @@ void Audio::play(const std::string& path){
 	xSemaphoreGive(playSemaphore);
 }
 
-void Audio::stop(){
+void Audio::stop() {
+	if(!enabled || !playing) {
+		return;
+	}
+
 	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
 		return;
 	}
@@ -63,6 +67,8 @@ void Audio::stop(){
 }
 
 void Audio::tick(float deltaTime) noexcept{
+	Super::tick(deltaTime);
+
 	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
 		return;
 	}
@@ -76,6 +82,7 @@ void Audio::tick(float deltaTime) noexcept{
 	CMF_LOG(Audio, LogLevel::Debug, "audio tick bytes: %d", bytesToTransfer);
 
 	if(bytesToTransfer == 0){
+		xSemaphoreGive(playSemaphore);
 		stop();
 		return;
 	}
