@@ -24,11 +24,12 @@ public:
 
 	Motors() = default;
 
-	Motors(const std::vector<MotorDef<Motor>>& motors, Object* easer = newObject<MotorsEaser>().get()) : Super(0, 3 * 1024, 8, 1), motorDefs(motors){
+	Motors(const std::vector<MotorDef<Motor>>& motors, Object* easer = newObject<MotorsEaser>().get()) : Super(10, 3 * 1024, 6, 1), motorDefs(motors){
+		std::lock_guard guard(accessMutex);
+
 		if(!easer->isA(MotorsEaser::staticClass())){
 			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
 			this->easer = newObject<MotorsEaser>().get();
-			return;
 		}
 
 		this->easer = easer;
@@ -38,6 +39,8 @@ public:
 	}
 
 	void reg(MotorDef<Motor> motor){
+		std::lock_guard guard(accessMutex);
+
 		motor.digitalPin.driver->write(motor.digitalPin.port, false);
 		motor.analogPin.driver->write(motor.analogPin.port, false);
 
@@ -53,6 +56,8 @@ public:
 	 * @param val [-100, 100]
 	 */
 	void set(Motor motor, float val){
+		std::lock_guard guard(accessMutex);
+
 		val = std::clamp(val, -100.f, 100.f);
 
 		targetValues[motor] = val;
@@ -61,10 +66,14 @@ public:
 	}
 
 	float get(Motor motor){
+		std::lock_guard guard(accessMutex);
+
 		return targetValues[motor];
 	}
 
 	void dereg(Motor motor){
+		std::lock_guard guard(accessMutex);
+
 		if(!motorPins.count(motor)) return;
 
 		motorPins[motor].digitalPin.driver->write(motorPins[motor].digitalPin.port, false);
@@ -83,16 +92,25 @@ protected:
 			return;
 		}
 
+		std::lock_guard guard(accessMutex);
+
+		size_t completedCount = 0;
+
 		for(const auto& motorPin: motorPins){
 
-			const Motor motor = motorPin.first;
+			const int motor = motorPin.first;
 
-			if(std::round(currentValues[motor]) == std::round(targetValues[motor])) continue;
-
+			if(std::round(currentValues[motor]) == std::round(targetValues[motor])) {
+				++completedCount;
+				continue;
+			}
 
 			float oldValue = currentValues[motor];
-			float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), -100.f, 100.f);
 
+			// TODO good idea but works a little bit wonky
+			//float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), -100.f, 100.f);
+
+			float newValue = targetValues[motor];
 
 			currentValues[motor] = newValue;
 
@@ -123,6 +141,14 @@ protected:
 
 				pins.analogPin.driver->write(pins.analogPin.port, duty / 100.f);
 			}
+
+			if(std::round(newValue) == std::round(targetValues[motor])) {
+				++completedCount;
+			}
+		}
+
+		if(completedCount < motorPins.size()) {
+			xSemaphoreGive(outputSemaphore);
 		}
 	}
 
@@ -143,18 +169,20 @@ private:
 	 * Map of current motor values.
 	 * key = Motor[enum, int] , value = state[float]
 	 */
-	std::map<Motor, float> currentValues;
+	std::map<int, float> currentValues;
 
-	std::map<Motor, float> targetValues;
+	std::map<int, float> targetValues;
 
 	struct MotorPins {
 		OutputPin digitalPin;
 		OutputPin analogPin;
 	};
 
-	std::map<Motor, MotorPins> motorPins;
+	std::map<int, MotorPins> motorPins;
 
 	SemaphoreHandle_t outputSemaphore;
+
+	std::mutex accessMutex;
 };
 
 #endif //CMF_MOTORS_H
