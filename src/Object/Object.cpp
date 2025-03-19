@@ -108,8 +108,6 @@ void Object::scanEvents(TickType_t wait) noexcept{
 	const uint64_t begin = millis();
 	wait = std::min(wait, getEventScanningTime());
 
-	std::lock_guard lock(eventHandleMutex);
-
 	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max((int64_t) 0, (int64_t) wait - ((int64_t) millis() - (int64_t) begin))); ){
 		if(handle == nullptr){
 			continue;
@@ -165,8 +163,6 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 }
 
 void Object::readyEventHandle(EventHandleBase *handle) noexcept{
-	std::lock_guard lock(eventHandleMutex);
-
 	readyEventHandles.push(handle);
 }
 

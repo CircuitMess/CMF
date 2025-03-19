@@ -271,7 +271,6 @@ private:
 	// Thread safety
 	std::mutex ownershipMutex;
 	std::mutex instigatorMutex;
-	std::mutex eventHandleMutex;
 	std::mutex destroyMutex;
 	std::mutex eventScanningMutex;
 
