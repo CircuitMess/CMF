@@ -118,8 +118,9 @@ protected:
 			xSemaphoreGive(outputSemaphore);
 
 			float oldValue = currentValues[motor];
-			float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), 0.f, 1.f);
+			//float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), 0.f, 1.f);
 
+			const float newValue = targetValues[motor];
 
 			if(fabs(newValue - oldValue) >= 0.0001){
 				currentValues[motor] = newValue;
