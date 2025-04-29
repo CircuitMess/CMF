@@ -201,7 +201,7 @@ class LED : public AsyncEntity {
 	GENERATED_BODY(LED, AsyncEntity)
 
 public:
-	LED() noexcept : Super(15, 4 * 1024, 4, 1) {
+	LED() noexcept : Super(30, 4 * 1024, 4, -1) {
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 	}

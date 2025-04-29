@@ -133,7 +133,11 @@ void Object::registerEventHandle(EventHandleBase* handle) const noexcept{
 		return;
 	}
 
-	if(handle->getOwningObject() != this){
+	if(handle->getOwningObject() == nullptr) {
+		return;
+	}
+
+	if(handle->getOwningObject() != this && handle->getOwningObject()->getOutermostOwner() != this){
 		return;
 	}
 
@@ -149,7 +153,11 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 		return;
 	}
 
-	if(handle->getOwningObject() != this){
+	if(handle->getOwningObject() == nullptr) {
+		return;
+	}
+
+	if(handle->getOwningObject() != this && handle->getOwningObject()->getOutermostOwner() != this){
 		return;
 	}
 

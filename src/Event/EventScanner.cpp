@@ -54,6 +54,10 @@ void EventScanner::tick(float deltaTime) noexcept {
             continue;
         }
 
+        if(handle->getOwningObject()->getOutermostOwner() != nullptr) {
+            owner = handle->getOwningObject()->getOutermostOwner();
+        }
+
         owner->readyEventHandle(handle);
     }
 }

@@ -1790,7 +1790,13 @@ public:
 	 * @brief Destructor unregisters this event handle from the owning object, stopping its scanning.
 	 */
 	inline virtual ~EventHandle() noexcept override {
-		if(owningObject.isValid()){
+		if(!owningObject.isValid()) {
+			return;
+		}
+
+		if(Object* owner = owningObject->getOutermostOwner()) {
+			owner->unregisterEventHandle(this);
+		}else {
 			owningObject->unregisterEventHandle(this);
 		}
 	}
@@ -1812,16 +1818,24 @@ public:
 	 */
 	template<typename O, typename F>
 	inline EventHandle& bind(O* object, F&& function) noexcept {
-		if(owningObject.isValid()){
-			owningObject->unregisterEventHandle(this);
+		if(owningObject.isValid()) {
+			Object* owner = owningObject->getOutermostOwner();
+			if(owner == nullptr){
+				owner = owningObject.get();
+			}
+
+			owner->unregisterEventHandle(this);
 		}
 
 		owningObject = cast<Object>(object);
 		callback = BindHelper<Args...>::template get(object, function);
 
-		if(owningObject.isValid()){
-			owningObject->registerEventHandle(this);
+		Object* owner = owningObject->getOutermostOwner();
+		if(owner == nullptr){
+			owner = owningObject.get();
 		}
+
+		owner->registerEventHandle(this);
 
 		return *this;
 	}
@@ -1836,16 +1850,24 @@ public:
 	 */
 	template<typename O, typename F> requires (std::same_as<F, std::function<void(Args...)>> || std::same_as<F, std::function<void(Args...)>&> || std::same_as<F, const std::function<void(Args...)>&>)
 	inline EventHandle& bind(O* object, F&& function) noexcept {
-		if(owningObject.isValid()){
-			owningObject->unregisterEventHandle(this);
+		if(owningObject.isValid()) {
+			Object* owner = owningObject->getOutermostOwner();
+			if(owner == nullptr){
+				owner = owningObject.get();
+			}
+
+			owner->unregisterEventHandle(this);
 		}
 
 		owningObject = object;
 		callback = function;
 
-		if(owningObject.isValid()){
-			owningObject->registerEventHandle(this);
+		Object* owner = owningObject->getOutermostOwner();
+		if(owner == nullptr){
+			owner = owningObject.get();
 		}
+
+		owner->registerEventHandle(this);
 
 		return *this;
 	}

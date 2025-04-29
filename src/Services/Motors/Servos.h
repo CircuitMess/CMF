@@ -21,30 +21,19 @@ struct ServoDef {
 };
 
 template<typename Servo>
-class Servos : public AsyncEntity {
-	GENERATED_BODY(Servos, AsyncEntity);
+class Servos : public Object {
+	GENERATED_BODY(Servos, Object);
 	TEMPLATE_ATTRIBUTES(Servo);
+
 public:
 	Servos() = default;
 
-	Servos(const std::vector<ServoDef<Servo>>& servos, Object* easer = newObject<MotorsEaser>().get()) : Super(0, 3 * 1024, 8, 1), servoDefs(servos){
-		if(!easer->isA(MotorsEaser::staticClass())){
-			CMF_LOG(Motors, LogLevel::Error, "Easer parameter isn't a MotorsEaser instance!");
-			this->easer = newObject<MotorsEaser>().get();
-			return;
-		}
-
-		this->easer = easer;
-
-		outputSemaphore = xSemaphoreCreateBinary();
-		xSemaphoreTake(outputSemaphore, 0);
-	}
+	Servos(const std::vector<ServoDef<Servo>>& servos) noexcept : Super(), servoDefs(servos){}
 
 	void reg(Servo servo, std::pair<float, float> allowedRange, OutputPin pin){
 		pins[servo] = pin;
 		allowedRanges[servo] = allowedRange;
 		currentValues[servo] = 0.5f;
-		targetValues[servo] = 0.5f;
 
 		pin.driver->write(pin.port, mapToServo(0.5f, servo));
 	}
@@ -55,22 +44,29 @@ public:
 	 * @param val [0 - 1.0]
 	 */
 	void set(Servo servo, float val){
-		if(!targetValues.count(servo)){
-			CMF_LOG(Servos, LogLevel::Warning, "!targetValues.count(servo)");
+		if(!currentValues.count(servo)){
+			CMF_LOG(Servos, LogLevel::Warning, "!currentValues.count(servo)");
 			return;
 		}
 
 		val = std::clamp(val, 0.f, 1.f);
 
-		targetValues[servo] = val;
+		if(currentValues[servo] == val){
+			return;
+		}
 
-		xSemaphoreGive(outputSemaphore);
+		currentValues[servo] = val;
+
+		const OutputPin& pin = pins[servo];
+
+		TRACE_LOG("%lld", millis());
+		pin.driver->write(pin.port, mapToServo(val, servo));
 	}
 
 	float get(Servo servo){
-		if(!targetValues.count(servo)) return 0;
+		if(!currentValues.count(servo)) return 0;
 
-		return targetValues[servo];
+		return currentValues[servo];
 	}
 
 	void enable(Servo servo){
@@ -102,35 +98,6 @@ public:
 	}
 
 protected:
-	void tick(float deltaTime) noexcept override{
-		Super::tick(deltaTime);
-
-		if(!xSemaphoreTake(outputSemaphore, portMAX_DELAY)){
-			return;
-		}
-
-		for(const auto& motorPin: pins){
-
-			const Servo motor = motorPin.first;
-
-			if(fabs(currentValues[motor] - targetValues[motor]) < 0.0001) continue;
-
-			xSemaphoreGive(outputSemaphore);
-
-			float oldValue = currentValues[motor];
-			//float newValue = std::clamp(easer->easeValue(deltaTime, currentValues[motor], targetValues[motor]), 0.f, 1.f);
-
-			const float newValue = targetValues[motor];
-
-			if(fabs(newValue - oldValue) >= 0.0001){
-				currentValues[motor] = newValue;
-				const auto& pin = motorPin.second;
-
-				pin.driver->write(pin.port, mapToServo(newValue, motor));
-			}
-		}
-	}
-
 	void postInitProperties() noexcept override{
 		Super::postInitProperties();
 
@@ -140,8 +107,6 @@ protected:
 	}
 
 private:
-	StrongObjectPtr<MotorsEaser> easer = nullptr;
-
 	const std::vector<ServoDef<Servo>> servoDefs;
 
 	/**
@@ -150,13 +115,9 @@ private:
 	 */
 	std::map<Servo, float> currentValues;
 
-	std::map<Servo, float> targetValues;
-
 	std::map<Servo, OutputPin> pins;
 
 	std::map<Servo, std::pair<float, float>> allowedRanges;
-
-	SemaphoreHandle_t outputSemaphore;
 
 	/**
 	 * Map value from 0 - 1 to servo's configured allowed range.
