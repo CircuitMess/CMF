@@ -1,7 +1,7 @@
 #ifndef CMF_CAST_H
 #define CMF_CAST_H
 
-#include "Object/Object.h"
+class Object;
 
 /**
  * @brief Casts a given object to another type, if they are compatible and safe to cast between them.
