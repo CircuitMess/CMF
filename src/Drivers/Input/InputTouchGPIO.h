@@ -2,11 +2,12 @@
 #define CMF_INPUTTOUCHGPIO_H
 
 #include "Drivers/Interface/InputDriver.h"
-#include <hal/touch_sensor_types.h>
 
 struct TouchPinDef : InputPinDef {
 	uint32_t threshold;
 };
+
+/* TODO - refactor using new ESP-IDF Touch API */
 
 class InputTouchGPIO : public InputDriver<TouchPinDef> {
 	GENERATED_BODY(InputTouchGPIO, InputDriver);

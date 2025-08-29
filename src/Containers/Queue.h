@@ -30,10 +30,16 @@ public:
 	 * @param other The queue being copied.
 	 */
 	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
+		std::lock_guard lock(other.accessMutex);
+
 		buffer = allocator.allocate(bufferSize);
 
 		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
 			buffer[i] = T(std::move_if_noexcept(other.buffer[i]));
+		}
+
+		if(xSemaphoreTake(other.waitSemaphore, 0)) {
+			xSemaphoreGive(waitSemaphore);
 		}
 	}
 
@@ -41,14 +47,17 @@ public:
 	 * @brief The move constructor from another queue with the same data type.
 	 * @param other The queue being moved. The queue is empty after the constructor finishes execution.
 	 */
-	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), accessMutex(std::move(other.accessMutex)) {
+	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
+		std::lock_guard lock(other.accessMutex);
 		other.buffer = 0;
 		other.bufferSize = 0;
 		other.begin = other.end = 0;
-		other.accessMutex = nullptr;
-		waitSemaphore = other.waitSemaphore;
+
+		if(xSemaphoreTake(other.waitSemaphore, 0)) {
+			xSemaphoreGive(waitSemaphore);
+		}
+
 		other.waitSemaphore = nullptr;
-		accessMutex.unlock();
 	}
 
 	/**

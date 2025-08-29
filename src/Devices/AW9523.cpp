@@ -17,10 +17,13 @@
 
 #define CFG_MASK (0b00010011)
 
-#define IT(pin) ((pin) <= 7 ? 0 : 1)
-#define REG(reg, pin) ((reg) + IT(pin))
-#define BIT(pin) ((pin) <= 7 ? (pin) : (pin) - 8)
-#define MASK(pin) (1 << BIT(pin))
+static uint8_t AW_IT(uint8_t pin){ return (pin <= 7) ? 0 : 1; }
+
+static uint8_t AW_REG(uint8_t reg, uint8_t pin){ return reg + AW_IT(pin); }
+
+static uint8_t AW_BIT(uint8_t pin){ return (pin <= 7) ? pin : (pin - 8); }
+
+static uint8_t AW_MASK(uint8_t pin){ return 1 << AW_BIT(pin); }
 
 static const char* TAG = "AW9523";
 
@@ -66,10 +69,10 @@ void AW9523::resetDimOutputs(){
 void AW9523::pinMode(uint8_t pin, AW9523::PinMode mode){
 	if(pin >= 16) return;
 
-	const uint8_t it = IT(pin);
-	const uint8_t mask = MASK(pin);
-	const uint8_t regDir = REG(REG_DIR, pin);
-	const uint8_t regMode = REG(REG_MODE, pin);
+	const uint8_t it = AW_IT(pin);
+	const uint8_t mask = AW_MASK(pin);
+	const uint8_t regDir = AW_REG(REG_DIR, pin);
+	const uint8_t regMode = AW_REG(REG_MODE, pin);
 	uint8_t& intRegDir = regs.dir[it];
 	uint8_t& intRegMode = regs.mode[it];
 
@@ -93,14 +96,14 @@ void AW9523::pinMode(uint8_t pin, AW9523::PinMode mode){
 bool AW9523::read(uint8_t pin){
 	if(pin >= 16) return false;
 
-	const uint8_t reg = REG(REG_INPUT, pin);
-	return readReg(reg) & MASK(pin);
+	const uint8_t reg = AW_REG(REG_INPUT, pin);
+	return readReg(reg) & AW_MASK(pin);
 }
 
 
 uint16_t AW9523::readAll(){
-	const auto regL = REG(REG_INPUT, 0);
-	const auto regH = REG(REG_INPUT, 15);
+	const auto regL = AW_REG(REG_INPUT, 0);
+	const auto regH = AW_REG(REG_INPUT, 15);
 
 	return (readReg(regH) << 8) | readReg(regL);
 }
@@ -108,9 +111,9 @@ uint16_t AW9523::readAll(){
 void AW9523::write(uint8_t pin, bool state){
 	if(pin >= 16) return;
 
-	const uint8_t reg = REG(REG_OUTPUT, pin);
-	const uint8_t mask = MASK(pin);
-	uint8_t& intReg = regs.output[IT(pin)];
+	const uint8_t reg = AW_REG(REG_OUTPUT, pin);
+	const uint8_t mask = AW_MASK(pin);
+	uint8_t& intReg = regs.output[AW_IT(pin)];
 
 	if(state){
 		intReg |= mask;
@@ -132,9 +135,9 @@ void AW9523::dim(uint8_t pin, uint8_t factor){
 void AW9523::setInterrupt(uint8_t pin, bool enabled){
 	if(pin >= 16) return;
 
-	const uint8_t reg = REG(REG_INTR, pin);
-	const uint8_t mask = MASK(pin);
-	uint8_t& intReg = regs.intr[IT(pin)];
+	const uint8_t reg = AW_REG(REG_INTR, pin);
+	const uint8_t mask = AW_MASK(pin);
+	uint8_t& intReg = regs.intr[AW_IT(pin)];
 
 	if(enabled){
 		intReg |= mask;
