@@ -21,7 +21,7 @@ public:
 	 * @param object Object that implements the template type I interface, used to construct the internals of an Interface instance.
 	 */
 	template<typename O, typename = std::enable_if<std::derived_from<O, Object>, O>::type>
-	inline constexpr Interface(O* object) noexcept {
+	explicit inline constexpr Interface(O* object) noexcept {
 		if(object == nullptr){
 			return;
 		}
@@ -98,7 +98,7 @@ public:
 	}
 
 	/**
-	 * @return The interface exended by the object.
+	 * @return The interface extended by the object.
 	 */
 	inline constexpr I* operator *() const noexcept {
 		return getInterface();
