@@ -57,7 +57,7 @@ bool TCA9555::read(uint8_t pin){
 
 uint16_t TCA9555::readAll(){
 	std::vector<uint8_t> val(2);
-	ESP_ERROR_CHECK(i2c->write_read(Addr, REG_INPUT, val, 2));
+	ESP_ERROR_CHECK(i2c->write_read(Addr, REG_INPUT, val));
 	return (val[1] << 8) | val[0];
 }
 
