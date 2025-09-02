@@ -1,6 +1,6 @@
 #include "InputTCA.h"
 
-InputTCA::InputTCA(const std::vector<InputPinDef>& inputs, TCA9555* tca9555){
+InputTCA::InputTCA(const std::vector<InputPinDef>& inputs, TCA9555* tca9555) : InputDriver<>(inputs), tca9555(tca9555){
 
 }
 

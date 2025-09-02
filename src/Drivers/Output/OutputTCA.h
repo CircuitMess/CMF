@@ -9,7 +9,7 @@ class OutputTCA : public OutputDriver<> {
 
 public:
 	OutputTCA() = default;
-	OutputTCA(const std::vector<OutputPinDef>& outputs, TCA9555* aw9523);
+	OutputTCA(const std::vector<OutputPinDef>& outputs, TCA9555* tca9555);
 
 	void performWrite(int port, float value) noexcept override;
 	void performRegister(OutputPinDef output) noexcept override;
