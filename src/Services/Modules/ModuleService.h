@@ -118,7 +118,7 @@ private:
 
 			busContexts[bus].type = ModuleType::Unknown;
 
-			ESP_LOGI(TAG, "Module %d removed from bus %d", (int)removed, bus);
+			ESP_LOGI(TAG, "Module %d removed from bus %d", (int) removed, bus);
 			modulesEvent.broadcast(bus, removed, Action::Remove);
 
 			busContexts[bus].instance = nullptr;
@@ -129,22 +129,24 @@ private:
 			busContexts[bus].type = addr;
 			busContexts[bus].inserted = true;
 
-			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int)addr, bus);
+			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) addr, bus);
 			modulesEvent.broadcast(bus, addr, Action::Insert);
 
 
-			busContexts[bus].instance = newObject<ModuleDevice>(*DeviceMap.at(addr), this);
-			//Set the input/output pins and I2C for newly created ModuleDevice
+			if(DeviceMap.contains(addr)){
+				busContexts[bus].instance = newObject<ModuleDevice>(*DeviceMap.at(addr), this);
 
-			std::array<InputPin, 6> inputs;
-			std::array<OutputPin, 6> outputs;
-			for(uint8_t i = 0; i < 6; ++i){
-				inputs[i] = InputPin{ busPins[bus].subAddressPins[i].inputDriver, busPins[bus].subAddressPins[i].port };
-				outputs[i] = OutputPin{ busPins[bus].subAddressPins[i].outputDriver, busPins[bus].subAddressPins[i].port };
+				//Set the input/output pins and I2C for newly created ModuleDevice
+				std::array<InputPin, 6> inputs;
+				std::array<OutputPin, 6> outputs;
+				for(uint8_t i = 0; i < 6; ++i){
+					inputs[i] = InputPin{ busPins[bus].subAddressPins[i].inputDriver, busPins[bus].subAddressPins[i].port };
+					outputs[i] = OutputPin{ busPins[bus].subAddressPins[i].outputDriver, busPins[bus].subAddressPins[i].port };
+				}
+				busContexts[bus].instance->setInputs(inputs);
+				busContexts[bus].instance->setOutputs(outputs);
+				busContexts[bus].instance->setI2C(busPins[bus].i2c);
 			}
-			busContexts[bus].instance->setInputs(inputs);
-			busContexts[bus].instance->setOutputs(outputs);
-			busContexts[bus].instance->setI2C(busPins[bus].i2c);
 		}
 	}
 
