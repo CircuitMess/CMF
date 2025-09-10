@@ -1,5 +1,4 @@
 #include "I2C.h"
-#include <driver/i2c.h>
 #include "Log/Log.h"
 
 I2C::I2C(I2CPort port, gpio_num_t sda, gpio_num_t scl) noexcept : Super(), port(i2c_port_t(port)){

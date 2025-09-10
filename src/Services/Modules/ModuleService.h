@@ -20,6 +20,8 @@
  * @tparam NumBus Number of independent UMAX ports (defaults to 1)
 */
 
+using namespace Modules;
+
 template<uint8_t NumBus = 1>
 class ModuleService : public AsyncEntity {
 	GENERATED_BODY(ModuleService, AsyncEntity);
@@ -30,59 +32,44 @@ public:
 	};
 
 	/**
-	 * Helper struct for pins which can be input and output, depending on Module type.
-	 */
-	struct IOPin {
-		InputDriverBase* inputDriver;
-		OutputDriverBase* outputDriver;
-		int port;
-	};
-
-	struct BusPins {
-		InputPin addr[6], detPins[2];
-		I2C* i2c;
-		IOPin subAddressPins[6];
-	};
-
-
-	/**
 	 * Generic constructor
 	 * @param busPins array of UMAX bus pin structures
 	 */
-	ModuleService(std::array<BusPins, NumBus> busPins = {}) : AsyncEntity(), busPins(std::move(busPins)){
+	ModuleService(std::array<Modules::BusPins, NumBus> busPins = {}) : AsyncEntity(), busPins(std::move(busPins)){
 		populateInputDrivers();
-
-
+		for(uint8_t i = 0; i < NumBus; i++){
+			registerSubAddressPinsInput(i);
+		}
 	}
 
 	/**
 	 * Specialized constructor for a single bus
 	 * @param busPinsSingle UMAX bus pins
 	 */
-	ModuleService(const BusPins& busPinsSingle, std::enable_if_t<NumBus == 1, int> = 0) : ModuleService(std::array<BusPins, 1>{ busPinsSingle }){
+	ModuleService(const Modules::BusPins& busPinsSingle, std::enable_if_t<NumBus == 1, int> = 0) : ModuleService(std::array<Modules::BusPins, 1>{ busPinsSingle }){
 
 	}
 
 	/**
 	 * uint8_t - busID
-	 * ModuleType - type of module
+	 * Type - type of module
 	 * Action - Insert or Remove
 	 */
-	DECLARE_EVENT(ModulesEvent, ModuleService, uint8_t, ModuleType, Action)
+	DECLARE_EVENT(ModulesEvent, ModuleService, uint8_t, Type, Action)
 
 	ModulesEvent modulesEvent{ this };
 
-	StrongObjectPtr<ModuleDevice> getDevice(uint8_t bus){
+	StrongObjectPtr<ModuleDevice> getDevice(uint8_t bus = 0){
 		if(bus >= NumBus) return nullptr;
 
 		return busContexts[bus].instance;
 	}
 
-	ModuleType getInserted(uint8_t bus){
-		if(bus >= NumBus) return ModuleType::Unknown;
+	Type getInserted(uint8_t bus = 0){
+		if(bus >= NumBus) return Type::Unknown;
 
 		if(!busContexts[bus].inserted){
-			return ModuleType::Unknown;
+			return Type::Unknown;
 		}
 
 		return busContexts[bus].type;
@@ -90,14 +77,14 @@ public:
 
 
 private:
-	const std::array<BusPins, NumBus> busPins;
+	const std::array<Modules::BusPins, NumBus> busPins;
 
 	/**
 	 * Model of the current bus state
 	 */
 	struct BusContext {
 		bool inserted;
-		ModuleType type;
+		Type type;
 		StrongObjectPtr<ModuleDevice> instance;
 	} busContexts[NumBus];
 
@@ -116,37 +103,26 @@ private:
 			busContexts[bus].inserted = false;
 			const auto removed = busContexts[bus].type;
 
-			busContexts[bus].type = ModuleType::Unknown;
+			busContexts[bus].type = Type::Unknown;
 
 			ESP_LOGI(TAG, "Module %d removed from bus %d", (int) removed, bus);
 			modulesEvent.broadcast(bus, removed, Action::Remove);
 
 			busContexts[bus].instance = nullptr;
 
-		}else if(!busContexts[bus].inserted && nowInserted){
-			const ModuleType addr = checkAddr(bus);
+			registerSubAddressPinsInput(bus);
 
-			busContexts[bus].type = addr;
+		}else if(!busContexts[bus].inserted && nowInserted){
+			const Type type = checkAddr(bus);
+
+			busContexts[bus].type = type;
 			busContexts[bus].inserted = true;
 
-			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) addr, bus);
-			modulesEvent.broadcast(bus, addr, Action::Insert);
+			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) type, bus);
+			modulesEvent.broadcast(bus, type, Action::Insert);
 
-
-			if(DeviceMap.contains(addr)){
-				busContexts[bus].instance = newObject<ModuleDevice>(*DeviceMap.at(addr), this);
-
-				//Set the input/output pins and I2C for newly created ModuleDevice
-				std::array<InputPin, 6> inputs;
-				std::array<OutputPin, 6> outputs;
-				for(uint8_t i = 0; i < 6; ++i){
-					inputs[i] = InputPin{ busPins[bus].subAddressPins[i].inputDriver, busPins[bus].subAddressPins[i].port };
-					outputs[i] = OutputPin{ busPins[bus].subAddressPins[i].outputDriver, busPins[bus].subAddressPins[i].port };
-				}
-				busContexts[bus].instance->setInputs(inputs);
-				busContexts[bus].instance->setOutputs(outputs);
-				busContexts[bus].instance->setI2C(busPins[bus].i2c);
-			}
+			registerSubAddressPinsModule(bus, type);
+			busContexts[bus].instance = CreateModuleDevice(this, type, busPins[bus]);
 		}
 	}
 
@@ -161,8 +137,8 @@ private:
 		return det1 == 0 && det2 == 1;
 	}
 
-	ModuleType checkAddr(uint8_t bus){
-		ModuleAddress readAddress{};
+	Type checkAddr(uint8_t bus){
+		Address readAddress{};
 
 		uint8_t addr = 0;
 		for(uint8_t i = 0; i < 6; i++){
@@ -183,13 +159,13 @@ private:
 				return AddressMap.at(readAddress);
 			}else{
 				ESP_LOGE(TAG, "Unknown primary address");
-				return ModuleType::Unknown;
+				return Type::Unknown;
 			}
 		}
 
-		const std::set<ModuleSubAddress>& subAddressSet = SubAddressMap.at(addr);
-		ModuleSubAddress readSubAddress{};
-		readSubAddress.type = ModuleSubAddress::Type::None;
+		const std::set<SubAddress>& subAddressSet = SubAddressMap.at(addr);
+		SubAddress readSubAddress{};
+		readSubAddress.type = SubAddress::Type::None;
 		/*
 		 * Caching read values to std::optional of each subAddress type.
 		 *
@@ -200,8 +176,8 @@ private:
 		std::optional<uint8_t> ReadTokenAddress;
 
 		//Check every possible subAddress for this mainAddress, stop when match is found
-		for(const ModuleSubAddress& subAddress : subAddressSet){
-			if(subAddress.type == ModuleSubAddress::Type::RM){
+		for(const SubAddress& subAddress : subAddressSet){
+			if(subAddress.type == SubAddress::Type::RM){
 				/* RM non-I2C modules are sub-addressed using subAddr pins 4 - 6 (3 bits)  */
 				if(!ReadRMAddress){
 					uint8_t RMAddr = 0;
@@ -219,13 +195,13 @@ private:
 					readSubAddress = subAddress;
 					break;
 				}
-			}else if(subAddress.type == ModuleSubAddress::Type::RM_I2C || subAddress.type == ModuleSubAddress::Type::Rover_I2C){
+			}else if(subAddress.type == SubAddress::Type::RM_I2C || subAddress.type == SubAddress::Type::Rover_I2C){
 				/* RM I2C and Rover I2C addresses determined by probing */
 				if(busPins[bus].i2c->probe(subAddress.I2CAddress) == ESP_OK){
 					readSubAddress = subAddress;
 					break;
 				}
-			}else if(subAddress.type == ModuleSubAddress::Type::Token){
+			}else if(subAddress.type == SubAddress::Type::Token){
 				/* Bit/Wacky robots are sub-addressed using all 6 SubAddress pins */
 				if(!ReadTokenAddress){
 					uint8_t tokenAddr = 0;
@@ -246,37 +222,32 @@ private:
 			}
 		}
 
-		if(readSubAddress.type == ModuleSubAddress::Type::None){
+		if(readSubAddress.type == SubAddress::Type::None){
 			ESP_LOGE(TAG, "Unknown main-sub address combination");
-			return ModuleType::Unknown;
+			return Type::Unknown;
 		}
 
 		readAddress.subAddress = readSubAddress;
 
 		if(!AddressMap.contains(readAddress)){
 			ESP_LOGE(TAG, "Error in main/sub address mapping (internal error)");
-			return ModuleType::Unknown;
+			return Type::Unknown;
 		}
 
 		return AddressMap.at(readAddress);
 	}
 
 	/**
-	 * Mapping the whole ModuleAddress to a specific ModuleType.
+	 * Mapping the whole Address to a specific Type.
 	 */
-	inline static const std::map<ModuleAddress, ModuleType> AddressMap = GetAddressMap();
-
-	/**
-	 * Mapping ModuleType to specific module device class
-	 */
-	inline static const std::map<ModuleType, SubclassOf<ModuleDevice>> DeviceMap = GetDeviceMap();
+	inline static const std::map<Address, Type> AddressMap = GetAddressMap();
 
 	/**
 	 * Mapping the main address to all available SubAddresses. Does not include modules with no SubAddress.
 	 * Populated in the constructor using data from AddressMap
 	 * Used for module detection.
 	 */
-	inline static const std::map<uint8_t, std::set<ModuleSubAddress>> SubAddressMap = GetSubAddressMap();
+	inline static const std::map<uint8_t, std::set<SubAddress>> SubAddressMap = GetSubAddressMap();
 
 	//Set of inputDrivers prevents unnecessary polling of the same InputDriver multiple times.
 	std::set<InputDriverBase*> inputDriverSet;
@@ -312,7 +283,23 @@ private:
 		}
 	}
 
-	inline static const char* TAG = "ModuleService";
+	/**
+	 * Registers all subAddress pins to their InputDrivers.
+	 * This enables using them for address scanning.
+	 * @param bus
+	 */
+	void registerSubAddressPinsInput(uint8_t bus){
+		//TODO - after InputDriver refactor
+//		for(const auto& pin : busPins[bus].subAddressPins){
+//			pin.inputDriver->registerInput({ .port=pin.port });
+//		}
+	}
+
+	void registerSubAddressPinsModule(uint8_t bus, Modules::Type type){
+
+	}
+
+	static constexpr const char* TAG = "ModuleService";
 };
 
 

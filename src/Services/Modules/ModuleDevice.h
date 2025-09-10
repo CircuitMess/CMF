@@ -7,23 +7,19 @@
 #include "Drivers/Interface/InputDriver.h"
 #include "Drivers/Interface/OutputDriver.h"
 
+using namespace Modules;
+
 class ModuleDevice : public Object {
 	GENERATED_BODY(ModuleDevice, Object)
 public:
-	ModuleDevice(ModuleType moduleType = ModuleType::Unknown);
+	ModuleDevice(Type Type = Type::Unknown, const Modules::BusPins& busPins={});
 
-	ModuleType getType() const;
+	Type getType() const;
 
-	void setI2C(I2C* i2c);
-	void setInputs(std::array<InputPin, 6> inputPins);
-	void setOutputs(std::array<OutputPin, 6> outputPins);
+protected:
+	const Type moduleType;
 
-private:
-	const ModuleType moduleType;
-
-	I2C* i2c;
-	std::array<InputPin, 6> inputPins;
-	std::array<OutputPin, 6> outputPins;
+	Modules::BusPins pins;
 };
 
 

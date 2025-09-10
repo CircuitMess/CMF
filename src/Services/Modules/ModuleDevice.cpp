@@ -1,21 +1,11 @@
 #include "ModuleDevice.h"
+#include "ModuleType.h"
 
-ModuleDevice::ModuleDevice(ModuleType moduleType) : Object(), moduleType(moduleType){
+ModuleDevice::ModuleDevice(Type moduleType, const Modules::BusPins& busPins) :
+		Object(), moduleType(moduleType), pins(busPins){
 
 }
 
-ModuleType ModuleDevice::getType() const{
+Type ModuleDevice::getType() const{
 	return moduleType;
-}
-
-void ModuleDevice::setI2C(I2C* i2c){
-	this->i2c = i2c;
-}
-
-void ModuleDevice::setInputs(std::array<InputPin, 6> inputPins){
-	this->inputPins = inputPins;
-}
-
-void ModuleDevice::setOutputs(std::array<OutputPin, 6> outputPins){
-	this->outputPins = outputPins;
 }

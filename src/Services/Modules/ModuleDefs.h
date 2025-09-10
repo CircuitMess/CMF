@@ -6,11 +6,12 @@
 #include "ModuleDevice.h"
 #include <map>
 
+namespace Modules {
 /**
  * Model of Module sub-address.
  * Necessary since sub-addressing follows various types and methods of addressing.
  */
-struct ModuleSubAddress {
+struct SubAddress {
 	enum class Type : uint8_t {
 		None, RM, RM_I2C, Token, Rover_I2C
 	} type;
@@ -20,7 +21,7 @@ struct ModuleSubAddress {
 		uint8_t tokenAddress; //STEM adventure tokens (Bit)
 	};
 
-	bool operator<(const ModuleSubAddress& rhs) const{
+	bool operator<(const SubAddress& rhs) const{
 		if(type < rhs.type)
 			return true;
 		if(rhs.type < type)
@@ -36,15 +37,15 @@ struct ModuleSubAddress {
 		return tokenAddress < rhs.tokenAddress;
 	}
 
-	bool operator>(const ModuleSubAddress& rhs) const{
+	bool operator>(const SubAddress& rhs) const{
 		return rhs < *this;
 	}
 
-	bool operator<=(const ModuleSubAddress& rhs) const{
+	bool operator<=(const SubAddress& rhs) const{
 		return !(rhs < *this);
 	}
 
-	bool operator>=(const ModuleSubAddress& rhs) const{
+	bool operator>=(const SubAddress& rhs) const{
 		return !(*this < rhs);
 	}
 };
@@ -52,11 +53,11 @@ struct ModuleSubAddress {
 /**
  * Unique representation of a module, through a main and sub address.
  */
-struct ModuleAddress {
+struct Address {
 	uint8_t mainAddress;
-	ModuleSubAddress subAddress;
+	SubAddress subAddress;
 
-	bool operator<(const ModuleAddress& rhs) const{
+	bool operator<(const Address& rhs) const{
 		if(mainAddress < rhs.mainAddress)
 			return true;
 		if(rhs.mainAddress < mainAddress)
@@ -64,21 +65,42 @@ struct ModuleAddress {
 		return subAddress < rhs.subAddress;
 	}
 
-	bool operator>(const ModuleAddress& rhs) const{
+	bool operator>(const Address& rhs) const{
 		return rhs < *this;
 	}
 
-	bool operator<=(const ModuleAddress& rhs) const{
+	bool operator<=(const Address& rhs) const{
 		return !(rhs < *this);
 	}
 
-	bool operator>=(const ModuleAddress& rhs) const{
+	bool operator>=(const Address& rhs) const{
 		return !(*this < rhs);
 	}
 };
 
-const std::map<ModuleAddress, ModuleType>& GetAddressMap();
-const std::map<ModuleType, SubclassOf<ModuleDevice>>& GetDeviceMap();
-const std::map<uint8_t, std::set<ModuleSubAddress>> GetSubAddressMap();
+/**
+ * Enumeration of pin modes for specific UMAX modules bus pin.
+ *
+ * If pin is unused, leave it at default (None)
+ */
+enum class PinMode{
+	None, Input, Output
+};
+
+/**
+ * Mapping address to a known Module type
+ *
+ * Useful for recognizing a module from an acquired address.
+ */
+const std::map<Address, Type>& GetAddressMap();
+
+/**
+ * Factory method for creating a new instance of a specific Module
+ */
+StrongObjectPtr<ModuleDevice> CreateModuleDevice(Object* owner, Type moduleType, const Modules::BusPins& busPins);
+const std::map<uint8_t, std::set<SubAddress>>& GetSubAddressMap();
+const std::map<Type, std::array<PinMode, 6>>& GetPinModeMap();
+
+}
 
 #endif //CMF_MODULEDEFS_H
