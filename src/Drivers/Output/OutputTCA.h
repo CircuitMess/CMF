@@ -4,7 +4,7 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "Devices/TCA9555.h"
 
-class OutputTCA : public OutputDriver<> {
+class OutputTCA : public OutputDriver {
 	GENERATED_BODY(OutputTCA, OutputDriver);
 
 public:

@@ -4,7 +4,7 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "Periphery/GPIOPeriph.h"
 
-class OutputGPIO : public OutputDriver<> {
+class OutputGPIO : public OutputDriver {
 	GENERATED_BODY(OutputGPIO, OutputDriver);
 public:
 	OutputGPIO() noexcept = default;

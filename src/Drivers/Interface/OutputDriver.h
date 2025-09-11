@@ -18,67 +18,44 @@ struct OutputPinDef {
 	}
 };
 
-class OutputDriverBase : public Object {
-	GENERATED_BODY(OutputDriverBase, Object)
+struct OutputPin {
+	class OutputDriver* driver = nullptr;
 
+	int port = -1;
+};
+
+class OutputDriver : public Object {
+	GENERATED_BODY(OutputDriver, Object)
 public:
-	virtual float getState(int port) const noexcept{ return 0.0f; }
-
-	virtual void write(int port, float value) noexcept{ }
 
 	void write(int port, bool value) noexcept{
 		write(port, value ? 1.0f : 0.0f);
 	}
 
-	virtual void send() noexcept{ }
+	virtual void send() noexcept{}
 
-protected:
-	virtual void performWrite(int port, float value) noexcept{ }
-};
-
-struct OutputPin {
-	OutputDriverBase* driver = nullptr;
-	int port = -1;
-};
-
-template<typename T = OutputPinDef> requires std::derived_from<T, OutputPinDef>
-class OutputDriver : public OutputDriverBase {
-	TEMPLATE_ATTRIBUTES(T)
-	GENERATED_BODY(OutputDriver, OutputDriverBase)
-
-public:
-	virtual float getState(int port) const noexcept override{
+	float getState(int port) const noexcept{
 		if(!states.contains(port)){
 			return 0;
 		}
 		return states.at(port);
 	}
 
-	virtual void write(int port, float value) noexcept override final{
+	void write(int port, float value) noexcept{
 		states[port] = value;
 		performWrite(port, getInversions()[port] ? 1.0 - value : value);
 	}
 
-	void registerOutput(T pinDef) noexcept{
+	void registerOutput(const OutputPinDef& pinDef) noexcept{
 		outputs.emplace_back(pinDef);
 		inversions[pinDef.port] = pinDef.inverted;
 		performRegister(pinDef);
 	}
 
 	void removeOutput(int port) noexcept{
-		auto it = std::remove_if(outputs.begin(), outputs.end(), [port](const T& pinDef){
+		auto it = std::remove_if(outputs.begin(), outputs.end(), [port](const OutputPinDef& pinDef){
 			return pinDef.port == port;
 		});
-		for(auto i = it; i != outputs.end(); ++i){
-			performDeregister(*i);
-			states.erase(i->port);
-			inversions.erase(i->port);
-		}
-		outputs.erase(it, outputs.end());
-	}
-
-	void removeOutput(T output) noexcept{
-		auto it = std::remove(outputs.begin(), outputs.end(), output);
 		for(auto i = it; i != outputs.end(); ++i){
 			performDeregister(*i);
 			states.erase(i->port);
@@ -90,11 +67,11 @@ public:
 protected:
 	OutputDriver() noexcept = default;
 
-	OutputDriver(const std::vector<T>& outputs) noexcept : outputs(outputs){
+	OutputDriver(const std::vector<OutputPinDef>& outputs) noexcept: outputs(outputs){
 
 	}
 
-	std::vector<T>& getOutputs() noexcept{
+	std::vector<OutputPinDef>& getOutputs() noexcept{
 		return outputs;
 	}
 
@@ -106,21 +83,42 @@ protected:
 		return inversions;
 	}
 
+	virtual void performWrite(int port, float value) noexcept{}
+
+
+	/**
+	 * Function which extracts a copy of InputPinDef from derived structs.
+	 * Useful for InputDriver specializations which also have a derived InputPinDef.
+	 * @tparam Derived Type derived from InputPinDef
+	 * @param derivedVec vector of derived types
+	 * @return
+	 */
+	template<typename Derived> requires std::derived_from<Derived, OutputPinDef>
+	static std::vector<OutputPinDef>
+	toOutputPinDef(const std::vector<Derived>& derivedVec) {
+		std::vector<OutputPinDef> tmp;
+		tmp.reserve(derivedVec.size());
+		for (const auto& item : derivedVec) {
+			tmp.emplace_back(static_cast<const OutputPinDef&>(item));
+		}
+		return tmp;
+	}
+
 private:
 	void postInitProperties() noexcept override final{
 		Super::postInitProperties();
 
-		for(const auto& output: outputs){
+		for(const auto& output : outputs){
 			inversions[output.port] = output.inverted;
 			performRegister(output);
 		}
 	}
 
-	virtual void performRegister(T output) noexcept{ }
+	virtual void performRegister(OutputPinDef output) noexcept{}
 
-	virtual void performDeregister(T output) noexcept{ }
+	virtual void performDeregister(OutputPinDef output) noexcept{}
 
-	std::vector<T> outputs;
+	std::vector<OutputPinDef> outputs;
 
 	/**
 	 * Map of cached output values.

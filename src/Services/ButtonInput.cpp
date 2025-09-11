@@ -10,7 +10,7 @@ void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registr
 }
 
 void ButtonInput::reg(Enum<int> button, InputPin pin) noexcept{
-	inputSources.insert(StrongObjectPtr<InputDriverBase>(pin.driver));
+	inputSources.insert(StrongObjectPtr<InputDriver>(pin.driver));
 	buttons[button] = pin;
 	dbTime[button] = 0;
 	btnState[button] = false;
