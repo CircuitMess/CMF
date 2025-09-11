@@ -20,6 +20,7 @@ struct InputPinDef {
 
 struct InputPin {
 	class InputDriver* driver;
+
 	int port;
 };
 
@@ -55,32 +56,15 @@ public:
 		inputs.erase(it, inputs.end());
 	}
 
-	/**
-	 * Function which extracts a copy of InputPinDef from derived structs.
-	 * Useful for InputDriver specializations which also have a derived InputPinDef.
-	 * @tparam Derived Type derived from InputPinDef
-	 * @param derivedVec vector of derived types
-	 * @return
-	 */
-	template<typename Derived> requires std::derived_from<Derived, InputPinDef>
-	static std::vector<InputPinDef>
-	toInputPinDef(const std::vector<Derived>& derivedVec) {
-		std::vector<InputPinDef> tmp;
-		tmp.reserve(derivedVec.size());
-		for (const auto& item : derivedVec) {
-			tmp.emplace_back(std::cref(static_cast<const InputPinDef&>(item)));
-		}
-		return tmp;
-	}
 
 protected:
 	InputDriver() noexcept = default;
 
-	InputDriver(const std::vector<InputPinDef>& inputs) noexcept : inputs(inputs){
+	InputDriver(const std::vector<InputPinDef>& inputs) noexcept: inputs(inputs){
 	}
 
 	void forEachInput(const std::function<void(const InputPinDef&)>& func) const noexcept{
-		for(const auto& input: inputs){
+		for(const auto& input : inputs){
 			func(input);
 		}
 	}
@@ -97,18 +81,38 @@ protected:
 		return inversions;
 	}
 
+	/**
+	 * Function which extracts a copy of InputPinDef from derived structs.
+	 * Useful for InputDriver specializations which also have a derived InputPinDef.
+	 * @tparam Derived Type derived from InputPinDef
+	 * @param derivedVec vector of derived types
+	 * @return
+	 */
+	template<typename Derived>
+	requires std::derived_from<Derived, InputPinDef>
+	static std::vector<InputPinDef>
+	toInputPinDef(const std::vector<Derived>& derivedVec){
+		std::vector<InputPinDef> tmp;
+		tmp.reserve(derivedVec.size());
+		for(const auto& item : derivedVec){
+			tmp.emplace_back(static_cast<const InputPinDef&>(item));
+		}
+		return tmp;
+	}
+
 private:
 	virtual void postInitProperties() noexcept override final{
 		Super::postInitProperties();
 
-		for(const auto& input: inputs){
+		for(const auto& input : inputs){
 			inversions[input.port] = input.inverted;
 			performRegister(input);
 		}
 	}
 
-	virtual void performRegister(InputPinDef input) noexcept{ }
-	virtual void performDeregister(InputPinDef input) noexcept{ }
+	virtual void performRegister(InputPinDef input) noexcept{}
+
+	virtual void performDeregister(InputPinDef input) noexcept{}
 
 	std::vector<InputPinDef> inputs;
 

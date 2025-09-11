@@ -1,6 +1,6 @@
 #include "OutputTCA.h"
 
-OutputTCA::OutputTCA(const std::vector<OutputPinDef>& outputs, TCA9555* tca9555) : OutputDriver<>(outputs), tca9555(tca9555){
+OutputTCA::OutputTCA(const std::vector<OutputPinDef>& outputs, TCA9555* tca9555) : OutputDriver(outputs), tca9555(tca9555){
 
 }
 

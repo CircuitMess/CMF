@@ -12,7 +12,7 @@ struct OutputPWMPinDef : OutputPinDef {
 	gpio_num_t pin;
 };
 
-class OutputPWM : public OutputDriver<OutputPWMPinDef> {
+class OutputPWM : public OutputDriver {
 	GENERATED_BODY(OutputPWM, OutputDriver);
 public:
 	OutputPWM() = default;
@@ -56,9 +56,9 @@ public:
 private:
 	void performWrite(int port, float value) noexcept override;
 
-	void performRegister(OutputPWMPinDef output) noexcept override;
+	void performRegister(OutputPinDef output) noexcept override;
 
-	void performDeregister(OutputPWMPinDef output) noexcept override;
+	void performDeregister(OutputPinDef output) noexcept override;
 
 	std::map<int, gpio_num_t> gpios;
 

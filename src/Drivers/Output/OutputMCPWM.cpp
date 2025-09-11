@@ -4,35 +4,39 @@
 
 DEFINE_LOG(OutputMCPWM)
 
-OutputMCPWM::OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs) : OutputDriver(outputs){
-
+OutputMCPWM::OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs) : OutputDriver(OutputDriver::toOutputPinDef(outputs)){
+	for(const auto& output : outputs){
+		states[output.port].config = output.config;
+	}
 }
 
-void OutputMCPWM::performRegister(OutputMCPWMPinDef output) noexcept{
+void OutputMCPWM::performRegister(OutputPinDef output) noexcept{
 	if(output.port >= PortsNum){
 		CMF_LOG(OutputMCPWM, LogLevel::Error, "MCPWM ports must be in range 0 - %d (got %d)", PortsNum, output.port);
 		return;
 	}
 
-	if(output.MinPulseWidth > output.MaxPulseWidth){
-		CMF_LOG(OutputMCPWM, LogLevel::Error, "MCPWM minimum pulse width bigger than maximum (%lu > %lu)", output.MinPulseWidth, output.MaxPulseWidth);
+	const auto& config = states[output.port].config;
+
+	if(config.MinPulseWidth > config.MaxPulseWidth){
+		CMF_LOG(OutputMCPWM, LogLevel::Error, "MCPWM minimum pulse width bigger than maximum (%lu > %lu)", config.MinPulseWidth, config.MaxPulseWidth);
 		return;
 	}
 
-	gpio_reset_pin(output.pin);
-	gpio_set_direction(output.pin, GPIO_MODE_OUTPUT);
+	gpio_reset_pin(config.pin);
+	gpio_set_direction(config.pin, GPIO_MODE_OUTPUT);
 
 	auto& state = states[output.port];
 
-	state.MinPulseWidth = output.MinPulseWidth;
-	state.MaxPulseWidth = output.MaxPulseWidth;
+	state.MinPulseWidth = config.MinPulseWidth;
+	state.MaxPulseWidth = config.MaxPulseWidth;
 
 	mcpwm_timer_config_t timer_config = {
 			.group_id = output.port / SOC_MCPWM_TIMERS_PER_GROUP,
 			.clk_src = MCPWM_TIMER_CLK_SRC_DEFAULT,
-			.resolution_hz = output.TimerResolution,
+			.resolution_hz = config.TimerResolution,
 			.count_mode = MCPWM_TIMER_COUNT_MODE_UP,
-			.period_ticks = output.PeriodLength,
+			.period_ticks = config.PeriodLength,
 	};
 	ESP_ERROR_CHECK(mcpwm_new_timer(&timer_config, &state.timerHandle));
 
@@ -49,12 +53,12 @@ void OutputMCPWM::performRegister(OutputMCPWMPinDef output) noexcept{
 	ESP_ERROR_CHECK(mcpwm_new_comparator(state.operatorHandle, &comparator_config, &state.compHandle));
 
 	mcpwm_generator_config_t generator_config = {
-			.gen_gpio_num = output.pin,
+			.gen_gpio_num = config.pin,
 	};
 	ESP_ERROR_CHECK(mcpwm_new_generator(state.operatorHandle, &generator_config, &state.genHandle));
 
 	// set the initial compare value, so that the servo will spin to the center position
-	ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(state.compHandle, (output.MaxPulseWidth - output.MinPulseWidth) / 2));
+	ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(state.compHandle, (config.MaxPulseWidth - config.MinPulseWidth) / 2));
 
 	// go high on counter empty
 	ESP_ERROR_CHECK(mcpwm_generator_set_action_on_timer_event(
@@ -65,7 +69,7 @@ void OutputMCPWM::performRegister(OutputMCPWMPinDef output) noexcept{
 
 }
 
-void OutputMCPWM::performDeregister(OutputMCPWMPinDef output) noexcept{
+void OutputMCPWM::performDeregister(OutputPinDef output) noexcept{
 
 	disable(output.port);
 

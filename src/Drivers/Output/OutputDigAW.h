@@ -4,18 +4,19 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "Devices/AW9523.h"
 
-class OutputDigAW : public OutputDriver<> {
+class OutputDigAW : public OutputDriver {
 	GENERATED_BODY(OutputDigAW, OutputDriver);
 
 public:
 	OutputDigAW() = default;
 	OutputDigAW(const std::vector<OutputPinDef>& outputs, AW9523* aw9523);
 
-	void performWrite(int port, float value) noexcept override;
-	void performRegister(OutputPinDef output) noexcept override;
 
 private:
 	StrongObjectPtr<AW9523> aw9523;
+
+	void performWrite(int port, float value) noexcept override;
+	void performRegister(OutputPinDef output) noexcept override;
 };
 
 

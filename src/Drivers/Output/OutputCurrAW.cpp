@@ -1,6 +1,6 @@
 #include "OutputCurrAW.h"
 
-OutputCurrAW::OutputCurrAW(const std::vector<OutputPinDef>& outputs, AW9523* aw9523) : OutputDriver<>(outputs), aw9523(aw9523){
+OutputCurrAW::OutputCurrAW(const std::vector<OutputPinDef>& outputs, AW9523* aw9523) : OutputDriver(outputs), aw9523(aw9523){
 
 }
 
@@ -9,7 +9,7 @@ void OutputCurrAW::performWrite(int port, float value) noexcept{
 		CMF_LOG(CMF, Warning, "Output port %d inversion missing", port);
 		return;
 	}
-	uint8_t val = (uint8_t)(255.f * value);
+	uint8_t val = (uint8_t) (255.f * value);
 	aw9523->dim(port, val);
 }
 
