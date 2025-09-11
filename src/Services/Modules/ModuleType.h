@@ -33,8 +33,8 @@ enum class Type : uint8_t {
  * Helper struct for pins which can be input and output, depending on Module type.
  */
 struct IOPin {
-	InputDriverBase* inputDriver;
-	OutputDriver<>* outputDriver;
+	InputDriver* inputDriver;
+	OutputDriver* outputDriver;
 	int port;
 };
 struct BusPins {

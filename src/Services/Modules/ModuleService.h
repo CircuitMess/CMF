@@ -250,7 +250,7 @@ private:
 	inline static const std::map<uint8_t, std::set<SubAddress>> SubAddressMap = GetSubAddressMap();
 
 	//Set of inputDrivers prevents unnecessary polling of the same InputDriver multiple times.
-	std::set<InputDriverBase*> inputDriverSet;
+	std::set<InputDriver*> inputDriverSet;
 
 	/**
 	 * Populates the inputDriverSets with their respective inputDrivers
@@ -289,14 +289,21 @@ private:
 	 * @param bus
 	 */
 	void registerSubAddressPinsInput(uint8_t bus){
-		//TODO - after InputDriver refactor
-//		for(const auto& pin : busPins[bus].subAddressPins){
-//			pin.inputDriver->registerInput({ .port=pin.port });
-//		}
+		for(const auto& pin : busPins[bus].subAddressPins){
+			pin.inputDriver->registerInput({ pin.port });
+		}
 	}
 
 	void registerSubAddressPinsModule(uint8_t bus, Modules::Type type){
-
+		const auto& pinModes = GetPinModeMap().at(type);
+		for(uint8_t i = 0; i < pinModes.size(); i++){
+			const auto& pin = busPins[bus].subAddressPins[i];
+			if(pinModes[i] == PinMode::Input){
+				pin.inputDriver->registerInput({ pin.port });
+			}else if(pinModes[i] == PinMode::Output){
+				pin.outputDriver->registerOutput({ pin.port });
+			}
+		}
 	}
 
 	static constexpr const char* TAG = "ModuleService";

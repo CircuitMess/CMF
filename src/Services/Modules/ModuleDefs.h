@@ -83,7 +83,7 @@ struct Address {
  *
  * If pin is unused, leave it at default (None)
  */
-enum class PinMode{
+enum class PinMode {
 	None, Input, Output
 };
 
