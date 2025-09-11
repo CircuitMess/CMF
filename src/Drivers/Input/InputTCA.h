@@ -10,9 +10,9 @@ public:
 	InputTCA() = default;
 	InputTCA(const std::vector<InputPinDef>& inputs, TCA9555* tca9555);
 
-private:
 	void scan() noexcept override;
 
+private:
 	void performRegister(InputPinDef input) noexcept override;
 
 	StrongObjectPtr<TCA9555> tca9555;
