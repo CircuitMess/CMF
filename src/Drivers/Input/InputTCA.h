@@ -4,7 +4,7 @@
 #include "Drivers/Interface/InputDriver.h"
 #include "Devices/TCA9555.h"
 
-class InputTCA : public InputDriver<> {
+class InputTCA : public InputDriver {
 	GENERATED_BODY(InputTCA, InputDriver)
 public:
 	InputTCA() = default;

@@ -1,6 +1,6 @@
 #include "InputAW.h"
 
-InputAW::InputAW(const std::vector<InputPinDef>& inputs, AW9523* aw9523) : Super(inputs), aw9523(aw9523){
+InputAW::InputAW(const std::vector<InputPinDef>& inputs, AW9523* aw9523) : InputDriver(inputs), aw9523(aw9523){
 
 }
 
