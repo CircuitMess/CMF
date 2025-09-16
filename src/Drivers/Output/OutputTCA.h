@@ -12,7 +12,7 @@ public:
 	OutputTCA(const std::vector<OutputPinDef>& outputs, TCA9555* tca9555);
 
 	void performWrite(int port, float value) noexcept override;
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 
 private:
 	StrongObjectPtr<TCA9555> tca9555;

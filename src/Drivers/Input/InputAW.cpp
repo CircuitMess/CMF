@@ -12,6 +12,6 @@ void InputAW::scan() noexcept{
 	});
 }
 
-void InputAW::performRegister(InputPinDef input) noexcept{
+void InputAW::performRegister(const InputPinDef& input) noexcept{
 	aw9523->pinMode(input.port, AW9523::PinMode::IN);
 }

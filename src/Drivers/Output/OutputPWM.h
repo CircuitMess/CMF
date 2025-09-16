@@ -56,9 +56,9 @@ public:
 private:
 	void performWrite(int port, float value) noexcept override;
 
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 
-	void performDeregister(OutputPinDef output) noexcept override;
+	void performDeregister(const OutputPinDef& output) noexcept override;
 
 	std::map<int, gpio_num_t> gpios;
 

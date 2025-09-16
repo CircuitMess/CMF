@@ -21,7 +21,7 @@ public:
 private:
 	void scan() noexcept override;
 
-	void performRegister(InputPinDef input) noexcept override;
+	void performRegister(const InputPinDef& input) noexcept override;
 
 //	std::map<int, uint32_t> benchmarks;
 	std::map<int, uint32_t> thresholds;

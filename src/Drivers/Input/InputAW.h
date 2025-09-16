@@ -13,7 +13,7 @@ public:
 private:
 	void scan() noexcept override;
 
-	void performRegister(InputPinDef input) noexcept override;
+	void performRegister(const InputPinDef& input) noexcept override;
 
 	StrongObjectPtr<AW9523> aw9523;
 };

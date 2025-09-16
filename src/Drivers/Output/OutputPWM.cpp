@@ -3,7 +3,7 @@
 
 DEFINE_LOG(PWM)
 
-OutputPWM::OutputPWM(const std::vector<OutputPWMPinDef>& outputs) : OutputDriver(OutputDriver::toOutputPinDef(outputs)){
+OutputPWM::OutputPWM(const std::vector<OutputPWMPinDef>& outputs) : Super(toOutputPinDef(outputs)){
 	for(const auto& output : outputs){
 		gpios[output.port] = output.pin;
 	}
@@ -66,7 +66,7 @@ void OutputPWM::performWrite(int port, float value) noexcept{
 	ledc_update_duty(group, chan);
 }
 
-void OutputPWM::performRegister(OutputPinDef output) noexcept{
+void OutputPWM::performRegister(const OutputPinDef& output) noexcept{
 	if(!gpios.contains(output.port)){
 		ESP_LOGE("OutputPWM", "Output port %d not found in pin map", output.port);
 		return;
@@ -94,7 +94,7 @@ void OutputPWM::performRegister(OutputPinDef output) noexcept{
 	attach(output.port);
 }
 
-void OutputPWM::performDeregister(OutputPinDef output) noexcept{
+void OutputPWM::performDeregister(const OutputPinDef& output) noexcept{
 	stop(output.port);
 	detach(output.port);
 }

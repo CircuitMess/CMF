@@ -1,7 +1,7 @@
 #include "InputTouchGPIO.h"
 #include <driver/touch_pad.h>
 
-InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept: InputDriver(InputDriver::toInputPinDef(inputs)){
+InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept: Super(toInputPinDef(inputs)){
 	for(const auto& input : inputs){
 		thresholds[input.port] = input.threshold;
 	}
@@ -32,7 +32,7 @@ void InputTouchGPIO::scan() noexcept{
 	});
 }
 
-void InputTouchGPIO::performRegister(InputPinDef input) noexcept{
+void InputTouchGPIO::performRegister(const InputPinDef& input) noexcept{
 	touch_pad_fsm_stop();
 
 	const auto touchPin = (touch_pad_t) input.port;

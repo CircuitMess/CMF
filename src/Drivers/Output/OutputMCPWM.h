@@ -37,9 +37,9 @@ public:
 private:
 	void performWrite(int port, float value) noexcept override;
 
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 
-	void performDeregister(OutputPinDef output) noexcept override;
+	void performDeregister(const OutputPinDef& output) noexcept override;
 
 	static constexpr uint8_t PortsNum = SOC_MCPWM_GROUPS * SOC_MCPWM_TIMERS_PER_GROUP;
 
