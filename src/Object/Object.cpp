@@ -122,7 +122,7 @@ void Object::scanEvents(TickType_t wait) noexcept{
 			continue;
 		}
 
-		child->scanEvents(std::max((uint64_t)0, wait - (millis() - begin)));
+		child->scanEvents(0);
 	}
 
 	eventScanningMutex.unlock();
