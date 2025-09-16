@@ -11,12 +11,11 @@ public:
 	OutputCurrAW() = default;
 	OutputCurrAW(const std::vector<OutputPinDef>& outputs, AW9523* aw9523);
 
-
 private:
 	StrongObjectPtr<AW9523> aw9523;
 
 	void performWrite(int port, float value) noexcept override;
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 };
 
 

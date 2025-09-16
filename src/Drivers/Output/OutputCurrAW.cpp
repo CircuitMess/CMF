@@ -13,6 +13,6 @@ void OutputCurrAW::performWrite(int port, float value) noexcept{
 	aw9523->dim(port, val);
 }
 
-void OutputCurrAW::performRegister(OutputPinDef output) noexcept{
+void OutputCurrAW::performRegister(const OutputPinDef& output) noexcept{
 	aw9523->pinMode(output.port, AW9523::LED);
 }
