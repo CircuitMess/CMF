@@ -2,8 +2,7 @@
 #include "Log/Log.h"
 
 InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept:
-		InputDriver(InputDriver::toInputPinDef(inputs)),
-		gpio(std::move(gpio)){
+	Super(toInputPinDef(inputs)), gpio(std::move(gpio)){
 
 	for(const auto& input : inputs){
 		pullModes[input.port] = input.pullMode;
@@ -12,6 +11,7 @@ InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIO
 
 void InputGPIO::scan() noexcept{
 	Super::scan();
+
 	forEachInput([this](const InputPinDef& input){
 		const auto pin = (gpio_num_t) input.port;
 		getStates()[input.port] = gpio->read(pin);
@@ -23,7 +23,7 @@ void InputGPIO::registerInput(const GPIOPinDef& pinDef){
 	InputDriver::registerInput(pinDef);
 }
 
-void InputGPIO::performRegister(InputPinDef input) noexcept{
+void InputGPIO::performRegister(const InputPinDef& input) noexcept{
 	gpio->setMode((gpio_num_t) input.port, GPIOMode::Input);
 
 	if(!pullModes.contains(input.port)){

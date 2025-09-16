@@ -35,6 +35,7 @@ public:
 			CMF_LOG(CMF, Error, "Input port %d not registered", port);
 			return 0;
 		}
+
 		return states.at(port) ^ inversions.at(port);
 	}
 
@@ -45,14 +46,16 @@ public:
 	}
 
 	void removeInput(int port) noexcept{
-		auto it = std::remove_if(inputs.begin(), inputs.end(), [port](const auto& pinDef){
+		auto it = std::remove_if(inputs.begin(), inputs.end(), [port](const InputPinDef& pinDef){
 			return pinDef.port == port;
 		});
+
 		for(auto i = it; i != inputs.end(); ++i){
 			performDeregister(*i);
 			states.erase(i->port);
 			inversions.erase(i->port);
 		}
+
 		inputs.erase(it, inputs.end());
 	}
 
@@ -60,8 +63,7 @@ public:
 protected:
 	InputDriver() noexcept = default;
 
-	InputDriver(const std::vector<InputPinDef>& inputs) noexcept: inputs(inputs){
-	}
+	InputDriver(const std::vector<InputPinDef>& inputs) noexcept: inputs(inputs){}
 
 	void forEachInput(const std::function<void(const InputPinDef&)>& func) const noexcept{
 		for(const auto& input : inputs){
@@ -90,13 +92,14 @@ protected:
 	 */
 	template<typename Derived>
 	requires std::derived_from<Derived, InputPinDef>
-	static std::vector<InputPinDef>
-	toInputPinDef(const std::vector<Derived>& derivedVec){
+	static std::vector<InputPinDef> toInputPinDef(const std::vector<Derived>& derivedVec){
 		std::vector<InputPinDef> tmp;
 		tmp.reserve(derivedVec.size());
+
 		for(const auto& item : derivedVec){
 			tmp.emplace_back(static_cast<const InputPinDef&>(item));
 		}
+
 		return tmp;
 	}
 
@@ -110,7 +113,7 @@ private:
 		}
 	}
 
-	virtual void performRegister(InputPinDef input) noexcept{}
+	virtual void performRegister(const InputPinDef& input) noexcept{}
 
 	virtual void performDeregister(InputPinDef input) noexcept{}
 

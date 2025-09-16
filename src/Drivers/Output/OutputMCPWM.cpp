@@ -4,13 +4,13 @@
 
 DEFINE_LOG(OutputMCPWM)
 
-OutputMCPWM::OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs) : OutputDriver(OutputDriver::toOutputPinDef(outputs)){
+OutputMCPWM::OutputMCPWM(const std::vector<OutputMCPWMPinDef>& outputs) : Super(toOutputPinDef(outputs)){
 	for(const auto& output : outputs){
 		states[output.port].config = output.config;
 	}
 }
 
-void OutputMCPWM::performRegister(OutputPinDef output) noexcept{
+void OutputMCPWM::performRegister(const OutputPinDef& output) noexcept{
 	if(output.port >= PortsNum){
 		CMF_LOG(OutputMCPWM, LogLevel::Error, "MCPWM ports must be in range 0 - %d (got %d)", PortsNum, output.port);
 		return;
@@ -69,7 +69,7 @@ void OutputMCPWM::performRegister(OutputPinDef output) noexcept{
 
 }
 
-void OutputMCPWM::performDeregister(OutputPinDef output) noexcept{
+void OutputMCPWM::performDeregister(const OutputPinDef& output) noexcept{
 
 	disable(output.port);
 

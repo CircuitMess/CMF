@@ -38,6 +38,7 @@ public:
 		if(!states.contains(port)){
 			return 0;
 		}
+
 		return states.at(port);
 	}
 
@@ -56,20 +57,20 @@ public:
 		auto it = std::remove_if(outputs.begin(), outputs.end(), [port](const OutputPinDef& pinDef){
 			return pinDef.port == port;
 		});
+
 		for(auto i = it; i != outputs.end(); ++i){
 			performDeregister(*i);
 			states.erase(i->port);
 			inversions.erase(i->port);
 		}
+
 		outputs.erase(it, outputs.end());
 	}
 
 protected:
 	OutputDriver() noexcept = default;
 
-	OutputDriver(const std::vector<OutputPinDef>& outputs) noexcept: outputs(outputs){
-
-	}
+	OutputDriver(const std::vector<OutputPinDef>& outputs) noexcept: outputs(outputs){}
 
 	std::vector<OutputPinDef>& getOutputs() noexcept{
 		return outputs;
@@ -98,9 +99,11 @@ protected:
 	toOutputPinDef(const std::vector<Derived>& derivedVec) {
 		std::vector<OutputPinDef> tmp;
 		tmp.reserve(derivedVec.size());
-		for (const auto& item : derivedVec) {
+
+		for (const OutputPinDef& item : derivedVec) {
 			tmp.emplace_back(static_cast<const OutputPinDef&>(item));
 		}
+
 		return tmp;
 	}
 
@@ -114,9 +117,9 @@ private:
 		}
 	}
 
-	virtual void performRegister(OutputPinDef output) noexcept{}
+	virtual void performRegister(const OutputPinDef& output) noexcept{}
 
-	virtual void performDeregister(OutputPinDef output) noexcept{}
+	virtual void performDeregister(const OutputPinDef& output) noexcept{}
 
 	std::vector<OutputPinDef> outputs;
 

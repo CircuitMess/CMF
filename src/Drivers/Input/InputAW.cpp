@@ -1,6 +1,6 @@
 #include "InputAW.h"
 
-InputAW::InputAW(const std::vector<InputPinDef>& inputs, AW9523* aw9523) : InputDriver(inputs), aw9523(aw9523){
+InputAW::InputAW(const std::vector<InputPinDef>& inputs, AW9523* aw9523) : Super(inputs), aw9523(aw9523){
 
 }
 
@@ -12,6 +12,6 @@ void InputAW::scan() noexcept{
 	});
 }
 
-void InputAW::performRegister(InputPinDef input) noexcept{
+void InputAW::performRegister(const InputPinDef& input) noexcept{
 	aw9523->pinMode(input.port, AW9523::PinMode::IN);
 }
