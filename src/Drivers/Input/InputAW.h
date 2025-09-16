@@ -4,7 +4,7 @@
 #include "Drivers/Interface/InputDriver.h"
 #include "Devices/AW9523.h"
 
-class InputAW : public InputDriver<> {
+class InputAW : public InputDriver {
 	GENERATED_BODY(InputAW, InputDriver)
 public:
 	InputAW() = default;
@@ -13,7 +13,7 @@ public:
 private:
 	void scan() noexcept override;
 
-	void performRegister(InputPinDef input) noexcept override;
+	void performRegister(const InputPinDef& input) noexcept override;
 
 	StrongObjectPtr<AW9523> aw9523;
 };

@@ -31,7 +31,7 @@ private:
 	void pressed(int btn);
 	void released(int btn);
 
-	std::set<StrongObjectPtr<InputDriverBase>> inputSources;
+	std::set<StrongObjectPtr<InputDriver>> inputSources;
 
 	std::map<int, InputPin> buttons;
 

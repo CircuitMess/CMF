@@ -1,6 +1,6 @@
 #include "InputTCA.h"
 
-InputTCA::InputTCA(const std::vector<InputPinDef>& inputs, TCA9555* tca9555){
+InputTCA::InputTCA(const std::vector<InputPinDef>& inputs, TCA9555* tca9555) : Super(inputs), tca9555(tca9555){
 
 }
 
@@ -12,6 +12,6 @@ void InputTCA::scan() noexcept{
 	});
 }
 
-void InputTCA::performRegister(InputPinDef input) noexcept{
+void InputTCA::performRegister(const InputPinDef& input) noexcept{
 	tca9555->pinMode(input.port, TCA9555::PinMode::IN);
 }
