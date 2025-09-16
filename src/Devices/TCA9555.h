@@ -1,7 +1,7 @@
 #ifndef CMF_TCA9555_H
 #define CMF_TCA9555_H
 
-#include "Periphery/I2C.h"
+#include "Object/Object.h"
 
 /**
  * GPIO expander, 16-bit.
@@ -11,15 +11,16 @@
  */
 class TCA9555 : public Object {
 	GENERATED_BODY(TCA9555, Object)
+
 public:
-	TCA9555(I2C* i2c = nullptr, uint8_t addr = 0x20);
+	explicit TCA9555(class I2C* i2c = nullptr, uint8_t addr = 0x20);
 
 	/**
 	 * Reset all pins to input and clear register state.
 	 */
 	void reset();
 
-	enum PinMode : uint8_t {
+	enum class PinMode : uint8_t {
 		IN, OUT
 	};
 
