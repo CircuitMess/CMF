@@ -11,7 +11,7 @@ public:
 	OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept;
 
 private:
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 
 	void performWrite(int port, float value) noexcept override;
 
