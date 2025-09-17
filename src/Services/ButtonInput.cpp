@@ -1,7 +1,7 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
-ButtonInput::ButtonInput() : Super(SleepTime / portTICK_PERIOD_MS, 4 * 1024, 4, -1){}
+ButtonInput::ButtonInput() : Super(SleepTime / portTICK_PERIOD_MS, 4 * 1024, 10, -1){}
 
 void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept{
 	for(auto& r: registrations){
@@ -10,7 +10,7 @@ void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registr
 }
 
 void ButtonInput::reg(Enum<int> button, InputPin pin) noexcept{
-	inputSources.insert(StrongObjectPtr<InputDriverBase>(pin.driver));
+	inputSources.insert(StrongObjectPtr<InputDriver>(pin.driver));
 	buttons[button] = pin;
 	dbTime[button] = 0;
 	btnState[button] = false;

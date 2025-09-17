@@ -12,17 +12,21 @@ struct GPIOPinDef : InputPinDef {
 	PullMode pullMode;
 };
 
-class InputGPIO : public InputDriver<GPIOPinDef> {
+class InputGPIO : public InputDriver {
 	GENERATED_BODY(InputGPIO, InputDriver);
 
 public:
 	InputGPIO() noexcept = default;
 	InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept;
 
+	void registerInput(const GPIOPinDef& pinDef);
+
 private:
 	void scan() noexcept override;
 
-	void performRegister(GPIOPinDef input) noexcept override;
+	void performRegister(const InputPinDef& input) noexcept override;
+
+	std::map<int, PullMode> pullModes;
 
 	StrongObjectPtr<GPIOPeriph> gpio;
 };

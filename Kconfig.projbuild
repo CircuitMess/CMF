@@ -20,4 +20,33 @@ config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
 
+
+config CMF_MODULES
+    bool "Enable Modules service"
+    default "n"
+
+    menu "Supported modules"
+        depends on CMF_MODULES
+
+    config RM_TempHum
+        bool "RM_TempHum module"
+        default "n"
+    config RM_LED
+        bool "RM_LED module"
+        default "n"
+    config RM_Motion
+        bool "RM_Motion module"
+        default "n"
+    config RM_CO2
+        bool "RM_CO2 module"
+        default "n"
+    config RM_IR
+        bool "RM_IR module"
+        default "n"
+    config RM_PerfBoard
+        bool "RM_PerfBoard module"
+        default "n"
+
+    endmenu
+
 endmenu

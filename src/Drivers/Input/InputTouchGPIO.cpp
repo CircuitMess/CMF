@@ -1,7 +1,11 @@
 #include "InputTouchGPIO.h"
 #include <driver/touch_pad.h>
 
-InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept : InputDriver(inputs){
+InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept: Super(toInputPinDef(inputs)){
+	for(const auto& input : inputs){
+		thresholds[input.port] = input.threshold;
+	}
+
 	touch_pad_init();
 
 	touch_pad_denoise_t denoise = {
@@ -15,20 +19,31 @@ InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept 
 	touch_pad_fsm_start();
 }
 
+void InputTouchGPIO::registerInput(const TouchPinDef& pinDef){
+	InputDriver::registerInput(pinDef);
+	thresholds[pinDef.port] = pinDef.threshold;
+}
+
 void InputTouchGPIO::scan() noexcept{
 	const auto touchStatus = touch_pad_get_status();
 
-	forEachInput([this, &touchStatus](const TouchPinDef& input){
+	forEachInput([this, &touchStatus](const InputPinDef& input){
 		getStates()[input.port] = (touchStatus & (1UL << input.port));
 	});
 }
 
-void InputTouchGPIO::performRegister(TouchPinDef input) noexcept{
+void InputTouchGPIO::performRegister(const InputPinDef& input) noexcept{
 	touch_pad_fsm_stop();
 
 	const auto touchPin = (touch_pad_t) input.port;
 	touch_pad_config(touchPin);
-	touch_pad_set_thresh(touchPin, input.threshold);
+
+	if(!thresholds.contains(input.port)){
+		ESP_LOGE("InputTouchGPIO", "Threshold for pin %d not defined", input.port);
+		return;
+	}
+
+	touch_pad_set_thresh(touchPin, thresholds[input.port]);
 
 	touch_pad_fsm_start();
 

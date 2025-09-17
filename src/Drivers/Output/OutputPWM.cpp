@@ -3,8 +3,10 @@
 
 DEFINE_LOG(PWM)
 
-OutputPWM::OutputPWM(const std::vector<OutputPWMPinDef>& outputs) : OutputDriver(outputs){
-
+OutputPWM::OutputPWM(const std::vector<OutputPWMPinDef>& outputs) : Super(toOutputPinDef(outputs)){
+	for(const auto& output : outputs){
+		gpios[output.port] = output.pin;
+	}
 }
 
 void OutputPWM::setFreq(int port, uint16_t freq){
@@ -56,7 +58,7 @@ void OutputPWM::detach(int port){
 }
 
 void OutputPWM::performWrite(int port, float value) noexcept{
-	const uint32_t duty = (uint32_t)(FullDuty * value);
+	const uint32_t duty = (uint32_t) (FullDuty * value);
 	const auto group = getSpeedMode(port);
 	const auto chan = getChannel(port);
 
@@ -64,11 +66,17 @@ void OutputPWM::performWrite(int port, float value) noexcept{
 	ledc_update_duty(group, chan);
 }
 
-void OutputPWM::performRegister(OutputPWMPinDef output) noexcept{
-	gpios[output.port] = output.pin;
+void OutputPWM::performRegister(const OutputPinDef& output) noexcept{
+	if(!gpios.contains(output.port)){
+		ESP_LOGE("OutputPWM", "Output port %d not found in pin map", output.port);
+		return;
+	}
 
-	gpio_reset_pin(output.pin);
-	gpio_set_direction(output.pin, GPIO_MODE_OUTPUT);
+
+	const auto& pin = gpios[output.port];
+
+	gpio_reset_pin(pin);
+	gpio_set_direction(pin, GPIO_MODE_OUTPUT);
 
 	const ledc_timer_config_t ledc_timer = {
 			.speed_mode       = getSpeedMode(output.port),
@@ -86,7 +94,7 @@ void OutputPWM::performRegister(OutputPWMPinDef output) noexcept{
 	attach(output.port);
 }
 
-void OutputPWM::performDeregister(OutputPWMPinDef output) noexcept{
+void OutputPWM::performDeregister(const OutputPinDef& output) noexcept{
 	stop(output.port);
 	detach(output.port);
 }

@@ -338,6 +338,10 @@ private:																													                                \
                                                                        														                                \
         inline virtual StrongObjectPtr<Object> createDefaultObject() const noexcept override {  											                \
 			void* temp = operator new(sizeof(ObjectName));																	                                \
+			if(temp == nullptr) {																								                            \
+				return nullptr;																								                                \
+			}																													                            \
+																																							\
 			memset(temp, 0, sizeof(ObjectName));																			                                \
 																																							\
 			StrongObjectPtr<ObjectName> tempPtr = static_cast<ObjectName*>(temp);																			\

@@ -14,7 +14,7 @@ void OutputGPIO::performWrite(int port, float value) noexcept{
 	gpio->write(pin, (bool) value);
 }
 
-void OutputGPIO::performRegister(OutputPinDef output) noexcept {
+void OutputGPIO::performRegister(const OutputPinDef& output) noexcept {
 	const auto pin = (gpio_num_t) output.port;
 	gpio->setMode(pin, GPIOMode::Output);
 	//setting initial state

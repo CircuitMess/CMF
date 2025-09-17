@@ -36,6 +36,10 @@ Class::Class(uint64_t ID) noexcept : classID(ID) {
 
 StrongObjectPtr<Object> Class::createDefaultObject()  const noexcept {
 	void* temp = operator new(sizeof(Object));
+	if(temp == nullptr){
+		return nullptr;
+	}
+
 	memset(temp, 0, sizeof(Object));
 
 	// This is used to make sure the new object is valid in its constructor
