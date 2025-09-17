@@ -1,15 +1,15 @@
 #ifndef CMF_RM_IRMODULE_H
 #define CMF_RM_IRMODULE_H
 
-#include "../ModuleDevice.h"
+#include "Services/Modules/ModuleDevice.h"
 
 class RM_IRModule : public ModuleDevice {
 	GENERATED_BODY(RM_IRModule, ModuleDevice)
 public:
-	RM_IRModule(const Modules::BusPins& busPins={});
+	RM_IRModule(const Modules::BusPins& busPins = {});
 
-	 void write(bool state);
-	 bool read();
+	void write(bool state);
+	bool read();
 };
 
 

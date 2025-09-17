@@ -1,7 +1,7 @@
 #ifndef CMF_RM_TEMPHUMMODULE_H
 #define CMF_RM_TEMPHUMMODULE_H
 
-#include "../ModuleDevice.h"
+#include "Services/Modules/ModuleDevice.h"
 
 class RM_TempHumModule : public ModuleDevice {
 	GENERATED_BODY(RM_TempHumModule, ModuleDevice)

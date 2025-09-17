@@ -1,12 +1,12 @@
 #ifndef CMF_RM_MOTIONSENSOR_H
 #define CMF_RM_MOTIONSENSOR_H
 
-#include "../ModuleDevice.h"
+#include "Services/Modules/ModuleDevice.h"
 
 class RM_MotionSensor : public ModuleDevice{
 	GENERATED_BODY(RM_MotionSensor, ModuleDevice)
 public:
-	RM_MotionSensor(const Modules::BusPins& busPins={});
+	RM_MotionSensor(const Modules::BusPins& busPins = {});
 
 	void setLEDs(bool state);
 

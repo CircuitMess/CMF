@@ -7,17 +7,15 @@
 #include "Drivers/Interface/InputDriver.h"
 #include "Drivers/Interface/OutputDriver.h"
 
-using namespace Modules;
-
 class ModuleDevice : public Object {
 	GENERATED_BODY(ModuleDevice, Object)
 public:
-	ModuleDevice(Type Type = Type::Unknown, const Modules::BusPins& busPins={});
+	ModuleDevice(Modules::Type Type = Modules::Type::Unknown, const Modules::BusPins& busPins={});
 
-	Type getType() const;
+	Modules::Type getType() const;
 
 protected:
-	const Type moduleType;
+	const Modules::Type moduleType;
 
 	Modules::BusPins pins;
 };

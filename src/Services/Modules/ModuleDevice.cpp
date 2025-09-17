@@ -1,11 +1,10 @@
 #include "ModuleDevice.h"
 #include "ModuleType.h"
 
-ModuleDevice::ModuleDevice(Type moduleType, const Modules::BusPins& busPins) :
-		Object(), moduleType(moduleType), pins(busPins){
+ModuleDevice::ModuleDevice(Modules::Type moduleType, const Modules::BusPins& busPins) : moduleType(moduleType), pins(busPins){
 
 }
 
-Type ModuleDevice::getType() const{
+Modules::Type ModuleDevice::getType() const{
 	return moduleType;
 }

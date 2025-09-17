@@ -1,7 +1,7 @@
 #include "RM_MotionSensor.h"
 
-RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : ModuleDevice(Type::RM_Motion, busPins){
-	const auto pin = (gpio_num_t) busPins.subAddressPins[0].port;
+RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Modules::Type::RM_Motion, busPins){
+	const auto pin = static_cast<gpio_num_t>(busPins.subAddressPins[0].port);
 	const gpio_config_t io_conf = {
 			.pin_bit_mask = 1ULL << pin,
 			.mode = GPIO_MODE_INPUT,
@@ -32,6 +32,6 @@ void RM_MotionSensor::isr(void* arg){
 		return;
 	}
 
-	RM_MotionSensor& motion = *((RM_MotionSensor*) arg);
-	motion.active = gpio_get_level((gpio_num_t) motion.pins.subAddressPins[0].port);
+	RM_MotionSensor* motion = static_cast<RM_MotionSensor*>(arg);
+	motion->active = gpio_get_level(static_cast<gpio_num_t>(motion->pins.subAddressPins[0].port));
 }

@@ -1,6 +1,6 @@
 #include "RM_IRModule.h"
 
-RM_IRModule::RM_IRModule(const Modules::BusPins& busPins) : ModuleDevice(Type::RM_IR, busPins){
+RM_IRModule::RM_IRModule(const Modules::BusPins& busPins) : Super(Modules::Type::RM_IR, busPins){
 	write(false);
 }
 
@@ -14,5 +14,6 @@ bool RM_IRModule::read(){
 	if(pins.subAddressPins[0].inputDriver){
 		return pins.subAddressPins[0].inputDriver->read(pins.subAddressPins[0].port);
 	}
+
 	return false;
 }
