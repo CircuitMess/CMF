@@ -4,14 +4,14 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "Periphery/GPIOPeriph.h"
 
-class OutputGPIO : public OutputDriver<> {
+class OutputGPIO : public OutputDriver {
 	GENERATED_BODY(OutputGPIO, OutputDriver);
 public:
 	OutputGPIO() noexcept = default;
 	OutputGPIO(const std::vector<OutputPinDef>& outputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept;
 
 private:
-	void performRegister(OutputPinDef output) noexcept override;
+	void performRegister(const OutputPinDef& output) noexcept override;
 
 	void performWrite(int port, float value) noexcept override;
 

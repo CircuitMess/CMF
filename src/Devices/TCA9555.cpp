@@ -1,4 +1,5 @@
 #include "TCA9555.h"
+#include "Periphery/I2C.h"
 
 static inline uint8_t TCA_IT(uint8_t pin){ return (pin <= 7) ? 0 : 1; }
 
@@ -12,13 +13,16 @@ static const char* TAG = "TCA9555";
 
 
 TCA9555::TCA9555(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
+	if(i2c == nullptr){
+		return;
+	}
+
 	if(i2c->probe(Addr) != ESP_OK){
 		ESP_LOGE(TAG, "Can't probe device");
 		abort();
 	}
 
 	reset();
-
 }
 
 void TCA9555::reset(){
@@ -35,7 +39,7 @@ void TCA9555::pinMode(uint8_t pin, TCA9555::PinMode mode){
 	const uint8_t regDir = TCA_REG(REG_DIR, pin);
 	uint8_t& intRegDir = regs.dir[it];
 
-	if(mode == OUT){
+	if(mode == PinMode::OUT){
 		intRegDir = intRegDir & ~mask;
 	}else{
 		intRegDir = intRegDir | mask;
@@ -57,7 +61,7 @@ bool TCA9555::read(uint8_t pin){
 
 uint16_t TCA9555::readAll(){
 	std::vector<uint8_t> val(2);
-	ESP_ERROR_CHECK(i2c->write_read(Addr, REG_INPUT, val, 2));
+	ESP_ERROR_CHECK(i2c->write_read(Addr, REG_INPUT, val));
 	return (val[1] << 8) | val[0];
 }
 

@@ -31,14 +31,14 @@ private:
 	void pressed(int btn);
 	void released(int btn);
 
-	std::set<StrongObjectPtr<InputDriverBase>> inputSources;
+	std::set<StrongObjectPtr<InputDriver>> inputSources;
 
 	std::map<int, InputPin> buttons;
 
 	std::unordered_map<int, bool> btnState;
 	std::unordered_map<int, uint64_t> dbTime;
 
-	static constexpr uint64_t SleepTime = 35; // [ms]
+	static constexpr uint64_t SleepTime = 5; // [ms]
 	static constexpr uint64_t DebounceTime = 5; // [ms]
 };
 
