@@ -7,8 +7,11 @@ dependencies:
   espressif/esp32-camera:
     git: https://github.com/espressif/esp32-camera.git
 
+  LIS2DW12:
+    git: https://github.com/CircuitMess/lis2dw12-pid
+
   idf:
-    version: '>=5.1.1'
+    version: '>=5.5'
 description: CircuitMess Framework
 repository: git://github.com/CircuitMess/CMF.git
 url: https://github.com/CircuitMess/CMF
