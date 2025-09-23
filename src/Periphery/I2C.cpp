@@ -70,6 +70,11 @@ esp_err_t I2C::write(uint8_t address, std::initializer_list<uint8_t> data, TickT
 	return write(address, std::vector<uint8_t>({ data }), wait);
 }
 
+esp_err_t I2C::write(uint8_t address, uint8_t* data, size_t size, TickType_t wait){
+	std::lock_guard lock(mutex);
+	return i2c_master_write_to_device(port, address, data, size, wait);
+}
+
 esp_err_t I2C::read(uint8_t address, std::vector<uint8_t>& data, TickType_t wait){
 	std::lock_guard lock(mutex);
 	return i2c_master_read_from_device(port, address, data.data(), data.size(), wait);
@@ -96,6 +101,11 @@ esp_err_t I2C::write_read(uint8_t address, const std::vector<uint8_t>& writeData
 
 esp_err_t I2C::write_read(uint8_t address, uint8_t writeData, uint8_t& readData, TickType_t wait){
 	return write_read(address, std::vector<uint8_t>({ writeData }), readData, wait);
+}
+
+esp_err_t I2C::write_read(uint8_t address, uint8_t* writeData, size_t writeSize, uint8_t* readData, size_t readSize, TickType_t wait){
+	std::lock_guard lock(mutex);
+	return i2c_master_write_read_device(port, address, writeData, writeSize, readData, readSize, wait);
 }
 
 esp_err_t I2C::writeRegister(uint8_t address, uint8_t reg, const std::vector<uint8_t>& data, TickType_t wait){
