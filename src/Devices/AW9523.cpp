@@ -30,9 +30,14 @@ static const char* TAG = "AW9523";
 const uint8_t AW9523::dimmap[16] = { 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 12, 13, 14, 15 };
 
 AW9523::AW9523(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
+	if(!i2c){
+		ESP_LOGE(TAG, "I2C interface is null");
+		abort();
+	}
+
 	if(i2c->probe(Addr) != ESP_OK){
 		ESP_LOGE(TAG, "Transmission error");
-		return;
+		abort();
 	}
 
 	// Reset

@@ -13,8 +13,9 @@ static const char* TAG = "TCA9555";
 
 
 TCA9555::TCA9555(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
-	if(i2c == nullptr){
-		return;
+	if(!i2c){
+		ESP_LOGE(TAG, "I2C interface is null");
+		abort();
 	}
 
 	if(i2c->probe(Addr) != ESP_OK){
