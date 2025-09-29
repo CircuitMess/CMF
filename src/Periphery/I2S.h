@@ -20,7 +20,7 @@ public:
 	 * Write data to I2S channel.
 	 * @param data data pointer
 	 * @param size number of bytes to be written
-	 * @return number of bytes successfully written, or ESP_ERR code
+	 * @return number of bytes successfully written, 0 if error
 	 */
 	size_t write(uint8_t* data, size_t bytes);
 
@@ -28,7 +28,7 @@ public:
 	 * Read data from I2S channel.
 	 * @param data data pointer
 	 * @param bytes number of bytes to be read
-	 * @return number of bytes successfully read, or ESP_ERR code
+	 * @return number of bytes successfully read, 0 if error
 	 */
 	size_t read(uint8_t* data, size_t bytes);
 
