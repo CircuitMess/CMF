@@ -20,6 +20,13 @@ config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
 
+config CMF_INACTIVITY_TIMEOUT
+    int "Shutdown after [s] (-1 for disable)"
+    default 120
+
+config CMF_BATTERY_SHUTDOWN
+    bool "Battery critical level shutdown"
+    default "y"
 
 config CMF_MODULES
     bool "Enable Modules service"

@@ -2,20 +2,45 @@
 #define CMF_SHUTDOWN_SERVICE_H
 
 #include <esp_sleep.h>
-#include "Object/Object.h"
+#include "Event/EventBroadcaster.h"
+#include "Entity/AsyncEntity.h"
+#include "Services/Battery/Battery.h"
 
 enum class ShutdownReason : uint8_t {
 	Inactivity, Battery
 };
 
-class ShutdownService : public Object {
-	GENERATED_BODY(ShutdownService, Object)
-public:
-	// TODO figure out how tf to make this work per project with timeout in the shutdown service and not in the project code
-	static constexpr uint32_t InactivityTimeout = 2 * 60000; //[ms] = 2 mins // TODO this shit should somehow be defined per project
+class ShutdownService : public AsyncEntity {
+	GENERATED_BODY(ShutdownService, AsyncEntity)
 
-	//Hardware shutdown, with notification audio beforehand
-	static void shutdown(ShutdownReason reason);
+public:
+	DECLARE_EVENT(OnShutdownEvent, ShutdownService, ShutdownReason)
+	OnShutdownEvent OnShutdown {this};
+
+public:
+	static SemaphoreHandle_t ShutdownSemaphore;
+
+public:
+	ShutdownService();
+
+	static constexpr uint32_t InactivityTimeout = CONFIG_CMF_INACTIVITY_TIMEOUT >= 0 ? CONFIG_CMF_INACTIVITY_TIMEOUT : portMAX_DELAY; //[ms]
+
+	void shutdown(ShutdownReason reason);
+
+	template<typename ...Args>
+	void activityCallback(Args... args) {
+#if CONFIG_CMF_INACTIVITY_TIMEOUT >= 0
+		xSemaphoreGive(inactivitySem);
+#endif
+	}
+
+private:
+	SemaphoreHandle_t inactivitySem;
+
+private:
+	void tick(float deltaTime) noexcept override;
+
+	void onBatteryLevelChange(Battery::Level level);
 };
 
 

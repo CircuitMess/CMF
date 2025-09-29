@@ -1,50 +1,49 @@
 #include "ShutdownService.h"
-#include "Services/Audio/Audio.h"
-#include "Enums.h"
-#include "Pins.hpp"
-#include "Drivers/Output/OutputGPIO.h"
-#include <Services/Motors/Motors.h>
-#include <Services/LED/LED.h>
 
-void ShutdownService::shutdown(ShutdownReason reason){
-	auto app = getApp();
+SemaphoreHandle_t ShutdownService::ShutdownSemaphore = xSemaphoreCreateBinary();
 
-	auto audio = app->getService<Audio>();
+ShutdownService::ShutdownService() : Super(InactivityTimeout, 3 * 1024, 10, -1) {
+    inactivitySem = xSemaphoreCreateBinary();
+    xSemaphoreGive(inactivitySem);
 
-	switch(reason){
-		case ShutdownReason::Inactivity:
-			audio->play("/spiffs/Gasenje.aac");
-			break;
-		case ShutdownReason::Battery:
-			audio->play("/spiffs/GasenjeBatt.aac");
-			break;
-		default:
-			break;
-	}
+    xSemaphoreGive(ShutdownSemaphore);
 
-	auto motors = app->getService<Motors<int>>();
-	motors->set(0, 0);
+#ifdef CONFIG_CMF_BATTERY_SHUTDOWN
+    const Application* app = getApp();
+    if(app == nullptr) {
+        return;
+    }
 
-	auto leds = app->getService<LED<LEDs, RGB_LEDs>>();
+    Battery* battery = app->getService<Battery>();
+    if(!isValid(battery)) {
+        return;
+    }
 
+    battery->OnLevelChanged.bind(this, &ShutdownService::onBatteryLevelChange);
+#endif
+}
 
-	for(int i = 0; i < (uint8_t) LEDs::COUNT; i++){
-		leds->off((LEDs) i);
-	}
+void ShutdownService::shutdown(ShutdownReason reason) {
+    xSemaphoreTake(ShutdownSemaphore, portMAX_DELAY);
 
-	for(int i = 0; i < (uint8_t) RGB_LEDs::COUNT; i++){
-		leds->off((RGB_LEDs) i);
-	}
+    OnShutdown.broadcast(reason);
+}
 
-	delayMillis(1000);
+void ShutdownService::tick(float deltaTime) noexcept {
+    Super::tick(deltaTime);
 
-	app->getDriver<OutputGPIO>()->write(SPKR_EN, false);
+#if CONFIG_CMF_INACTIVITY_TIMEOUT >= 0
+    if(xSemaphoreTake(inactivitySem, 0) == pdFALSE){
+        //Semaphore not given in the last 'Timeout' milliseconds by the inputEvent callback.
+        shutdown(ShutdownReason::Inactivity);
+    }
+#endif
+}
 
-
-	ESP_ERROR_CHECK(esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_AUTO));
-	ESP_ERROR_CHECK(esp_sleep_pd_config(ESP_PD_DOMAIN_RC_FAST, ESP_PD_OPTION_AUTO));
-	ESP_ERROR_CHECK(esp_sleep_pd_config(ESP_PD_DOMAIN_CPU, ESP_PD_OPTION_AUTO));
-	ESP_ERROR_CHECK(esp_sleep_pd_config(ESP_PD_DOMAIN_XTAL, ESP_PD_OPTION_AUTO));
-	ESP_ERROR_CHECK(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
-	esp_deep_sleep_start();
+void ShutdownService::onBatteryLevelChange(Battery::Level level) {
+#ifdef CONFIG_CMF_BATTERY_SHUTDOWN
+    if(level == Battery::Level::Critical) {
+        shutdown(ShutdownReason::Battery);
+    }
+#endif
 }

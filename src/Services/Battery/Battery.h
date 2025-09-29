@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <atomic>
+#include <utility>
 #include "Entity/AsyncEntity.h"
 #include "Services/ADCReader.h"
 #include "Drivers/Interface/OutputDriver.h"
@@ -70,7 +71,7 @@ private:
 class Composite_ADCFilter : public ADCFilter {
 	GENERATED_BODY(Composite_ADCFilter, ADCFilter)
 public:
-	Composite_ADCFilter(std::vector<StrongObjectPtr<ADCFilter>> filters = {}) : filters(filters){
+	Composite_ADCFilter(std::vector<StrongObjectPtr<ADCFilter>> filters = {}) : filters(std::move(filters)){
 
 	}
 
@@ -90,13 +91,14 @@ private:
 class Battery : public Object {
 	GENERATED_BODY(Battery, Object)
 public:
-	Battery(OutputPin refSwitch = {});
+	Battery(int32_t pin = -1, OutputPin refSwitch = {});
 
 	void begin() const;
 
 	enum class Level {
 		Critical = 0, VeryLow, Low, Mid, High, VeryHigh, Full, COUNT
 	};
+
 	DECLARE_EVENT(BatteryEvent, Battery, Level);
 	BatteryEvent OnLevelChanged{ this };
 

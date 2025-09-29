@@ -1,13 +1,11 @@
 #include "Battery.h"
-#include "../Pins.hpp"
 #include "Memory/ObjectMemory.h"
-#include <Util/stdafx.h>
+#include "Util/stdafx.h"
 #include <driver/gpio.h>
-
 
 DEFINE_LOG(Battery)
 
-Battery::Battery(OutputPin refSwitch) : refSwitch(refSwitch), hysteresis({ 0, 4, 15, 30, 50, 70, 90, 100 }, 3){
+Battery::Battery(int32_t pin /*= -1*/, OutputPin refSwitch /*= {}*/) : refSwitch(refSwitch), hysteresis({ 0, 4, 15, 30, 50, 70, 90, 100 }, 3){
 	adc_oneshot_chan_cfg_t cfg = {
 			.atten = ADC_ATTEN_DB_2_5,
 			.bitwidth = ADC_BITWIDTH_12
@@ -21,9 +19,9 @@ Battery::Battery(OutputPin refSwitch) : refSwitch(refSwitch), hysteresis({ 0, 4,
 			StrongObjectPtr<ADCFilter>{ newObject<Remap_ADCFilter>(this, VoltEmpty, VoltFull) }
 	};
 
-	readerBatt = newObject<ADCReader>(this, (gpio_num_t) PIN_BATT, cfg, true, newObject<Composite_ADCFilter>(this, filters).get());
+	readerBatt = newObject<ADCReader>(this, static_cast<gpio_num_t>(pin), cfg, true, newObject<Composite_ADCFilter>(this, filters).get());
 
-	readerRef = newObject<ADCReader>(this, (gpio_num_t) PIN_BATT, cfg, true, newObject<FactorOffset_ADCFilter>(this, Factor, Offset).get());
+	readerRef = newObject<ADCReader>(this, static_cast<gpio_num_t>(pin), cfg, true, newObject<FactorOffset_ADCFilter>(this, Factor, Offset).get());
 
 	calibrate();
 
