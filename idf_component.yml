@@ -1,14 +1,22 @@
 dependencies:
   LovyanGFX:
     git: https://github.com/lovyan03/LovyanGFX.git
-    version: develop
+    version: 1.2.7
+    matches:
+      - if: "$CONFIG{CMF_LGFX} == True"
 
-  lvgl/lvgl: ">=9.2.0"
+  lvgl/lvgl:
+    version: "9.2.0"
+    matches:
+      - if: "$CONFIG{CMF_LVGL} == True"
+
   espressif/esp32-camera:
-    git: https://github.com/espressif/esp32-camera.git
+    version: "2.1.3"
+    matches:
+      - if: "$CONFIG{CMF_CAMERA} == True"
 
-  idf:
-    version: '>=5.1.1'
+  idf: '>=5.1.1'
+
 description: CircuitMess Framework
 repository: git://github.com/CircuitMess/CMF.git
 url: https://github.com/CircuitMess/CMF
