@@ -6,7 +6,6 @@
 #include "ModuleType.h"
 #include "Event/EventBroadcaster.h"
 #include "Drivers/Interface/InputDriver.h"
-#include "Periphery/I2C.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "ModuleDevice.h"
 #include "ModuleDefs.h"

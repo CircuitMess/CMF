@@ -3,7 +3,6 @@
 
 #include "Object/Object.h"
 #include "ModuleType.h"
-#include "Periphery/I2C.h"
 #include "Drivers/Interface/InputDriver.h"
 #include "Drivers/Interface/OutputDriver.h"
 
