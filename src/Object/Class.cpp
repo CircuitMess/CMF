@@ -23,6 +23,10 @@ uint64_t Class::getID() const noexcept{
 }
 
 bool Class::isA(const Class *other) const noexcept {
+	if(other == nullptr) {
+		return false;
+	}
+
 	return other->getID() == getID();
 }
 
@@ -34,7 +38,7 @@ Class::Class(uint64_t ID) noexcept : classID(ID) {
 	registry->registerClass(this);
 }
 
-StrongObjectPtr<Object> Class::createDefaultObject()  const noexcept {
+StrongObjectPtr<Object> Class::createDefaultObject() const noexcept {
 	void* temp = operator new(sizeof(Object));
 	if(temp == nullptr){
 		return nullptr;

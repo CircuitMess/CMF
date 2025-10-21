@@ -43,8 +43,6 @@ public:
 	void set(Motor motor, float val){
 		std::lock_guard guard(accessMutex);
 
-		TRACE_LOG("%lld", millis());
-
 		val = std::clamp(val, -100.f, 100.f);
 		if(currentValues[static_cast<int>(motor)] == val) {
 			return;
