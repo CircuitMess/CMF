@@ -69,7 +69,7 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 	// This is used to make sure the new object is valid in its constructor
 	StrongObjectPtr<T> tempPtr = static_cast<T*>(temp);
 
-	StrongObjectPtr<T> newObject = new(temp) T(args...);
+	StrongObjectPtr<T> newObject = new(temp) T(std::forward<Args>(args)...);
 
 	initObject(cast<Object>(newObject.get()), owner);
 

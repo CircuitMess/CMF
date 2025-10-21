@@ -66,6 +66,10 @@ public:
 	 * @return True if same type or derived from it, false otherwise.
 	 */
 	inline virtual bool isA(const Class* other) const noexcept{
+		if(other == nullptr) {
+			return false;
+		}
+
 		return other->getID() == staticClass()->getID();
 	}
 
@@ -328,6 +332,10 @@ private:																													                                \
 		}                                                                    												                                \
 																																							\
 		inline virtual bool isA(const Class* other) const noexcept override {													                            \
+			if(other == nullptr){																															\
+				return false;																																\
+			}																																				\
+																																							\
 			return other->getID() == Class::getID() || SuperObject::staticClass()->isA(other);																\
 		}																														                            \
 																																							\
