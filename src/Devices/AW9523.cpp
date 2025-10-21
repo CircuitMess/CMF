@@ -29,15 +29,21 @@ static const char* TAG = "AW9523";
 
 const uint8_t AW9523::dimmap[16] = { 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 12, 13, 14, 15 };
 
-AW9523::AW9523(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
-	if(!i2c){
-		ESP_LOGE(TAG, "I2C interface is null");
+AW9523::AW9523(std::unique_ptr<I2CDevice> device) : dev(std::move(device)){
+	if(!dev){
+		ESP_LOGE(TAG, "I2C device is null");
 		abort();
 	}
 
-	if(i2c->probe(Addr) != ESP_OK){
+	uint8_t id = 0;
+	if(dev->readRegister(REG_ID, id) != ESP_OK){
 		ESP_LOGE(TAG, "Transmission error");
 		abort();
+	}
+
+	if(id != VAL_ID){
+		ESP_LOGE(TAG, "ID missmatch: expected %d, got %d", VAL_ID, id);
+		return;
 	}
 
 	// Reset
@@ -45,12 +51,6 @@ AW9523::AW9523(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
 	regs = Regs();
 
 	delayMicros(50);
-
-	uint8_t id = readReg(REG_ID);
-	if(id != VAL_ID){
-		ESP_LOGE(TAG, "ID missmatch: expected %d, got %d", VAL_ID, id);
-		return;
-	}
 
 	// All input
 	regs.dir[0] = regs.dir[1] = 0xff;
@@ -162,14 +162,14 @@ void AW9523::setCurrentLimit(AW9523::CurrentLimit limit){
 
 uint8_t AW9523::readReg(uint8_t reg) const{
 	uint8_t data;
-	i2c->readRegister(Addr, reg, data);
+	ESP_ERROR_CHECK(dev->readRegister(reg, data));
 	return data;
 }
 
 void AW9523::writeReg(uint8_t reg, const uint8_t* data, size_t size) const{
-	ESP_ERROR_CHECK(i2c->writeRegister(Addr, reg, data, size));
+	ESP_ERROR_CHECK(dev->writeRegister(reg, data, size));
 }
 
 void AW9523::writeReg(uint8_t reg, uint8_t data) const{
-	ESP_ERROR_CHECK(i2c->writeRegister(Addr, reg, data));
+	ESP_ERROR_CHECK(dev->writeRegister(reg, data));
 }

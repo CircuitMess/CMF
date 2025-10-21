@@ -1,5 +1,7 @@
 #include "TCA9555.h"
-#include "Periphery/I2C.h"
+#include "Core/Application.h"
+#include "Periphery/I2CMaster.h"
+#include "Periphery/I2CDevice.h"
 
 static inline uint8_t TCA_IT(uint8_t pin){ return (pin <= 7) ? 0 : 1; }
 
@@ -12,14 +14,15 @@ static inline uint8_t TCA_MASK(uint8_t pin){ return 1 << TCA_BIT(pin); }
 static const char* TAG = "TCA9555";
 
 
-TCA9555::TCA9555(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
+TCA9555::TCA9555(std::unique_ptr<I2CMaster> i2c, uint8_t addr){
 	if(!i2c){
-		ESP_LOGE(TAG, "I2C interface is null");
+		ESP_LOGE(TAG, "I2C master is null");
 		abort();
 	}
 
-	if(i2c->probe(Addr) != ESP_OK){
-		ESP_LOGE(TAG, "Can't probe device");
+	dev = i2c->addDevice(addr);
+	if(!dev){
+		ESP_LOGE(TAG, "I2C device is null");
 		abort();
 	}
 
@@ -27,8 +30,8 @@ TCA9555::TCA9555(I2C* i2c, uint8_t addr) : i2c(i2c), Addr(addr){
 }
 
 void TCA9555::reset(){
-	i2c->write(Addr, { REG_DIR, 0xff, 0xff }); // All pins to input
-	i2c->write(Addr, { REG_POLARITY, 0x00, 0x00 }); // Turn off polarity inversion for all pins
+	dev->write({ REG_DIR, 0xff, 0xff }); // All pins to input
+	dev->write({ REG_POLARITY, 0x00, 0x00 }); // Turn off polarity inversion for all pins
 	regs = Regs();
 }
 
@@ -46,7 +49,7 @@ void TCA9555::pinMode(uint8_t pin, TCA9555::PinMode mode){
 		intRegDir = intRegDir | mask;
 	}
 
-	ESP_ERROR_CHECK(i2c->writeRegister(Addr, regDir, intRegDir));
+	ESP_ERROR_CHECK(dev->writeRegister(regDir, intRegDir));
 }
 
 bool TCA9555::read(uint8_t pin){
@@ -55,14 +58,14 @@ bool TCA9555::read(uint8_t pin){
 	const uint8_t reg = TCA_REG(REG_INPUT, pin);
 
 	uint8_t regVal;
-	ESP_ERROR_CHECK(i2c->readRegister(Addr, reg, regVal));
+	ESP_ERROR_CHECK(dev->readRegister(reg, regVal));
 
 	return regVal & TCA_MASK(pin);
 }
 
 uint16_t TCA9555::readAll(){
 	std::vector<uint8_t> val(2);
-	ESP_ERROR_CHECK(i2c->write_read(Addr, REG_INPUT, val));
+	ESP_ERROR_CHECK(dev->write_read(REG_INPUT, val));
 	return (val[1] << 8) | val[0];
 }
 
@@ -79,6 +82,6 @@ void TCA9555::write(uint8_t pin, bool state){
 		intReg = intReg & ~mask;
 	}
 
-	ESP_ERROR_CHECK(i2c->writeRegister(Addr, reg, intReg));
+	ESP_ERROR_CHECK(dev->writeRegister(reg, intReg));
 
 }

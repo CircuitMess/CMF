@@ -1,7 +1,8 @@
 #ifndef CMF_AW9523_H
 #define CMF_AW9523_H
 
-#include "Periphery/I2C.h"
+#include "Object/Object.h"
+#include "Periphery/I2CDevice.h"
 
 /**
  * GPIO expander and LED driver, 16-pin.
@@ -12,7 +13,7 @@
 class AW9523 : public Object {
 	GENERATED_BODY(AW9523, Object)
 public:
-	AW9523(I2C* i2c = nullptr, uint8_t addr = 0x58);
+	explicit AW9523(std::unique_ptr<I2CDevice> device = {});
 
 	void resetDimOutputs();
 
@@ -82,8 +83,7 @@ public:
 	void setCurrentLimit(CurrentLimit limit);
 
 private:
-	I2C* i2c;
-	const uint8_t Addr;
+	std::unique_ptr<I2CDevice> dev;
 
 	static const uint8_t dimmap[16];
 
