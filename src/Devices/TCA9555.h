@@ -2,6 +2,7 @@
 #define CMF_TCA9555_H
 
 #include "Object/Object.h"
+#include "Periphery/I2CMaster.h"
 
 /**
  * GPIO expander, 16-bit.
@@ -13,7 +14,7 @@ class TCA9555 : public Object {
 	GENERATED_BODY(TCA9555, Object)
 
 public:
-	explicit TCA9555(class I2C* i2c = nullptr, uint8_t addr = 0x20);
+	explicit TCA9555(std::unique_ptr<I2CMaster> i2c = {}, uint8_t addr = 0x20);
 
 	/**
 	 * Reset all pins to input and clear register state.
@@ -53,8 +54,7 @@ public:
 	void write(uint8_t pin, bool state);
 
 private:
-	I2C* i2c;
-	const uint8_t Addr;
+	std::unique_ptr<class I2CDevice> dev;
 
 	struct Regs {
 		uint8_t dir[2] = { 0xff, 0xff };

@@ -316,7 +316,7 @@ protected:
 	 */
 	template<typename T, typename ...Args>
 	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Object>){
-		StrongObjectPtr<T> object = newObject<T>(this, args...);
+		StrongObjectPtr<T> object = newObject<T>(this, std::forward<Args>(args)...);
 		if(!object.isValid()){
 			return nullptr;
 		}

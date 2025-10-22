@@ -1,7 +1,10 @@
 #include "RM_TempHumModule.h"
+#include <Periphery/I2CDevice.h>
 
 RM_TempHumModule::RM_TempHumModule(const Modules::BusPins& busPins) : ModuleDevice(Modules::Type::RM_TempHum, busPins){
-	ESP_ERROR_CHECK(busPins.i2c->write(Addr, 0x00));
+	i2c = busPins.i2c->addDevice(Addr);
+	assert(i2c != nullptr);
+	ESP_ERROR_CHECK(i2c->write(0x00));
 }
 
 void RM_TempHumModule::sample(){
@@ -21,9 +24,9 @@ uint8_t RM_TempHumModule::getHumidity() const{
 //TODO - separate this out to its own Device class for AHT20
 std::array<uint8_t, 6> RM_TempHumModule::readData(){
 	std::array<uint8_t, 6> data{};
-	pins.i2c->write(Addr, { 0xAC, 0x33, 0x00 });
+	i2c->write({ 0xAC, 0x33, 0x00 });
 	delayMillis(80);
-	pins.i2c->read(Addr, data);
+	i2c->read(data);
 
 	return data;
 }

@@ -28,6 +28,7 @@ public:
 
 private:
 	static constexpr uint8_t Addr = 0x38;
+	std::unique_ptr<I2CDevice> i2c;
 
 	int16_t temp = 0;
 	uint8_t hum = 0;

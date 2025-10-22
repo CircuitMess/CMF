@@ -3,7 +3,7 @@
 
 #include "Drivers/Interface/InputDriver.h"
 #include "Drivers/Interface/OutputDriver.h"
-#include "Periphery/I2C.h"
+#include "Periphery/I2CMaster.h"
 
 namespace Modules {
 
@@ -39,7 +39,7 @@ struct IOPin {
 };
 struct BusPins {
 	InputPin addr[6], detPins[2];
-	I2C* i2c;
+	I2CMaster* i2c;
 	IOPin subAddressPins[6];
 };
 

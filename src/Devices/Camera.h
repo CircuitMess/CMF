@@ -2,14 +2,13 @@
 #define CMF_CAMERA_H
 
 #include <esp_camera.h>
-#include "Periphery/I2C.h"
 #include "Periphery/GPIOPeriph.h"
 
 class Camera : public Object {
 	GENERATED_BODY(Camera, Object)
 
 public:
-	Camera(camera_config_t config = {}, I2C* i2c = nullptr, std::function<void(sensor_t*)> sensorConfig = {});
+	Camera(camera_config_t config = {}, class I2CMaster* i2c = nullptr, std::function<void(sensor_t*)> sensorConfig = {});
 
 	~Camera() override;
 
@@ -40,7 +39,7 @@ private:
 	int failedFrames = 0;
 
 	camera_config_t config;
-	StrongObjectPtr<I2C> i2c;
+	StrongObjectPtr<I2CMaster> i2c;
 	StrongObjectPtr<GPIOPeriph> gpio;
 	std::function<void(sensor_t*)> sensorConfig;
 };

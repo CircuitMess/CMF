@@ -1,10 +1,17 @@
 #include "Camera.h"
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
+#include "Periphery/I2CMaster.h"
 
 DEFINE_LOG(Camera)
+static constexpr const char* TAG = "Camera";
 
-Camera::Camera(camera_config_t config, I2C* i2c, std::function<void(sensor_t*)> sensorConfig) : config(config), i2c(i2c), sensorConfig(sensorConfig){
+Camera::Camera(camera_config_t config, I2CMaster* i2c, std::function<void(sensor_t*)> sensorConfig) : config(config), i2c(i2c), sensorConfig(sensorConfig){
+	if(!i2c){
+		ESP_LOGE(TAG, "I2C interface is null");
+		abort();
+	}
+
 	if(config.pin_pwdn >= 0){
 		gpio = ApplicationStatics::getApplication()->getPeriphery<GPIOPeriph>();
 		gpio->setMode((gpio_num_t) config.pin_pwdn, GPIOMode::Output);

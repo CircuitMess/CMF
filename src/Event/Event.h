@@ -135,6 +135,8 @@ protected:
 
 		bool succeeded = true;
 
+		// TODO this should return false if app or event scanner are nullptr
+
 		for(const HandleContainer& container : handles){
 			if(container.handle == nullptr || !container.owningObject.isValid()){
 				continue;
