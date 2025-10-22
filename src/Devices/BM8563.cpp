@@ -2,21 +2,14 @@
 
 static const char* TAG = "BM8563";
 
-BM8563::BM8563(I2C* i2c, uint8_t Addr) : i2c(i2c), Addr(Addr){
+BM8563::BM8563(std::unique_ptr<I2CDevice> i2cDevice, uint8_t Addr) : i2c(std::move(i2cDevice)), Addr(Addr){
 	if(!i2c){
 		ESP_LOGE(TAG, "No I2C peripheral provided");
 		abort();
 	}
 
-	if(i2c->probe(Addr) != ESP_OK){
-		ESP_LOGE(TAG, "No device found at address 0x%x", Addr);
-		abort();
-	}
-
 	// Clear status registers (0x0 and 0x1)
-	const auto ret = i2c->write(Addr, { 0, 0, 0 }, 10);
-
-	if(ret != ESP_OK){
+	if(const auto ret = i2c->write({ 0, 0, 0 }, 10); ret != ESP_OK){
 		ESP_LOGE(TAG, "Error clearing status registers: %d", ret);
 		abort();
 	}
@@ -24,8 +17,8 @@ BM8563::BM8563(I2C* i2c, uint8_t Addr) : i2c(i2c), Addr(Addr){
 
 tm BM8563::getTime(){
 	uint8_t data[7];
-	uint8_t writeData = 0x02;
-	if(i2c->write_read(Addr, &writeData, 1, data, 7) != ESP_OK) return {};
+	constexpr uint8_t writeData = 0x02;
+	if(i2c->write_read(&writeData, 1, data, 7) != ESP_OK) return {};
 
 	tm time = {};
 
@@ -50,7 +43,7 @@ tm BM8563::getTime(){
 	/* If century bit set assume it is 2000. Note that it seems */
 	/* that unlike PCF8563, the BM8563 does NOT automatically */
 	/* toggle the century bit when year overflows from 99 to 00. */
-	uint8_t century = (data[5] & 0b10000000) ? 100 : 0;
+	const uint8_t century = (data[5] & 0b10000000) ? 100 : 0;
 
 	/* Number of years since 1900 */
 	time.tm_year = bcd2dec(data[6] & 0b11111111) + century;
@@ -92,7 +85,7 @@ void BM8563::setTime(const tm& time){
 
 	uint8_t wdata[8] = { 0x02 };
 	memcpy(wdata + 1, data, 7);
-	i2c->write(Addr, wdata, 8);
+	i2c->write(wdata, 8);
 }
 
 uint8_t BM8563::bcd2dec(uint8_t bcd){

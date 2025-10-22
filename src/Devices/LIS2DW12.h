@@ -1,9 +1,10 @@
-#ifndef BUTTERBOT_FIRMWARE_LIS2DW12_H
-#define BUTTERBOT_FIRMWARE_LIS2DW12_H
+#ifndef CMF_LIS2DW12_H
+#define CMF_LIS2DW12_H
 
 #include "Object/Object.h"
+#include <driver/gpio.h>
 #include "lis2dw12_reg.h"
-#include "Periphery/I2C.h"
+#include "Periphery/I2CDevice.h"
 #include "Event/EventBroadcaster.h"
 
 //TODO - factor out an accelerometer interface, and a FIFO-capable accelerometer abstract class
@@ -13,8 +14,8 @@
  */
 class LIS2DW12 : public Object {
 	GENERATED_BODY(LIS2DW12, Object)
-public:
 
+public:
 	struct FreeFallConfig {
 		lis2dw12_ff_ths_t threshold;
 		/**
@@ -82,7 +83,7 @@ public:
 	};
 
 
-	LIS2DW12(I2C* i2c = nullptr, PinConfig pinConfig = {}, Config config = {}, uint8_t addr = (LIS2DW12_I2C_ADD_L >> 1));
+	explicit LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice = {}, PinConfig pinConfig = {}, Config config = {}, uint8_t addr = (LIS2DW12_I2C_ADD_L >> 1));
 
 	Sample getSample();
 
@@ -92,7 +93,7 @@ public:
 	 * @param timeout Timeout when taking from an empty FIFO queue
 	 * @return sample
 	 */
-	Sample pollFIFO(TickType_t timeout = portMAX_DELAY);
+	Sample pollFIFO(TickType_t timeout = portMAX_DELAY) const;
 
 	enum class EventType {
 		FreeFall, Tap, FIFOOverflow
@@ -100,19 +101,19 @@ public:
 
 
 	DECLARE_EVENT(AcceleroEvent, LIS2DW12, EventType);
-	AcceleroEvent event = AcceleroEvent(this);
+	AcceleroEvent event = AcceleroEvent{this};
 
-	void enableFreeFallDetection(FreeFallConfig FFConfig);
-	void disableFreeFallDetection();
+	void enableFreeFallDetection(FreeFallConfig FFConfig) const;
+	void disableFreeFallDetection() const;
 
-	void enableTapDetection(TapConfig tapConfig);
-	void disableTapDetection();
+	void enableTapDetection(TapConfig tapConfig) const;
+	void disableTapDetection() const;
 
 	void enableFIFO(FIFOConfig fifoConfig);
 	void disableFIFO();
 
 private:
-	I2C* i2c;
+	std::unique_ptr<I2CDevice> i2c;
 	const uint8_t Addr;
 
 	Config config;
@@ -139,7 +140,7 @@ private:
 	 * Read and reset all interrupt sources.
 	 * This will reset all status bits and interrupt signals.
 	 */
-	void clearSources();
+	void clearSources() const;
 
 	static void isr(void* arg);
 
@@ -151,4 +152,4 @@ private:
 };
 
 
-#endif //BUTTERBOT_FIRMWARE_LIS2DW12_H
+#endif //CMF_LIS2DW12_H

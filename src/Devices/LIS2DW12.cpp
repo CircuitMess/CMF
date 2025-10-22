@@ -2,15 +2,10 @@
 
 static constexpr const char* TAG = "LIS2DW12";
 
-LIS2DW12::LIS2DW12(I2C* i2c, PinConfig pinConfig, Config config, uint8_t addr) : i2c(i2c), Addr(addr), config(config), pins(pinConfig),
+LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Config config, uint8_t addr) : i2c(std::move(i2cDevice)), Addr(addr), config(config), pins(pinConfig),
 																				 dispatcherThread([this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8){
 	if(!i2c){
 		ESP_LOGE(TAG, "No I2C peripheral provided");
-		abort();
-	}
-
-	if(i2c->probe(Addr) != ESP_OK){
-		ESP_LOGE(TAG, "No device found at address 0x%x", Addr);
 		abort();
 	}
 
@@ -48,7 +43,7 @@ LIS2DW12::Sample LIS2DW12::getSample(){
 	return sample;
 }
 
-LIS2DW12::Sample LIS2DW12::pollFIFO(TickType_t timeout){
+LIS2DW12::Sample LIS2DW12::pollFIFO(TickType_t timeout) const {
 	if(!queue){
 		ESP_LOGE(TAG, "FIFO not enabled");
 		return Sample{};
@@ -63,7 +58,6 @@ LIS2DW12::Sample LIS2DW12::pollFIFO(TickType_t timeout){
 }
 
 void LIS2DW12::init(Config config, PinConfig pins){
-
 	lis2dw12_reset_set(&ctx, 1);
 	uint8_t resetVal;
 	do {
@@ -113,25 +107,25 @@ void LIS2DW12::init(Config config, PinConfig pins){
 }
 
 int32_t LIS2DW12::platform_write(void* hndl, uint8_t reg, const uint8_t* data, uint16_t len){
-	auto accel = (LIS2DW12*) hndl;
-	return accel->i2c->writeRegister(accel->Addr, reg, data, len);
+	auto accel = static_cast<LIS2DW12*>(hndl);
+	return accel->i2c->writeRegister(reg, data, len);
 }
 
 int32_t LIS2DW12::platform_read(void* hndl, uint8_t reg, uint8_t* data, uint16_t len){
-	auto accel = (LIS2DW12*) hndl;
-	return accel->i2c->write_read(accel->Addr, &reg, 1, data, len);
+	auto accel = static_cast<LIS2DW12*>(hndl);
+	return accel->i2c->write_read(&reg, 1, data, len);
 }
 
-void LIS2DW12::enableFreeFallDetection(LIS2DW12::FreeFallConfig FFConfig){
+void LIS2DW12::enableFreeFallDetection(LIS2DW12::FreeFallConfig FFConfig) const {
 	lis2dw12_ff_threshold_set(&ctx, FFConfig.threshold);
 	lis2dw12_ff_dur_set(&ctx, FFConfig.duration);
 }
 
-void LIS2DW12::disableFreeFallDetection(){
+void LIS2DW12::disableFreeFallDetection() const {
 	lis2dw12_ff_dur_set(&ctx, 0);
 }
 
-void LIS2DW12::enableTapDetection(LIS2DW12::TapConfig tapConfig){
+void LIS2DW12::enableTapDetection(LIS2DW12::TapConfig tapConfig) const {
 	lis2dw12_tap_mode_set(&ctx, tapConfig.mode);
 	lis2dw12_tap_threshold_x_set(&ctx, tapConfig.thresholdX);
 	lis2dw12_tap_threshold_y_set(&ctx, tapConfig.thresholdY);
@@ -147,7 +141,7 @@ void LIS2DW12::enableTapDetection(LIS2DW12::TapConfig tapConfig){
 	lis2dw12_tap_detection_on_z_set(&ctx, tapConfig.enableZ);
 }
 
-void LIS2DW12::disableTapDetection(){
+void LIS2DW12::disableTapDetection() const {
 	lis2dw12_tap_detection_on_x_set(&ctx, 0);
 	lis2dw12_tap_detection_on_y_set(&ctx, 0);
 	lis2dw12_tap_detection_on_z_set(&ctx, 0);
@@ -167,7 +161,7 @@ void LIS2DW12::disableFIFO(){
 	}
 }
 
-void LIS2DW12::clearSources(){
+void LIS2DW12::clearSources() const {
 	lis2dw12_all_sources_t src;
 	lis2dw12_all_sources_get(&ctx, &src);
 }
