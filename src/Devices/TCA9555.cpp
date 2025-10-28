@@ -14,7 +14,7 @@ static inline uint8_t TCA_MASK(uint8_t pin){ return 1 << TCA_BIT(pin); }
 static const char* TAG = "TCA9555";
 
 
-TCA9555::TCA9555(std::unique_ptr<I2CMaster> i2c, uint8_t addr){
+TCA9555::TCA9555(I2CMaster* i2c, uint8_t addr){
 	if(!i2c){
 		ESP_LOGE(TAG, "I2C master is null");
 		abort();

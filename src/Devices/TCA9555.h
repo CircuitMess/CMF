@@ -14,7 +14,7 @@ class TCA9555 : public Object {
 	GENERATED_BODY(TCA9555, Object)
 
 public:
-	explicit TCA9555(std::unique_ptr<I2CMaster> i2c = {}, uint8_t addr = 0x20);
+	explicit TCA9555(I2CMaster* i2c = nullptr, uint8_t addr = 0x20);
 
 	/**
 	 * Reset all pins to input and clear register state.
