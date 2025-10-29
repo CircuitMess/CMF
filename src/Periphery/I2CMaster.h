@@ -5,6 +5,7 @@
 #include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <driver/i2c_types.h>
+#include "I2CDevice.h"
 
 enum class I2CPort : int8_t {
 	None = -1,
@@ -29,15 +30,15 @@ public:
 
 	std::lock_guard<std::mutex> lockBus() noexcept;
 
-	std::unique_ptr<class I2CDevice> addDevice(uint16_t addr, i2c_addr_bit_len_t addrLen = I2C_ADDR_BIT_LEN_7, uint32_t speedHz = 400000);
+	std::unique_ptr<I2CDevice> addDevice(uint16_t addr, i2c_addr_bit_len_t addrLen = I2C_ADDR_BIT_LEN_7, uint32_t speedHz = 400000);
 
 	void scan(TickType_t timeout = 5) noexcept;
 	esp_err_t probe(uint8_t address, TickType_t timeout = 5) noexcept;
 
-	esp_err_t write(class I2CDevice& dev, const uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
-	esp_err_t read(class I2CDevice& dev, uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
-	esp_err_t write_read(class I2CDevice& dev, const uint8_t* writeData, size_t writeSize, uint8_t* readData, size_t readSize, TickType_t wait = portMAX_DELAY);
-	esp_err_t writeRegister(class I2CDevice& dev, uint8_t reg, const uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
+	esp_err_t write(I2CDevice& dev, const uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
+	esp_err_t read(I2CDevice& dev, uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
+	esp_err_t write_read(I2CDevice& dev, const uint8_t* writeData, size_t writeSize, uint8_t* readData, size_t readSize, TickType_t wait = portMAX_DELAY);
+	esp_err_t writeRegister(I2CDevice& dev, uint8_t reg, const uint8_t* data, size_t size, TickType_t wait = portMAX_DELAY);
 
 
 private:
