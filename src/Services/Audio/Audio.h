@@ -2,13 +2,14 @@
 #define CMF_AUDIO_H
 
 #include <optional>
+#include "Object/Class.h"
 #include "Entity/AsyncEntity.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "AudioSource.h"
 #include "Periphery/I2S.h"
 
 class Audio : public AsyncEntity {
-	GENERATED_BODY(Audio, AsyncEntity)
+	GENERATED_BODY(Audio, AsyncEntity, CONSTRUCTOR_PACK(StrongObjectPtr<I2S>, Object*, OutputPin))
 
 public:
 	Audio() = default;

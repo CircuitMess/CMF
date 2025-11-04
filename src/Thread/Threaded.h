@@ -2,6 +2,7 @@
 #define CMF_THREADED_H
 
 #include "Object/Object.h"
+#include "Object/Class.h"
 #include <cstddef>
 #include <string>
 #include <freertos/FreeRTOS.h>
@@ -16,7 +17,7 @@
  * The thread starts running immediately as constructed.
  */
 class Threaded : public Object {
-	GENERATED_BODY(Threaded, Object)
+	GENERATED_BODY(Threaded, Object, CONSTRUCTOR_PACK(const std::function<void(void)>&, const std::string&, TickType_t, size_t, uint8_t, int8_t))
 
 protected:
 	/**

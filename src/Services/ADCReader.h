@@ -1,13 +1,14 @@
 #ifndef CMF_ADCREADER_H
 #define CMF_ADCREADER_H
 
+#include "Object/Class.h"
 #include "Periphery/ADCUnit.h"
 #include "driver/gpio.h"
 #include "Object/Interface.h"
 #include "Log/Log.h"
 
 class ADCFilter : public Object {
-	GENERATED_BODY(ADCFilter, Object)
+	GENERATED_BODY(ADCFilter, Object, void)
 public:
 	virtual float apply(float sample){
 		return sample;
@@ -15,7 +16,7 @@ public:
 };
 
 class EMA_ADCFilter : public ADCFilter {
-	GENERATED_BODY(EMA_ADCFilter, ADCFilter)
+	GENERATED_BODY(EMA_ADCFilter, ADCFilter, CONSTRUCTOR_PACK(float))
 public:
 	EMA_ADCFilter(float factor = 1.0) : factor(factor){};
 
@@ -43,7 +44,7 @@ private:
 };
 
 class ADCReader : public Object {
-	GENERATED_BODY(ADCReader, Object)
+	GENERATED_BODY(ADCReader, Object, CONSTRUCTOR_PACK(gpio_num_t, adc_oneshot_chan_cfg_t, bool, StrongObjectPtr<ADCFilter>))
 
 public:
 	/**

@@ -2,6 +2,7 @@
 #define CMF_GPIOPERIPH_H
 
 #include "Object/Object.h"
+#include "Object/Class.h"
 #include "driver/gpio.h"
 
 enum class GPIOMode : uint8_t {
@@ -13,7 +14,7 @@ enum class GPIOMode : uint8_t {
  * Stateless wrapper for GPIO functions.
  */
 class GPIOPeriph : public Object {
-	GENERATED_BODY(GPIOPeriph, Object)
+	GENERATED_BODY(GPIOPeriph, Object, void)
 
 public:
 	void setMode(gpio_num_t gpioNum, GPIOMode mode);

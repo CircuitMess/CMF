@@ -1,6 +1,7 @@
 #ifndef CMF_AUDIOSOURCE_H
 #define CMF_AUDIOSOURCE_H
 
+#include "Object/Class.h"
 #include <fstream>
 #include "Log/Log.h"
 #include "Object/Object.h"
@@ -8,9 +9,9 @@
 DEFINE_LOG(AudioSource)
 
 class AudioSource : public Object {
-	GENERATED_BODY(AudioSource, Object)
-public:
+	GENERATED_BODY(AudioSource, Object, void)
 
+public:
 	virtual void open(const std::string& path){};
 
 	virtual void close(){};

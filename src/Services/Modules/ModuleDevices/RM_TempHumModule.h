@@ -1,10 +1,12 @@
 #ifndef CMF_RM_TEMPHUMMODULE_H
 #define CMF_RM_TEMPHUMMODULE_H
 
+#include "Object/Class.h"
 #include "Services/Modules/ModuleDevice.h"
 
 class RM_TempHumModule : public ModuleDevice {
-	GENERATED_BODY(RM_TempHumModule, ModuleDevice)
+	GENERATED_BODY(RM_TempHumModule, ModuleDevice, CONSTRUCTOR_PACK(const Modules::BusPins&))
+
 public:
 	RM_TempHumModule(const Modules::BusPins& busPins = {});
 

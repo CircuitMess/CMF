@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <set>
+#include "Object/Class.h"
 #include "Entity/AsyncEntity.h"
 #include "Object/SubclassOf.h"
 #include "Memory/GarbageCollector.h"
@@ -10,6 +11,7 @@
 #include "Misc/Singleton.h"
 #include "Object/Interface.h"
 #include "Event/EventScanner.h"
+#include "Object/Class.h"
 
 /**
  * @brief The base class used to define the core applications,
@@ -17,7 +19,7 @@
  * The user of the framework must extend this class to define their own application that is custom to their hardware and software.
  */
 class Application : public AsyncEntity {
-	GENERATED_BODY(Application, AsyncEntity)
+	GENERATED_BODY(Application, AsyncEntity, CONSTRUCTOR_PACK(TickType_t, size_t, uint8_t, int8_t))
 
 	friend class ApplicationStatics;
 

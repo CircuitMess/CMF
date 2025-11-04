@@ -1,6 +1,7 @@
 #ifndef CMF_INPUTGPIO_H
 #define CMF_INPUTGPIO_H
 
+#include "Object/Class.h"
 #include "Drivers/Interface/InputDriver.h"
 #include "Periphery/GPIOPeriph.h"
 
@@ -13,7 +14,7 @@ struct GPIOPinDef : InputPinDef {
 };
 
 class InputGPIO : public InputDriver {
-	GENERATED_BODY(InputGPIO, InputDriver);
+	GENERATED_BODY(InputGPIO, InputDriver, CONSTRUCTOR_PACK(const std::vector<GPIOPinDef>&, StrongObjectPtr<GPIOPeriph>));
 
 public:
 	InputGPIO() noexcept = default;

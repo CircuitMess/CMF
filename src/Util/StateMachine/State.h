@@ -1,6 +1,7 @@
 #ifndef CMF_STATE_H
 #define CMF_STATE_H
 
+#include "Object/Class.h"
 #include "Entity/SyncEntity.h"
 #include "Object/SubclassOf.h"
 
@@ -9,7 +10,7 @@
  * has access to the StateMachine that owns it and had functions triggered when the state machine transitions to it or from it.
  */
 class State : public SyncEntity {
-	GENERATED_BODY(State, SyncEntity)
+	GENERATED_BODY(State, SyncEntity, void)
 
 public:
 	/**

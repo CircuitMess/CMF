@@ -2,6 +2,7 @@
 #define CMF_ENTITY_H
 
 #include "Object/Object.h"
+#include "Object/Class.h"
 
 /**
  * @brief End reason enum, representing the reason why the entity is being destroyed.
@@ -16,7 +17,7 @@ enum class EndReason : uint8_t {
  * @brief The base entity class representing an object that has begin, tick and end lifetime functionality.
  */
 class Entity : public Object {
-	GENERATED_BODY(Entity, Object)
+	GENERATED_BODY(Entity, Object, void)
 
 public:
 	/**

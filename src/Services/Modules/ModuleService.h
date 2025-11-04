@@ -22,7 +22,7 @@
 
 template<uint8_t NumBus = 1>
 class ModuleService : public AsyncEntity {
-	GENERATED_BODY(ModuleService, AsyncEntity);
+	GENERATED_BODY(ModuleService, AsyncEntity, CONSTRUCTOR_PACK(std::array<Modules::BusPins, NumBus>));
 public:
 
 	enum class Action : uint8_t {

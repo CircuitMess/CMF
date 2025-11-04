@@ -1,6 +1,7 @@
 #ifndef CMF_TCA9555_H
 #define CMF_TCA9555_H
 
+#include "Object/Class.h"
 #include "Object/Object.h"
 #include "Periphery/I2CMaster.h"
 
@@ -11,7 +12,7 @@
  * Known clone drop-in replacement: XINLUDA XL9555 (https://xinluda.com/en/I2C-to-GPIO-extension/20240718576.html)
  */
 class TCA9555 : public Object {
-	GENERATED_BODY(TCA9555, Object)
+	GENERATED_BODY(TCA9555, Object, CONSTRUCTOR_PACK(I2CMaster*, uint8_t))
 
 public:
 	explicit TCA9555(I2CMaster* i2c = nullptr, uint8_t addr = 0x20);

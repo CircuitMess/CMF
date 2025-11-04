@@ -1,12 +1,13 @@
 #ifndef CMF_BUTTONINPUT_H
 #define CMF_BUTTONINPUT_H
 
+#include "Object/Class.h"
 #include "Drivers/Interface/InputDriver.h"
 #include "Entity/AsyncEntity.h"
 #include "Event/EventBroadcaster.h"
 
 class ButtonInput : public AsyncEntity {
-	GENERATED_BODY(ButtonInput, AsyncEntity);
+	GENERATED_BODY(ButtonInput, AsyncEntity, void)
 
 public:
 	ButtonInput();

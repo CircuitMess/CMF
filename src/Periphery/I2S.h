@@ -1,12 +1,13 @@
 #ifndef CMF_I2S_H
 #define CMF_I2S_H
 
+#include "Object/Class.h"
 #include "Object/Object.h"
 #include <driver/i2s_std.h>
 #include <driver/i2s_pdm.h>
 
 class I2S : public Object {
-	GENERATED_BODY(I2S, Object)
+	GENERATED_BODY(I2S, Object, CONSTRUCTOR_PACK(i2s_port_t, i2s_std_config_t))
 
 public:
 	I2S(i2s_port_t port = I2S_NUM_AUTO, i2s_std_config_t config = {});

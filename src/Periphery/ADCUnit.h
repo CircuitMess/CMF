@@ -1,11 +1,12 @@
 #ifndef CODEE_FIRMWARE_ADC_H
 #define CODEE_FIRMWARE_ADC_H
 
+#include "Object/Class.h"
 #include "Object/Object.h"
 #include <esp_adc/adc_oneshot.h>
 
 class ADCUnit : public Object {
-	GENERATED_BODY(ADCUnit, Object)
+	GENERATED_BODY(ADCUnit, Object, CONSTRUCTOR_PACK(adc_unit_t))
 
 public:
 	static ADCUnit* getADCUnit(adc_unit_t unit);

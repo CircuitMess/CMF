@@ -2,6 +2,7 @@
 #define CMF_I2C_MASTER_H
 
 #include "GPIOPeriph.h"
+#include "Object/Class.h"
 #include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <driver/i2c_types.h>
@@ -20,7 +21,7 @@ enum class I2CPort : int8_t {
 };
 
 class I2CMaster : public Object {
-	GENERATED_BODY(I2CMaster, Object)
+	GENERATED_BODY(I2CMaster, Object, CONSTRUCTOR_PACK(I2CPort, gpio_num_t, gpio_num_t))
 
 public:
 	explicit I2CMaster(I2CPort port = I2CPort::None, gpio_num_t sda = GPIO_NUM_NC, gpio_num_t scl = GPIO_NUM_NC) noexcept;

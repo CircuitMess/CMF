@@ -2,6 +2,7 @@
 #define CMF_TIMER_H
 
 #include "Object/Object.h"
+#include "Object/Class.h"
 #include <esp_timer.h>
 
 /**
@@ -14,7 +15,7 @@
 
 
 class Timer : public Object {
-	GENERATED_BODY(Timer, Object)
+	GENERATED_BODY(Timer, Object, void)
 
 public:
 	Timer() = default;

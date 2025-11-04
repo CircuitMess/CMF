@@ -1,6 +1,7 @@
 #ifndef CMF_LIS2DW12_H
 #define CMF_LIS2DW12_H
 
+#include "Object/Class.h"
 #include "Object/Object.h"
 #include <driver/gpio.h>
 #include "lis2dw12_reg.h"
@@ -13,8 +14,6 @@
  * 3-axis accelerometer (https://www.st.com/resource/en/datasheet/lis2dw12.pdf)
  */
 class LIS2DW12 : public Object {
-	GENERATED_BODY(LIS2DW12, Object)
-
 public:
 	struct FreeFallConfig {
 		lis2dw12_ff_ths_t threshold;
@@ -82,7 +81,9 @@ public:
 		float accelZ;
 	};
 
+	GENERATED_BODY(LIS2DW12, Object, CONSTRUCTOR_PACK(std::unique_ptr<I2CDevice>, LIS2DW12::PinConfig, LIS2DW12::Config, uint8_t))
 
+public:
 	explicit LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice = {}, PinConfig pinConfig = {}, Config config = {}, uint8_t addr = (LIS2DW12_I2C_ADD_L >> 1));
 
 	Sample getSample();

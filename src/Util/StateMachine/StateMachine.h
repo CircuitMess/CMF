@@ -1,6 +1,7 @@
 #ifndef CMF_STATEMACHINE_H
 #define CMF_STATEMACHINE_H
 
+#include "Object/Class.h"
 #include "State.h"
 #include "Entity/AsyncEntity.h"
 #include "Object/SubclassOf.h"
@@ -10,7 +11,7 @@
  * @brief State machine abstraction AsyncEntity that ticks on its own and transitions between the states depending on the given state type.
  */
 class StateMachine : public AsyncEntity {
-	GENERATED_BODY(StateMachine, AsyncEntity)
+	GENERATED_BODY(StateMachine, AsyncEntity, CONSTRUCTOR_PACK(TickType_t, size_t, uint8_t, int8_t))
 
 public:
 	/**

@@ -7,6 +7,7 @@
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Statics/ApplicationStatics.h"
 #include "ObjectManager.h"
+#include "Object/Class.h"
 #include "Object/Interface.h"
 
 /**
@@ -78,18 +79,20 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
 
 /**
  * @brief Creates a new object from a give class.
+ * Using types that are not compatible with the constructor of the actual object of the class type will still compile but could result in unexpected behavior.
  * @tparam T Type of object being created.
  * @param cls Class of which the object is created.
  * @param owner Owner of the new object.
+ * @param args Constructor arguments
  * @return Strong object pointer to the newly created object.
  */
-template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) noexcept {
+template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr, Args... args) noexcept {
 	if(cls == nullptr){
 		return nullptr;
 	}
 
-	StrongObjectPtr<T> newObjectPtr = cast<T>(cls->createDefaultObject().get());
+	StrongObjectPtr<T> newObjectPtr = cast<T>(cls->createObject(std::forward<Args>(args)...).get());
 	if(!newObjectPtr.isValid()){
 		return nullptr;
 	}
@@ -109,7 +112,18 @@ inline StrongObjectPtr<T> newObject(const Class* cls, Object* owner = nullptr) n
  */
 template<typename T, typename ...Args, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
 inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noexcept requires (sizeof...(Args) == 0){
-	return newObject<T>(T::staticClass(), owner);
+	// TODO change this to better support with API
+	void* temp = operator new(sizeof(T));
+	memset(temp, 0, sizeof(T));
+
+	// This is used to make sure the new object is valid in its constructor
+	StrongObjectPtr<T> tempPtr = static_cast<T*>(temp);
+
+	StrongObjectPtr<T> newObject = new(temp) T();
+
+	initObject(cast<Object>(newObject.get()), owner);
+
+	return newObject;
 }
 
 /**

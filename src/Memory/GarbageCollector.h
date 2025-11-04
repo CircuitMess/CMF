@@ -2,6 +2,7 @@
 #define CMF_GARBAGECOLLECTOR_H
 
 #include "Entity/AsyncEntity.h"
+#include "Object/Class.h"
 
 /**
  * @brief Garbage collector goes through all objects in memory and frees the memory of those that do not have any strong references to them,
@@ -10,7 +11,7 @@
  * The faster the garbage collector ticks, the better the memory management, but the worse the performance of the application.
  */
 class GarbageCollector : public AsyncEntity {
-	GENERATED_BODY(GarbageCollector, AsyncEntity)
+	GENERATED_BODY(GarbageCollector, AsyncEntity, void)
 
 public:
 	/**

@@ -1,7 +1,6 @@
 #ifndef CMF_MODULEDEFS_H
 #define CMF_MODULEDEFS_H
 
-#include <Object/SubclassOf.h>
 #include "ModuleType.h"
 #include "ModuleDevice.h"
 #include <map>

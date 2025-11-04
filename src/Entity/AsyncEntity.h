@@ -2,6 +2,7 @@
 #define CMF_ASYNCENTITY_H
 
 #include "Entity.h"
+#include "Object/Class.h"
 #include <set>
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
@@ -15,7 +16,7 @@ class SyncEntity;
  * and handles lifetime of its child objects in the same thread.
  */
 class AsyncEntity : public Entity {
-	GENERATED_BODY(AsyncEntity, Entity)
+	GENERATED_BODY(AsyncEntity, Entity, CONSTRUCTOR_PACK(TickType_t, size_t, uint8_t, int8_t))
 
 public:
 	/**

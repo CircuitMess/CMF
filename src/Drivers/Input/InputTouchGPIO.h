@@ -1,6 +1,7 @@
 #ifndef CMF_INPUTTOUCHGPIO_H
 #define CMF_INPUTTOUCHGPIO_H
 
+#include "Object/Class.h"
 #include "Drivers/Interface/InputDriver.h"
 
 struct TouchPinDef : InputPinDef {
@@ -10,7 +11,7 @@ struct TouchPinDef : InputPinDef {
 /* TODO - refactor using new ESP-IDF Touch API */
 
 class InputTouchGPIO : public InputDriver {
-	GENERATED_BODY(InputTouchGPIO, InputDriver);
+	GENERATED_BODY(InputTouchGPIO, InputDriver, CONSTRUCTOR_PACK(const std::vector<TouchPinDef>&));
 
 public:
 	InputTouchGPIO() noexcept = default;

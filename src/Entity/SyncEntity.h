@@ -2,6 +2,7 @@
 #define CMF_SYNCENTITY_H
 
 #include "Entity.h"
+#include "Object/Class.h"
 #include "Memory/SmartPtr/WeakObjectPtr.h"
 
 class AsyncEntity;
@@ -10,7 +11,7 @@ class AsyncEntity;
  * @brief Sync entity is an Entity implementation with an owner that controls its lifetime while alive, that ticks synchronously with the owner.
  */
 class SyncEntity : public Entity {
-	GENERATED_BODY(SyncEntity, Entity)
+	GENERATED_BODY(SyncEntity, Entity, void)
 
 public:
 	/**

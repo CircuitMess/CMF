@@ -4,11 +4,7 @@
 #include <cinttypes>
 #include <map>
 #include <string>
-
-class Object;
-
-template<typename T>
-class StrongObjectPtr;
+#include <Object/Object.h>
 
 /**
  * @brief Class registry is used internally by CMF to track all existing object classes by their ID.
@@ -52,9 +48,13 @@ public:
 	virtual ~Class() = default;
 
 	/**
-	 * @return A default object represented by this class.
+	 * @return An object represented by this class.
 	 */
-	virtual StrongObjectPtr<Object> createDefaultObject() const noexcept;
+	template<typename ...Args>
+	StrongObjectPtr<Object> createObject(Args&&... args) const noexcept {
+		std::tuple<Args...> arguments = std::make_tuple(std::forward<Args>(args)...);
+		return __createObject(&arguments);
+	}
 
 	/**
 	 * @return The ID of the class. Each class has a unique ID
@@ -117,6 +117,11 @@ protected:
 	 * @param ID The generated ID of the class.
 	 */
 	explicit Class(uint64_t ID) noexcept;
+
+	/**
+	 * @return An object represented by this class.
+	 */
+	virtual StrongObjectPtr<Object> __createObject(void* arguments) const noexcept;
 
 private:
 	uint64_t classID;

@@ -1,11 +1,12 @@
 #ifndef CMF_AACSOURCE_H
 #define CMF_AACSOURCE_H
 
+#include "Object/Class.h"
 #include "AudioSource.h"
 #include <aacdec.h>
 
 class AACSource : public AudioSource {
-	GENERATED_BODY(AACSource, AudioSource)
+	GENERATED_BODY(AACSource, AudioSource, void)
 
 	using SampleType = int16_t;
 

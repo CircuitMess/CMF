@@ -1,6 +1,7 @@
 #ifndef CMF_OUTPUTMCPWM_H
 #define CMF_OUTPUTMCPWM_H
 
+#include "Object/Class.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "driver/mcpwm_prelude.h"
 #include <hal/gpio_types.h>
@@ -24,7 +25,8 @@ struct OutputMCPWMPinDef : OutputPinDef {
 
 
 class OutputMCPWM : public OutputDriver {
-	GENERATED_BODY(OutputMCPWM, OutputDriver)
+	GENERATED_BODY(OutputMCPWM, OutputDriver, CONSTRUCTOR_PACK(const std::vector<OutputMCPWMPinDef>&))
+
 public:
 	OutputMCPWM() = default;
 

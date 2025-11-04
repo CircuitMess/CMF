@@ -1,6 +1,7 @@
 #ifndef CMF_AW9523_H
 #define CMF_AW9523_H
 
+#include "Object/Class.h"
 #include "Object/Object.h"
 #include "Periphery/I2CDevice.h"
 
@@ -11,7 +12,7 @@
 
 
 class AW9523 : public Object {
-	GENERATED_BODY(AW9523, Object)
+	GENERATED_BODY(AW9523, Object, CONSTRUCTOR_PACK(std::unique_ptr<I2CDevice>))
 public:
 	explicit AW9523(std::unique_ptr<I2CDevice> device = {});
 

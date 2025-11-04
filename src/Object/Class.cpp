@@ -38,7 +38,7 @@ Class::Class(uint64_t ID) noexcept : classID(ID) {
 	registry->registerClass(this);
 }
 
-StrongObjectPtr<Object> Class::createDefaultObject() const noexcept {
+StrongObjectPtr<Object> Class::__createObject(void* arguments) const noexcept {
 	void* temp = operator new(sizeof(Object));
 	if(temp == nullptr){
 		return nullptr;

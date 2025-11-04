@@ -1,6 +1,7 @@
 #ifndef CMF_INPUTDRIVER_H
 #define CMF_INPUTDRIVER_H
 
+#include "Object/Class.h"
 #include "Misc/Enum.h"
 #include "Entity/SyncEntity.h"
 #include "Log/Log.h"
@@ -25,7 +26,7 @@ struct InputPin {
 };
 
 class InputDriver : public Object {
-	GENERATED_BODY(InputDriver, Object);
+	GENERATED_BODY(InputDriver, Object, const std::vector<InputPinDef>&)
 
 public:
 	virtual void scan() noexcept{}

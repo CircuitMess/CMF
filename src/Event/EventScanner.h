@@ -4,9 +4,11 @@
 #include <mutex>
 #include <set>
 #include "Entity/AsyncEntity.h"
+#include "Object/Class.h"
 
 class EventScanner : public AsyncEntity {
-    GENERATED_BODY(EventScanner, AsyncEntity)
+    GENERATED_BODY(EventScanner, AsyncEntity, void)
+
 public:
     EventScanner();
     virtual ~EventScanner() override;

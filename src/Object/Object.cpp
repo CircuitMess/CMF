@@ -5,8 +5,23 @@
 #include "Log/Log.h"
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
+#include "Class.h"
+
+const Object::ClassType* Object::objectStaticClass = new Object::ClassType((uint64_t) STRING_HASH("Object") << 32);
 
 Object::Object() noexcept : id(ObjectIndex++){}
+
+std::string Object::getName() const noexcept {
+	return getStaticClass()->getName().append("_").append(std::to_string(getID()));
+}
+
+bool Object::isA(const Class* other) const noexcept {
+	if(other == nullptr) {
+		return false;
+	}
+
+	return other->getID() == staticClass()->getID();
+}
 
 void Object::postInitProperties() noexcept{}
 

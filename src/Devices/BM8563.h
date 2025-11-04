@@ -3,6 +3,7 @@
 
 #include "Object/Object.h"
 #include "Periphery/I2CDevice.h"
+#include "Object/Class.h"
 
 /**
  * BM8563 - RTC clock/calendar)
@@ -10,7 +11,7 @@
  */
 
 class BM8563 : public Object {
-	GENERATED_BODY(BM8563, Object)
+	GENERATED_BODY(BM8563, Object, CONSTRUCTOR_PACK(std::unique_ptr<I2CDevice>, uint8_t))
 public:
 	explicit BM8563(std::unique_ptr<I2CDevice> i2cDevice = {}, uint8_t Addr = 0x51);
 

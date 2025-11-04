@@ -1,11 +1,13 @@
 #ifndef CMF_RM_CO2SENSOR_H
 #define CMF_RM_CO2SENSOR_H
 
+#include "Object/Class.h"
 #include "Services/Modules/ModuleDevice.h"
 #include "Services/ADCReader.h"
 
 class RM_CO2Sensor : public ModuleDevice{
-	GENERATED_BODY(RM_CO2Sensor, ModuleDevice)
+	GENERATED_BODY(RM_CO2Sensor, ModuleDevice, CONSTRUCTOR_PACK(const Modules::BusPins&))
+
 public:
 	RM_CO2Sensor(const Modules::BusPins& pins = {});
 

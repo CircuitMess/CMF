@@ -18,7 +18,7 @@ enum class WiFiType : uint8_t {
 };
 
 class WiFi : public Object{
-    GENERATED_BODY(WiFi, Object)
+    GENERATED_BODY(WiFi, Object, void)
 
 public:
     // STATION EVENTS

@@ -1,6 +1,7 @@
 #ifndef CMF_OUTPUTDRIVER_H
 #define CMF_OUTPUTDRIVER_H
 
+#include "Object/Class.h"
 #include "Misc/Enum.h"
 #include "Entity/SyncEntity.h"
 #include "Log/Log.h"
@@ -25,9 +26,9 @@ struct OutputPin {
 };
 
 class OutputDriver : public Object {
-	GENERATED_BODY(OutputDriver, Object)
-public:
+	GENERATED_BODY(OutputDriver, Object, CONSTRUCTOR_PACK(const std::vector<OutputPinDef>&))
 
+public:
 	void write(int port, bool value) noexcept{
 		write(port, value ? 1.0f : 0.0f);
 	}

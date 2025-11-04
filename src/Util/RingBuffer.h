@@ -3,10 +3,12 @@
 
 #include <cstdint>
 #include <cstddef>
+#include "Object/Class.h"
 #include "Object/Object.h"
 
 class RingBuffer : public Object {
-	GENERATED_BODY(RingBuffer, Object)
+	GENERATED_BODY(RingBuffer, Object, CONSTRUCTOR_PACK(size_t))
+
 public:
 	RingBuffer(size_t size = 0);
 	virtual ~RingBuffer();

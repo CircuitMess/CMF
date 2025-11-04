@@ -1,6 +1,7 @@
 #ifndef CMF_OUTPUTPWM_H
 #define CMF_OUTPUTPWM_H
 
+#include "Object/Class.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include <driver/ledc.h>
 
@@ -13,7 +14,8 @@ struct OutputPWMPinDef : OutputPinDef {
 };
 
 class OutputPWM : public OutputDriver {
-	GENERATED_BODY(OutputPWM, OutputDriver);
+	GENERATED_BODY(OutputPWM, OutputDriver, CONSTRUCTOR_PACK(const std::vector<OutputPWMPinDef>&))
+
 public:
 	OutputPWM() = default;
 	OutputPWM(const std::vector<OutputPWMPinDef>& outputs);

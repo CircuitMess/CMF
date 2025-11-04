@@ -5,10 +5,10 @@
 #include "Periphery/GPIOPeriph.h"
 
 class Camera : public Object {
-	GENERATED_BODY(Camera, Object)
+	GENERATED_BODY(Camera, Object, CONSTRUCTOR_PACK(camera_config_t, class  I2CMaster*, std::function<void(sensor_t*)>))
 
 public:
-	Camera(camera_config_t config = {}, class I2CMaster* i2c = nullptr, std::function<void(sensor_t*)> sensorConfig = {});
+	Camera(camera_config_t config = {}, I2CMaster* i2c = nullptr, std::function<void(sensor_t*)> sensorConfig = {});
 
 	~Camera() override;
 
