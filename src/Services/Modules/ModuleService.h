@@ -120,8 +120,10 @@ private:
 			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) type, bus);
 			modulesEvent.broadcast(bus, type, Action::Insert);
 
-			registerSubAddressPinsModule(bus, type);
-			busContexts[bus].instance = CreateModuleDevice(this, type, busPins[bus]);
+			if(type != Modules::Type::Unknown){
+				registerSubAddressPinsModule(bus, type);
+				busContexts[bus].instance = CreateModuleDevice(this, type, busPins[bus]);
+			}
 		}
 	}
 
@@ -157,7 +159,7 @@ private:
 			if(AddressMap.contains(readAddress)){
 				return AddressMap.at(readAddress);
 			}else{
-				ESP_LOGE(TAG, "Unknown primary address");
+				ESP_LOGW(TAG, "Unknown primary address");
 				return Modules::Type::Unknown;
 			}
 		}
@@ -222,7 +224,7 @@ private:
 		}
 
 		if(readSubAddress.type == Modules::SubAddress::Type::None){
-			ESP_LOGE(TAG, "Unknown main-sub address combination");
+			ESP_LOGW(TAG, "Unknown main-sub address combination");
 			return Modules::Type::Unknown;
 		}
 
