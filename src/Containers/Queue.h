@@ -7,6 +7,7 @@
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 /**
  * @brief A variable size queue which is thread-safe, template,
@@ -22,42 +23,53 @@ public:
 	 * @param size The size the queue starts its life with.
 	 */
 	inline explicit Queue(size_t size = DefaultSize) noexcept : bufferSize(size), waitSemaphore(xSemaphoreCreateBinary()) {
-		buffer = allocator.allocate(bufferSize);
+		reserve(bufferSize);
 	}
 
 	/**
 	 * @brief The copy constructor from another queue of same data type.
 	 * @param other The queue being copied.
 	 */
-	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
+	inline Queue(const Queue& other) noexcept : bufferSize(other.bufferSize), begin(other.begin), end(other.end), qSize(other.qSize), waitSemaphore(xSemaphoreCreateBinary()) {
 		std::lock_guard lock(other.accessMutex);
 
-		buffer = allocator.allocate(bufferSize);
+		reserve(bufferSize);
 
-		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			buffer[i] = T(std::move_if_noexcept(other.buffer[i]));
+		if(empty()){
+			return;
 		}
 
-		if(xSemaphoreTake(other.waitSemaphore, 0)) {
-			xSemaphoreGive(waitSemaphore);
+		if(begin > end){
+			for(size_t i = 0; i <= end; ++i){
+				new(&buffer[i]) T(other.buffer[i]);
+			}
+
+			for(size_t i = begin; i < bufferSize; ++i){
+				new(&buffer[i]) T(other.buffer[i]);
+			}
+		}else{
+			for(size_t i = begin; i <= end; ++i){
+				new(&buffer[i]) T(other.buffer[i]);
+			}
 		}
+
+		xSemaphoreGive(waitSemaphore);
 	}
 
 	/**
 	 * @brief The move constructor from another queue with the same data type.
 	 * @param other The queue being moved. The queue is empty after the constructor finishes execution.
 	 */
-	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), waitSemaphore(xSemaphoreCreateBinary()) {
+	inline Queue(Queue&& other) noexcept : buffer(other.buffer), bufferSize(other.bufferSize), begin(other.begin), end(other.end), qSize(other.qSize), waitSemaphore(xSemaphoreCreateBinary()) {
 		std::lock_guard lock(other.accessMutex);
-		other.buffer = 0;
+		other.buffer = nullptr;
 		other.bufferSize = 0;
 		other.begin = other.end = 0;
+		other.qSize = 0;
 
-		if(xSemaphoreTake(other.waitSemaphore, 0)) {
+		if(!empty()){
 			xSemaphoreGive(waitSemaphore);
 		}
-
-		other.waitSemaphore = nullptr;
 	}
 
 	/**
@@ -66,23 +78,20 @@ public:
 	inline ~Queue() noexcept {
 		setKillPill();
 
-		std::lock_guard guard(accessMutex);
+		clear();
 
-		allocator.deallocate(buffer, bufferSize);
+		std::lock_guard guard(accessMutex);
 		buffer = nullptr;
 		begin = end = 0;
 		bufferSize = 0;
+		qSize = 0;
 	}
 
 	/**
 	 * @return The size of the queue.
 	 */
 	inline size_t size() const noexcept {
-		if(begin > end){
-			return bufferSize - begin + end + 1;
-		}
-
-		return end - begin;
+		return qSize;
 	}
 
 	/**
@@ -97,7 +106,7 @@ public:
 	 * @return True if size is 0. False otherwise.
 	 */
 	inline bool empty() const noexcept {
-		return begin == end;
+		return size() == 0;
 	}
 
 	/**
@@ -166,10 +175,11 @@ public:
 			return false;
 		}
 
-		value = buffer[begin];
+		value = std::move_if_noexcept(buffer[begin]);
 		buffer[begin].~T();
 
 		begin = (begin + 1) % bufferSize;
+		--qSize;
 
 		if(!empty()){
 			xSemaphoreGive(waitSemaphore);
@@ -190,9 +200,13 @@ public:
 
 		std::lock_guard guard(accessMutex);
 
-		buffer[end] = T(value);
+		if(!empty()){
+			end = (end + 1) % bufferSize;
+		}
 
-		end = (end + 1) % bufferSize;
+		new(&buffer[end]) T(value);
+
+		++qSize;
 
 		xSemaphoreGive(waitSemaphore);
 
@@ -211,9 +225,13 @@ public:
 
 		std::lock_guard guard(accessMutex);
 
-		buffer[end] = T(std::move(value));
+		if(!empty()){
+			end = (end + 1) % bufferSize;
+		}
 
-		end = (end + 1) % bufferSize;
+		new(&buffer[end]) T(std::move(value));
+
+		++qSize;
 
 		xSemaphoreGive(waitSemaphore);
 
@@ -228,9 +246,27 @@ public:
 	inline bool check(const T& value) const noexcept {
 		std::lock_guard guard(accessMutex);
 
-		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			if(buffer[i] == value) {
-				return true;
+		if(empty()){
+			return false;
+		}
+
+		if(begin > end){
+			for(size_t i = 0; i <= end; i = ++i){
+				if(buffer[i] == value){
+					return true;
+				}
+			}
+
+			for(size_t i = begin; i < bufferSize; ++i){
+				if(buffer[i] == value){
+					return true;
+				}
+			}
+		}else{
+			for(size_t i = begin; i <= end; ++i){
+				if(buffer[i] == value){
+					return true;
+				}
 			}
 		}
 
@@ -244,23 +280,34 @@ public:
 	inline void remove(const T& value) noexcept {
 		std::lock_guard guard(accessMutex);
 
-		bool found = true;
-		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			if(buffer[i] == value){
-				found = false;
-				buffer[i].~T();
-				continue;
-			}
-
-			if(!found){
-				continue;
-			}
-
-			buffer[i-1] = buffer[i];
+		if(empty()){
+			return;
 		}
 
-		if(found){
-			--end;
+		std::vector<size_t> toRemove;
+
+		if(begin > end){
+			for(size_t i = 0; i <= end; ++i){
+				if(buffer[i] == value){
+					toRemove.emplace_back(i);
+				}
+			}
+
+			for(size_t i = begin; i < bufferSize; ++i){
+				if(buffer[i] == value){
+					toRemove.emplace_back(i);
+				}
+			}
+		}else{
+			for(size_t i = begin; i <= end; ++i){
+				if(buffer[i] == value){
+					toRemove.emplace_back(i);
+				}
+			}
+		}
+
+		for(size_t i : toRemove){
+			removeAt(i);
 		}
 	}
 
@@ -270,11 +317,26 @@ public:
 	inline void clear() noexcept {
 		std::lock_guard guard(accessMutex);
 
-		for(size_t i = begin; i <= end; i = (i + 1) % bufferSize){
-			buffer[i].~T();
+		if(empty()){
+			return;
+		}
+
+		if(begin > end){
+			for(size_t i = 0; i <= end; ++i){
+				buffer[i].~T();
+			}
+
+			for(size_t i = begin; i < bufferSize; ++i){
+				buffer[i].~T();
+			}
+		}else{
+			for(size_t i = begin; i <= end; ++i){
+				buffer[i].~T();
+			}
 		}
 
 		end = begin = 0;
+		qSize = 0;
 
 		xSemaphoreTake(waitSemaphore, 0);
 	}
@@ -294,10 +356,11 @@ public:
 
 private:
 	static constexpr size_t DefaultSize = 16;
-	T* buffer;
+	T* buffer = nullptr;
 	Allocator allocator = Allocator();
 	size_t bufferSize;
 	size_t begin = 0;
+	size_t qSize = 0;
 	size_t end = 0;
 	bool kill = false;
 	std::mutex accessMutex;
@@ -312,23 +375,32 @@ private:
 	 */
 	inline bool reserveInternal(size_t newSize) noexcept {
 		T* newBuffer = allocator.allocate(newSize);
-		if(buffer == nullptr){
+		if(newBuffer == nullptr){
 			return false;
+		}
+
+		if(buffer == nullptr){
+			buffer = newBuffer;
+			bufferSize = newSize;
+			return true;
 		}
 
 		if(begin > end){
 			for(size_t i = begin; i < bufferSize; ++i){
-				newBuffer[newSize - bufferSize + i] =  T(std::move_if_noexcept(buffer[i]));
+				new(&newBuffer[newSize - bufferSize + i]) T(std::move_if_noexcept(buffer[i]));
+				buffer[i].~T();
 			}
 
-			for(size_t i = 0; i < end; ++i){
-				newBuffer[i] =  T(std::move_if_noexcept(buffer[i]));
+			for(size_t i = 0; i <= end; ++i){
+				new(&newBuffer[i]) T(std::move_if_noexcept(buffer[i]));
+				buffer[i].~T();
 			}
 
 			begin = newSize - bufferSize + begin;
 		}else{
-			for(size_t i = begin; i < end; ++i){
-				newBuffer[newSize - bufferSize + i] =  T(std::move_if_noexcept(buffer[i]));
+			for(size_t i = begin; i <= end; ++i){
+				new(&newBuffer[newSize - bufferSize + i]) T(std::move_if_noexcept(buffer[i]));
+				buffer[i].~T();
 			}
 		}
 
@@ -337,6 +409,96 @@ private:
 		bufferSize = newSize;
 
 		return true;
+	}
+
+	inline void removeAt(size_t index) noexcept {
+		if(index >= bufferSize || empty()){
+			return;
+		}
+
+		if(index == begin){
+			buffer[index].~T();
+
+			--qSize;
+
+			if(!empty() || begin != end){
+				begin = (begin + 1) % bufferSize;
+			}
+
+			return;
+		}
+
+		if(index == end){
+			buffer[index].~T();
+
+			--qSize;
+
+			if(!empty() || end != begin){
+				if(end == 0){
+					end += bufferSize;
+				}
+
+				--end;
+			}
+
+			return;
+		}
+
+		if(begin > end){
+			if(index > end && index < begin){
+				return;
+			}
+
+			if(index > begin){
+				for(size_t i = begin; i <= index; ++i){
+					buffer[i + 1] = std::move_if_noexcept(buffer[i]);
+				}
+
+				buffer[begin].~T();
+
+				--qSize;
+
+				if(!empty() || begin != end){
+					begin = (begin + 1) % bufferSize;
+				}
+			}else if(index < end){
+				for(size_t i = index; i < end; ++i){
+					buffer[i] = std::move_if_noexcept(buffer[i + 1]);
+				}
+
+				buffer[end].~T();
+
+				--qSize;
+
+				if(!empty() || end != begin){
+					if(end == 0){
+						end += bufferSize;
+					}
+
+					--end;
+				}
+			}
+		}else{
+			if(index < begin && index > end){
+				return;
+			}
+
+			for(size_t i = index; i < end; ++i){
+				buffer[i] = std::move_if_noexcept(buffer[i + 1]);
+			}
+
+			buffer[end].~T();
+
+			--qSize;
+
+			if(!empty() || end != begin){
+				if(end == 0){
+					end += bufferSize;
+				}
+
+				--end;
+			}
+		}
 	}
 };
 
