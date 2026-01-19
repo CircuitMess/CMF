@@ -29,6 +29,24 @@ set(EXCLUDED_ITEMS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/AudioSource.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevice.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevice.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleService.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleType.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_CO2Sensor.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_CO2Sensor.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_IRModule.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_IRModule.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_LEDModule.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_LEDModule.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_MotionSensor.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_MotionSensor.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_Perfboard.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_Perfboard.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.h"
         CACHE INTERNAL "" FORCE)
 
 foreach(SRC IN LISTS SRC_DIRS)
@@ -41,6 +59,48 @@ foreach(SRC IN LISTS EXCLUDED_ITEMS)
 endforeach()
 
 set(LIBS_INCL "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm/glm" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libhelix-aac/src" CACHE INTERNAL "" FORCE)
+
+# Modules
+if(CONFIG_CMF_MODULES)
+    list(APPEND SOURCES
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevice.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevice.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleService.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleType.h")
+
+    if(CONFIG_RM_TempHum)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.h")
+    endif()
+    if(CONFIG_RM_LED)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_LEDModule.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_LEDModule.h")
+    endif()
+    if(CONFIG_RM_Motion)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_MotionSensor.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_MotionSensor.h")
+    endif()
+    if(CONFIG_RM_CO2)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_CO2Sensor.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_CO2Sensor.h")
+    endif()
+    if(CONFIG_RM_IR)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_IRModule.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_IRModule.h")
+    endif()
+    if(CONFIG_RM_PerfBoard)
+        list(APPEND SOURCES
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_Perfboard.cpp"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_Perfboard.h")
+    endif()
+endif()
 
 # LVGL specific
 if(CONFIG_CMF_LVGL)
