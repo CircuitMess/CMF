@@ -126,9 +126,8 @@ void Object::scanEvents(TickType_t wait) noexcept{
 	}
 
 	const uint64_t begin = millis();
-	wait = std::min(wait, getEventScanningTime());
 
-	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max((int64_t) 0, (int64_t) wait - ((int64_t) millis() - (int64_t) begin))); ){
+	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max(static_cast<int64_t>(0), static_cast<int64_t>(wait) - (static_cast<int64_t>(millis()) - static_cast<int64_t>(begin)))); ){
 		if(handle == nullptr){
 			continue;
 		}
@@ -192,14 +191,6 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 
 void Object::readyEventHandle(EventHandleBase *handle) noexcept{
 	readyEventHandles.push(handle);
-}
-
-TickType_t Object::getEventScanningTime() const noexcept{
-	return eventScanningTime;
-}
-
-void Object::setEventScanningTime(TickType_t value) noexcept {
-	eventScanningTime = value;
 }
 
 Archive& Object::serialize(Archive& archive) noexcept{

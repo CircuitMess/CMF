@@ -50,6 +50,16 @@ protected:
 	 */
 	virtual void __onDestroy() noexcept override;
 
+	/**
+	 * @return The maximum time the object can spend scanning and executing events.
+	 */
+	virtual TickType_t getEventScanningTime() const noexcept;
+
+	/**
+	* @param value The maximum allowed time to spend scanning the events for new triggers.
+	*/
+	void setEventScanningTime(TickType_t value) noexcept;
+
 private:
 	/**
 	 * @brief The internal tick handle which is running within the native thread.
@@ -64,7 +74,7 @@ private:
 	uint8_t threadPriority;
 	int8_t cpuCore;
 	uint64_t lastTickTime;
-	TickType_t tickingInterval;
+	TickType_t eventScanningTime;
 };
 
 #endif //CMF_ASYNCENTITY_H

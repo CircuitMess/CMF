@@ -10,8 +10,7 @@ AsyncEntity::AsyncEntity(TickType_t interval/* = 0*/, size_t threadStackSize/* =
 						threadStackSize(threadStackSize),
 						threadPriority(threadPriority),
 						cpuCore(cpuCore),
-						lastTickTime(micros()),
-						tickingInterval(interval) {
+						lastTickTime(micros()) {
 	setEventScanningTime(interval);
 }
 
@@ -44,6 +43,14 @@ void AsyncEntity::__onDestroy() noexcept{
 	}
 
 	Super::__onDestroy();
+}
+
+TickType_t AsyncEntity::getEventScanningTime() const noexcept {
+	return eventScanningTime;
+}
+
+void AsyncEntity::setEventScanningTime(TickType_t value) noexcept {
+	eventScanningTime = value;
 }
 
 void AsyncEntity::tickHandle() noexcept{
