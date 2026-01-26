@@ -7,9 +7,7 @@ SyncEntity::SyncEntity() noexcept : Super() {}
 
 SyncEntity::~SyncEntity() noexcept = default;
 
-void SyncEntity::tick(float deltaTime) noexcept {
-	Super::tick(deltaTime);
-
+void SyncEntity::__tick(float deltaTime) noexcept {
 	forEachChild([](Object* child) {
 		if(!isValid(child)){
 			return false;
@@ -21,6 +19,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 			}
 
 			entity->begin();
+			entity->__begin();
 		}
 
 		return false;
@@ -33,6 +32,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 
 		if(SyncEntity* entity = cast<SyncEntity>(child)){
 			entity->tick(deltaTime);
+			entity->__tick(deltaTime);
 		}
 
 		return false;
@@ -49,6 +49,7 @@ void SyncEntity::tick(float deltaTime) noexcept {
 				}
 
 				entity->end(reason);
+				entity->__end(reason);
 			}
 			childrenToRemove.insert(child);
 		}
@@ -65,13 +66,9 @@ void SyncEntity::tick(float deltaTime) noexcept {
 	}
 }
 
-void SyncEntity::postInitProperties() noexcept {
-	Super::postInitProperties();
-}
+void SyncEntity::tick(float deltaTime) noexcept {}
 
-void SyncEntity::begin() noexcept {
-	Super::begin();
-
+void SyncEntity::__begin() noexcept {
 	forEachChild([](Object* child) {
 		if(!isValid(child)){
 			return false;
@@ -83,15 +80,20 @@ void SyncEntity::begin() noexcept {
 			}
 
 			entity->begin();
+			entity->__begin();
 		}
 
 		return false;
 	});
 }
 
-void SyncEntity::end(EndReason reason) noexcept {
-	Super::end(reason);
+void SyncEntity::begin() noexcept {}
+
+void SyncEntity::__end(EndReason reason) noexcept {
+	Super::__end(reason);
 }
+
+void SyncEntity::end(EndReason reason) noexcept {}
 
 void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{
 	Super::onOwnerChanged(oldOwner);

@@ -26,7 +26,7 @@ public:
 	Entity() noexcept;
 
 	/**
-	 * @brief Default emprt destructor.
+	 * @brief Default entity destructor.
 	 */
 	virtual ~Entity() noexcept override;
 
@@ -37,14 +37,11 @@ public:
 
 protected:
 	/**
-	 * @brief 
-	 */
-	virtual void postInitProperties() noexcept override;
-
-	/**
 	 * @brief Called before the first tick, the function marks the begin of the entities lifetime as a fully setup object.
 	 */
 	virtual void begin() noexcept;
+
+	virtual void __begin() noexcept;
 
 	/**
 	 * @brief Called once per ticking period as long as the entity exists.
@@ -52,15 +49,18 @@ protected:
 	 */
 	virtual void tick(float deltaTime) noexcept;
 
+	virtual void __tick(float deltaTime) noexcept;
+
 	/**
 	 * @brief Called after the final tick, marks the end of the entities lifetime with given reason.
 	 * @param reason The reason for end of life.
 	 */
 	virtual void end(EndReason reason) noexcept;
 
-private:
+	virtual void __end(EndReason reason) noexcept;
+
+protected:
 	bool begun;
-	std::mutex beginMutex;
 };
 
 #endif //CMF_ENTITY_H

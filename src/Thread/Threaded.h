@@ -51,7 +51,7 @@ public:
 	/**
 	 * @brief Starts the thread after all initial properties have been set.
 	 */
-	virtual void postInitProperties() noexcept override;
+	virtual void __postInitProperties() noexcept override;
 
 	/**
 	 * @brief Stops the thread.

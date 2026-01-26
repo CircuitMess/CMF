@@ -23,22 +23,10 @@ AsyncEntity::~AsyncEntity() noexcept {
 	thread->stop(portMAX_DELAY);
 }
 
-void AsyncEntity::postInitProperties() noexcept {
-	Super::postInitProperties();
+void AsyncEntity::__postInitProperties() noexcept {
+	Super::__postInitProperties();
 
 	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
-}
-
-void AsyncEntity::begin() noexcept {
-	Super::begin();
-}
-
-void AsyncEntity::tick(float deltaTime) noexcept {
-	Super::tick(deltaTime);
-}
-
-void AsyncEntity::end(EndReason reason) noexcept {
-	Super::end(reason);
 }
 
 void AsyncEntity::setOwner(Object* object) noexcept{
@@ -50,12 +38,12 @@ void AsyncEntity::setOwner(Object* object) noexcept{
 	}
 }
 
-void AsyncEntity::onDestroy() noexcept{
+void AsyncEntity::__onDestroy() noexcept{
 	if(thread.isValid()){
 		thread->destroy();
 	}
 
-	Super::onDestroy();
+	Super::__onDestroy();
 }
 
 void AsyncEntity::tickHandle() noexcept{
@@ -65,6 +53,7 @@ void AsyncEntity::tickHandle() noexcept{
 
 	if(!hasBegun()){
 		begin();
+		__begin();
 	}
 
 	forEachChild([](Object* child) {
@@ -78,6 +67,7 @@ void AsyncEntity::tickHandle() noexcept{
 			}
 
 			entity->begin();
+			entity->__begin();
 		}
 
 		return false;
@@ -88,6 +78,7 @@ void AsyncEntity::tickHandle() noexcept{
 
 	scanEvents(getEventScanningTime());
 	tick(deltaTime);
+	__tick(deltaTime);
 
 	forEachChild([deltaTime](Object* child) {
 		if(!isValid(child)){
@@ -96,6 +87,7 @@ void AsyncEntity::tickHandle() noexcept{
 
 		if(SyncEntity* entity = cast<SyncEntity>(child)){
 			entity->tick(deltaTime);
+			entity->__tick(deltaTime);
 		}
 
 		return false;
@@ -116,6 +108,7 @@ void AsyncEntity::tickHandle() noexcept{
 				}
 
 				entity->end(reason);
+				entity->__end(reason);
 			}
 			childrenToRemove.insert(child);
 		}
@@ -139,6 +132,7 @@ void AsyncEntity::tickHandle() noexcept{
 
 			if(SyncEntity* entity = cast<SyncEntity>(child)){
 				entity->end(EndReason::Quit);
+				entity->__end(EndReason::Quit);
 			}
 
 			child->destroy();
@@ -159,6 +153,8 @@ void AsyncEntity::tickHandle() noexcept{
 		}
 
 		end(reason);
+		__end(reason);
+
 		destroy();
 	}else{
 		lastTickTime = currentTickTime;

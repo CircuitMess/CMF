@@ -3,9 +3,7 @@
 #include "Statics/ApplicationStatics.h"
 #include "Core/Application.h"
 
-Entity::Entity() noexcept : Super() {
-	beginMutex.lock();
-}
+Entity::Entity() noexcept : Super() {}
 
 Entity::~Entity() noexcept = default;
 
@@ -13,21 +11,18 @@ bool Entity::hasBegun() const noexcept{
 	return begun;
 }
 
-void Entity::postInitProperties() noexcept {
-	Super::postInitProperties();
+void Entity::begin() noexcept{}
 
-	beginMutex.unlock();
-}
-
-void Entity::begin() noexcept{
-	std::lock_guard lock(beginMutex);
+void Entity::__begin() noexcept {
 	begun = true;
 }
 
-void Entity::tick(float deltaTime) noexcept{
-	std::lock_guard lock(beginMutex);
+void Entity::tick(float deltaTime) noexcept{}
+
+void Entity::__tick(float deltaTime) noexcept {
 }
 
-void Entity::end(EndReason reason) noexcept{
-	std::lock_guard lock(beginMutex);
+void Entity::end(EndReason reason) noexcept{}
+
+void Entity::__end(EndReason reason) noexcept {
 }

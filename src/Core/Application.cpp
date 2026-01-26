@@ -16,26 +16,18 @@ void Application::registerLifetimeObject(Object* object) noexcept{
 	lifetimeObjects.insert(object);
 }
 
-void Application::postInitProperties() noexcept {
-	Super::postInitProperties();
-
+void Application::__postInitProperties() noexcept {
 	eventScanner = newObject<EventScanner>();
+
+	Super::__postInitProperties();
 }
 
-void Application::begin() noexcept {
-	Super::begin();
-}
-
-void Application::tick(float deltaTime) noexcept {
-	Super::tick(deltaTime);
-}
-
-void Application::end(EndReason reason) noexcept {
+void Application::__end(EndReason reason) noexcept {
 	// TODO right now only Quit reason is supported, this needs to be expanded in the future
 	reason = EndReason::Quit;
 	shuttingDown = true;
 
-	Super::end(reason);
+	Super::__end(reason);
 
 	ObjectManager::get()->forEachObject([](Object* object) {
 		if(AsyncEntity* entity = cast<AsyncEntity>(object)){

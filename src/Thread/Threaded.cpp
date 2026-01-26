@@ -28,8 +28,8 @@ Threaded::~Threaded() noexcept{
 	vSemaphoreDelete(pauseSemaphore);
 }
 
-void Threaded::postInitProperties() noexcept{
-	Super::postInitProperties();
+void Threaded::__postInitProperties() noexcept{
+	Super::__postInitProperties();
 
 	start();
 }

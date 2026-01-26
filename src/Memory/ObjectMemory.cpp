@@ -13,6 +13,7 @@ void initObject(Object* object, Object* owner) noexcept {
 	}
 
 	object->postInitProperties();
+	object->__postInitProperties();
 }
 
 bool isValid(const Object* object) noexcept {

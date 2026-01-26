@@ -28,25 +28,22 @@ public:
 	 * @brief Controls the lifetime functionality of all synch entity children of this entity.
 	 * @param deltaTime Time since the last tick call.
 	 */
+	virtual void __tick(float deltaTime) noexcept override;
+
 	virtual void tick(float deltaTime) noexcept override;
 
 	/**
 	 * @brief Also calls the begin of all children entities.
 	 */
+	virtual void __begin() noexcept override;
+
 	virtual void begin() noexcept override;
 
-	/**
-	 * @brief
-	 * @param reason 
-	 */
+	virtual void __end(EndReason reason) noexcept override;
+
 	virtual void end(EndReason reason) noexcept override;
 
 protected:
-	/**
-	 * @brief 
-	 */
-	virtual void postInitProperties() noexcept override;
-
 	/**
 	 * @brief Ensures that the sync entity has an owner. Even if invalid owner is set, the owner of the entity will be set to the application instance.
 	 * @param oldOwner 

@@ -7,7 +7,7 @@
 #include "Core/Application.h"
 #include "Class.h"
 
-const Object::ClassType* Object::objectStaticClass = new Object::ClassType((uint64_t) STRING_HASH("Object") << 32);
+const Object::ClassType* Object::objectStaticClass = new Object::ClassType(static_cast<uint64_t>(STRING_HASH("Object")) << 32);
 
 Object::Object() noexcept : id(ObjectIndex++){}
 
@@ -25,6 +25,8 @@ bool Object::isA(const Class* other) const noexcept {
 
 void Object::postInitProperties() noexcept{}
 
+void Object::__postInitProperties() noexcept {}
+
 bool Object::canDelete() noexcept{
 	std::lock_guard lock(destroyMutex);
 
@@ -37,9 +39,12 @@ void Object::destroy() noexcept{
 	markedForDestroy = true;
 
 	onDestroy();
+	__onDestroy();
 }
 
-void Object::onDestroy() noexcept{
+void Object::onDestroy() noexcept{}
+
+void Object::__onDestroy() noexcept {
 	forEachChild([](Object* child){
 		if(isValid(child)){
 			return false;

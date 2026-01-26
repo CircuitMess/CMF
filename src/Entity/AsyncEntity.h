@@ -37,24 +37,7 @@ protected:
 	/**
 	 * @brief Creates the thread of the entity and starts its execution.
 	 */
-	virtual void postInitProperties() noexcept override;
-
-	/**
-	 * @brief
-	 */
-	virtual void begin() noexcept override;
-
-	/**
-	 * @brief
-	 * @param deltaTime
-	 */
-	virtual void tick(float deltaTime) noexcept override;
-
-	/**
-	 * @brief
-	 * @param reason
-	 */
-	virtual void end(EndReason reason) noexcept override;
+	virtual void __postInitProperties() noexcept override;
 
 	/**
 	 * @brief Ensures that the owner set is always nullptr since async entities cannot have an owner.
@@ -65,7 +48,7 @@ protected:
 	/**
 	 * @brief Stops and destroys the thread.
 	 */
-	virtual void onDestroy() noexcept override;
+	virtual void __onDestroy() noexcept override;
 
 private:
 	/**

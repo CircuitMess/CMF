@@ -223,24 +223,13 @@ protected:
 	/**
 	 * @brief
 	 */
-	virtual void postInitProperties() noexcept override;
-
-	/**
-	 * @brief
-	 */
-	virtual void begin() noexcept override;
-
-	/**
-	 * @brief
-	 * @param deltaTime The time passed since the last tick call.
-	 */
-	virtual void tick(float deltaTime) noexcept override;
+	virtual void __postInitProperties() noexcept override;
 
 	/**
 	 * @brief
 	 * @param reason The reason why the entity instance stopped ticking and is getting destroyed.
 	 */
-	virtual void end(EndReason reason) noexcept override;
+	virtual void __end(EndReason reason) noexcept override;
 
 	/**
 	 * @brief

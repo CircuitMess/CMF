@@ -94,6 +94,8 @@ public:
 	 */
 	virtual void postInitProperties() noexcept;
 
+	virtual void __postInitProperties() noexcept;
+
 	/**
 	 * @brief Checks if the object can be deleted in regards to the multithreaded locking.
 	 * @return True if it can be deleted, false otherwise.
@@ -111,6 +113,11 @@ public:
 	 * @brief
 	 */
 	virtual void onDestroy() noexcept;
+
+	/**
+	 * @brief
+	 */
+	virtual void __onDestroy() noexcept;
 
 	/**
 	 * @brief Checks if the object is marked for destroy.
