@@ -8,7 +8,7 @@
  * @brief SubclassOf is used to mark a Object type that is of template type T (or derives template type T).
  * @tparam T The object type that the underlying class instance has to be of, or has to extend.
  */
-template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
+template<typename T, typename = std::enable_if_t<std::derived_from<T, Object>, T>>
 class SubclassOf {
 public:
 	/**

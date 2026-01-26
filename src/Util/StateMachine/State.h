@@ -3,7 +3,6 @@
 
 #include "Object/Class.h"
 #include "Entity/SyncEntity.h"
-#include "Object/SubclassOf.h"
 
 /**
  * @brief State used by the StateMachine class, extends SyncEntity, can transition to another state,
@@ -37,6 +36,11 @@ public:
 	 * @return The owning StateMachine or nullptr if the State is still inactive.
 	 */
 	class StateMachine* getStateMachine() const noexcept;
+
+	void setNextState(const Class* state) noexcept;
+
+private:
+	const Class* next = nullptr;
 };
 
 #endif //CMF_STATE_H
