@@ -7,7 +7,7 @@
 #include "Entity/AsyncEntity.h"
 
 class LVGL : public AsyncEntity {
-	GENERATED_BODY(LVGL, AsyncEntity)
+	GENERATED_BODY(LVGL, AsyncEntity, void)
 
 public:
 	LVGL() = default;

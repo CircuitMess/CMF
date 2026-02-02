@@ -14,7 +14,7 @@ DEFINE_LOG(LED)
 template<typename LED, typename DataT>
 class LEDFunction : public SyncEntity {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDFunction, SyncEntity)
+	GENERATED_BODY(LEDFunction, SyncEntity, void)
 
 public:
 	virtual bool isDone() const noexcept{ return true; }
@@ -25,7 +25,7 @@ public:
 template<typename LED, typename DataT> requires (std::same_as<DataT, glm::vec3> || std::same_as<DataT, float>)
 class LEDBase : public SyncEntity {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDBase, SyncEntity)
+	GENERATED_BODY(LEDBase, SyncEntity, void)
 
 public:
 	void reg(LED led, std::array<OutputPin, sizeof(DataT) / sizeof(float)> pins) noexcept{
@@ -198,7 +198,7 @@ private:
 template<typename Monos, typename RGBs>
 class LED : public AsyncEntity {
 	TEMPLATE_ATTRIBUTES(Monos, RGBs)
-	GENERATED_BODY(LED, AsyncEntity)
+	GENERATED_BODY(LED, AsyncEntity, void)
 
 public:
 	LED() noexcept : Super(30, 4 * 1024, 4, -1) {

@@ -3,6 +3,7 @@
 
 #include "Object/Object.h"
 #include <LovyanGFX.h>
+#include <Object/Class.h>
 
 typedef lgfx::LGFX_Sprite Sprite;
 
@@ -10,10 +11,9 @@ typedef lgfx::LGFX_Sprite Sprite;
  * Wrapper for LovyanGFX objects.
  */
 class Display : public Object {
-	GENERATED_BODY(Display, Object)
+	GENERATED_BODY(Display, Object, CONSTRUCTOR_PACK(lgfx::Bus_SPI::config_t, lgfx::Panel_Device::config_t, std::function<void(Sprite&)>))
 
 public:
-	Display() = default;
 	Display(lgfx::Bus_SPI::config_t busConfig, lgfx::Panel_Device::config_t panelConfig, std::function<void(Sprite&)> canvasInit = {});
 	~Display() override;
 

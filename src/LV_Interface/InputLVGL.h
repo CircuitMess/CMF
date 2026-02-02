@@ -8,7 +8,7 @@
 #include "Services/ButtonInput.h"
 
 class InputLVGL : public Object {
-	GENERATED_BODY(InputLVGL, Object)
+	GENERATED_BODY(InputLVGL, Object, void)
 public:
 	InputLVGL() = default;
 

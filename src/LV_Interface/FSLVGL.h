@@ -6,12 +6,13 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <memory>
+#include <Object/Class.h>
 #include "FileSystem/RawCache.h"
 #include "FileSystem/FileArchive.h"
 #include "Object/Object.h"
 
 class FSLVGL : public Object {
-	GENERATED_BODY(FSLVGL, Object)
+	GENERATED_BODY(FSLVGL, Object,  CONSTRUCTOR_PACK(char, FileCache*))
 public:
 	FSLVGL(char letter = 'S', FileCache* cache = nullptr);
 	~FSLVGL() override;
