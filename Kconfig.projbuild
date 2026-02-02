@@ -20,6 +20,17 @@ config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
 
+menu "I2C settings"
+
+    config CMF_I2C_default_timeout
+        int "Number of ticks for timeout in I2C scan/probe operations (Default)"
+        range 1 1000
+        default 5
+        help
+            Some hardware implementations require larger timeout windows.
+            Increase this value in case of I2C probe errors, while 5 ticks should be enough for most boards.
+            Value should be lowest-possible to keep blocking times during init reasonably short.
+endmenu
 
 config CMF_MODULES
     bool "Enable Modules service"
