@@ -283,16 +283,6 @@ protected:
 			return nullptr;
 		}
 
-		for(const StrongObjectPtr<Object>& driver : drivers){
-			if(!driver.isValid()){
-				continue;
-			}
-
-			if(driver->getStaticClass() == object->getStaticClass()){
-				return nullptr;
-			}
-		}
-
 		drivers.insert(*object);
 
 		return *object;
@@ -310,16 +300,6 @@ protected:
 		StrongObjectPtr<T> object = newObject<T>(this, std::forward<Args>(args)...);
 		if(!object.isValid()){
 			return nullptr;
-		}
-
-		for(const StrongObjectPtr<Object>& service : services){
-			if(!service.isValid()){
-				continue;
-			}
-
-			if(service->getStaticClass() == object->getStaticClass()){
-				return nullptr;
-			}
 		}
 
 		services.insert(*object);
