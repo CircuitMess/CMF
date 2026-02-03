@@ -7,10 +7,10 @@
 #include "Event/EventBroadcaster.h"
 
 class ButtonInput : public AsyncEntity {
-	GENERATED_BODY(ButtonInput, AsyncEntity, void)
+	GENERATED_BODY(ButtonInput, AsyncEntity, CONSTRUCTOR_PACK(const std::vector<std::pair<Enum<int>, InputPin>>&))
 
 public:
-	ButtonInput();
+	ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations);
 
 	enum class Action : uint8_t {
 		Release, Press
@@ -19,6 +19,7 @@ public:
 	DECLARE_EVENT(ButtonInputEvent, ButtonInput, Enum<int>, Action)
 	ButtonInputEvent OnButtonEvent = ButtonInputEvent(this);
 
+	//TODO - sve naknadne registracije moraju biti syncane s tickom ButtonInput threada
 	void reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept;
 
 	void reg(Enum<int> button, InputPin pin) noexcept;
