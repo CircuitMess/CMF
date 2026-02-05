@@ -178,8 +178,10 @@ public:
 		value = std::move_if_noexcept(buffer[begin]);
 		buffer[begin].~T();
 
-		begin = (begin + 1) % bufferSize;
 		--qSize;
+		if(!empty()){
+			begin = (begin + 1) % bufferSize;
+		}
 
 		if(!empty()){
 			xSemaphoreGive(waitSemaphore);
