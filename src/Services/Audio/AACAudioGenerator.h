@@ -2,18 +2,18 @@
 #define CMF_AACSOURCE_H
 
 #include "Object/Class.h"
-#include "AudioSource.h"
+#include "AudioGenerator.h"
 #include <aacdec.h>
 
-class AACSource : public AudioSource {
-	GENERATED_BODY(AACSource, AudioSource, void)
+class AACAudioGenerator : public AudioGenerator, public Object {
+	GENERATED_BODY(AACAudioGenerator, Object, void)
 
 	using SampleType = int16_t;
 
 public:
-	AACSource() = default;
+	AACAudioGenerator();
 
-	void open(const std::string& path) override;
+	void open(AudioSource* resource) override;
 
 	void close() override;
 
@@ -22,7 +22,7 @@ public:
 private:
 	HAACDecoder decoder;
 
-	std::ifstream file;
+	AudioSource* resource = nullptr;
 	int bytesRemaining;
 
 	std::vector<char> fillBuffer;

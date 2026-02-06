@@ -1,18 +1,8 @@
-#include "AACSource.h"
+#include "AACAudioGenerator.h"
 
 DEFINE_LOG(AACSource)
 
-void AACSource::open(const std::string& path){
-	file = std::ifstream(path);
-	if(!file.is_open()){
-		CMF_LOG(AACSource, LogLevel::Error, "Failed to open file %s", path.c_str());
-		return;
-	}
-
-	if(decoder){
-		AACFreeDecoder(decoder);
-	}
-
+AACAudioGenerator::AACAudioGenerator(){
 	decoder = AACInitDecoder();
 
 	if(decoder == nullptr){
@@ -21,17 +11,31 @@ void AACSource::open(const std::string& path){
 	}
 }
 
-void AACSource::close(){
-	file.close();
-	AACFreeDecoder(decoder);
-	decoder = nullptr;
+void AACAudioGenerator::open(AudioSource* resource){
+	AACFlushCodec(decoder);
+
+	resource->open();
+	this->resource = resource;
+}
+
+void AACAudioGenerator::close(){
+	printf("AACGen close\n");
+	resource->close();
+	// delete resource; //TODO - jel se ovo smije
+	resource = nullptr;
+
+	AACFlushCodec(decoder);
 
 	fillBuffer.clear();
 	dataBuffer.clear();
 	bytesRemaining = 0;
 }
 
-size_t AACSource::getData(uint8_t* buffer, size_t bytes){
+size_t AACAudioGenerator::getData(uint8_t* buffer, size_t bytes){
+	if(resource == nullptr){
+		CMF_LOG(AACSource, LogLevel::Debug, "early return, no resource");
+		return 0;
+	}
 	if(decoder == nullptr){
 		CMF_LOG(AACSource, LogLevel::Debug, "early return, decoder == nullptr");
 		return 0;
@@ -59,10 +63,9 @@ size_t AACSource::getData(uint8_t* buffer, size_t bytes){
 	while(bytesTransferred < bytes){
 		CMF_LOG(AACSource, LogLevel::Debug, "bytesRemaining: %d", bytesRemaining);
 
-		if(fillBuffer.size() < FileReadThreshold && file){
+		if(fillBuffer.size() < FileReadThreshold && (bool)*resource){
 			fillBuffer.resize(fillBuffer.size() + FileReadChunkSize);
-			file.read(fillBuffer.data() + fillBuffer.size() - FileReadChunkSize, FileReadChunkSize);
-			bytesRemaining += file.gcount();
+			bytesRemaining += resource->getData((uint8_t*)fillBuffer.data() + fillBuffer.size() - FileReadChunkSize, FileReadChunkSize);
 			CMF_LOG(AACSource, LogLevel::Debug, "fillBuffer resized, bytesRemaining: %d", bytesRemaining);
 		}
 
@@ -70,7 +73,7 @@ size_t AACSource::getData(uint8_t* buffer, size_t bytes){
 			break;
 		}
 
-		unsigned char* inBuffer = reinterpret_cast<unsigned char *>(fillBuffer.data());
+		unsigned char* inBuffer = reinterpret_cast<unsigned char*>(fillBuffer.data());
 
 		const int bytesRemainingBefore = bytesRemaining;
 

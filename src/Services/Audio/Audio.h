@@ -5,22 +5,20 @@
 #include "Object/Class.h"
 #include "Entity/AsyncEntity.h"
 #include "Drivers/Interface/OutputDriver.h"
-#include "AudioSource.h"
+#include "AudioGenerator.h"
 #include "Periphery/I2S.h"
 
 class Audio : public AsyncEntity {
-	GENERATED_BODY(Audio, AsyncEntity, CONSTRUCTOR_PACK(StrongObjectPtr<I2S>, Object*, OutputPin))
+	GENERATED_BODY(Audio, AsyncEntity, CONSTRUCTOR_PACK(StrongObjectPtr<I2S>, OutputPin))
 
 public:
-	Audio() = default;
+	Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin);
 
-	Audio(StrongObjectPtr<I2S> i2s, Object* source, OutputPin enablePin);
-
-	Audio(StrongObjectPtr<I2S> i2s, Object* source);
+	Audio(StrongObjectPtr<I2S> i2s);
 
 	~Audio() override;
 
-	void play(const std::string& path);
+	void play(AudioGenerator* generator, AudioSource* source);
 
 	void stop();
 
@@ -28,14 +26,13 @@ public:
 
 	void setGain(float gain);
 
-
 protected:
 	void tick(float deltaTime) noexcept override;
 
 private:
 	StrongObjectPtr<I2S> i2s;
 	std::optional<OutputPin> enablePin = std::nullopt;
-	StrongObjectPtr<AudioSource> source;
+	AudioGenerator* generator;
 
 	bool enabled = true;
 
