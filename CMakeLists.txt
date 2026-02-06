@@ -24,11 +24,14 @@ set(EXCLUDED_ITEMS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Devices/Camera.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Periphery/WiFi.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Periphery/WiFi.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACSource.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACSource.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACAudioGenerator.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACAudioGenerator.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/FileAudioSource.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/FileAudioSource.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/Audio.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/Audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AudioSource.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AudioGenerator.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDefs.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevice.cpp"
@@ -115,11 +118,14 @@ endif()
 
 # Audio specific
 if(CONFIG_CMF_AUDIO)
-    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACSource.h"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACSource.cpp"
+    list(APPEND SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACAudioGenerator.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AACAudioGenerator.cpp"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/Audio.h"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/Audio.cpp"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AudioSource.h")
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AudioSource.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/AudioGenerator.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/FileAudioSource.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Audio/FileAudioSource.cpp")
     file(GLOB_RECURSE LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libhelix-aac/src/**.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libhelix-aac/src/**.c")
 else()
     set(LIBS "" CACHE INTERNAL "" FORCE)

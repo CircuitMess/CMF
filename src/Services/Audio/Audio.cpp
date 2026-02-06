@@ -3,20 +3,13 @@
 
 DEFINE_LOG(Audio)
 
-Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source, OutputPin enablePin) : Audio(std::move(i2s), source){
+Audio::Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin) : Audio(std::move(i2s)){
 	this->enablePin = enablePin;
 }
 
-Audio::Audio(StrongObjectPtr<I2S> i2s, Object* source) : AsyncEntity(0, 4 * 1024, 7, -1), i2s(std::move(i2s)){
-	if(!source->isA<AudioSource>()){
-		CMF_LOG(Audio, LogLevel::Error, "Given source isn't an AudioSource instance!");
-		abort();
-	}
-
+Audio::Audio(StrongObjectPtr<I2S> i2s) : AsyncEntity(0, 4 * 1024, 7, -1), i2s(std::move(i2s)){
 	playSemaphore = xSemaphoreCreateBinary();
 	xSemaphoreTake(playSemaphore, 0);
-
-	this->source = cast<AudioSource>(source);
 
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, true);
@@ -31,7 +24,7 @@ Audio::~Audio(){
 	}
 }
 
-void Audio::play(const std::string& path){
+void Audio::play(AudioGenerator* generator, std::unique_ptr<AudioSource> source){
 	if(!enabled) return;
 
 	if(playing){
@@ -42,7 +35,8 @@ void Audio::play(const std::string& path){
 		enablePin->driver->write(enablePin->port, true);
 	}
 
-	source->open(path);
+	generator->open(std::move(source));
+	this->generator = generator;
 
 	playing = true;
 
@@ -61,7 +55,7 @@ void Audio::stop() {
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, false);
 	}
-	source->close();
+	generator->close();
 	playing = false;
 }
 
@@ -76,7 +70,7 @@ void Audio::tick(float deltaTime) noexcept{
 		return;
 	}
 
-	const size_t bytesToTransfer = source->getData((uint8_t*)dataBuf.data(), BufSize * sizeof(int16_t));
+	const size_t bytesToTransfer = generator->getData((uint8_t*)dataBuf.data(), BufSize * sizeof(int16_t));
 
 	CMF_LOG(Audio, LogLevel::Debug, "audio tick bytes: %d", bytesToTransfer);
 
