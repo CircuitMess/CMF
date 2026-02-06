@@ -11,17 +11,16 @@ AACAudioGenerator::AACAudioGenerator(){
 	}
 }
 
-void AACAudioGenerator::open(AudioSource* resource){
+void AACAudioGenerator::open(std::unique_ptr<AudioSource> resource){
 	AACFlushCodec(decoder);
 
 	resource->open();
-	this->resource = resource;
+	this->resource = std::move(resource);
 }
 
 void AACAudioGenerator::close(){
-	printf("AACGen close\n");
 	resource->close();
-	// delete resource; //TODO - jel se ovo smije
+	resource.reset();
 	resource = nullptr;
 
 	AACFlushCodec(decoder);

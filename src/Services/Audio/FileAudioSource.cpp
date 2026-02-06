@@ -1,6 +1,6 @@
 #include "FileAudioSource.h"
-
 #include <utility>
+#include "Log/Log.h"
 
 DEFINE_LOG(FileAudioSource)
 

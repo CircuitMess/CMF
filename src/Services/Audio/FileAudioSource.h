@@ -2,10 +2,9 @@
 #define CMF_FILEAUDIOSOURCE_H
 
 #include "AudioSource.h"
-#include "Object/Object.h"
 #include <fstream>
 
-class FileAudioSource : public Object, public AudioSource {
+class FileAudioSource : public AudioSource {
 public:
 	FileAudioSource(std::string path);
 

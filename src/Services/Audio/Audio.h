@@ -18,7 +18,7 @@ public:
 
 	~Audio() override;
 
-	void play(AudioGenerator* generator, AudioSource* source);
+	void play(AudioGenerator* generator, std::unique_ptr<AudioSource> source);
 
 	void stop();
 

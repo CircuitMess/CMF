@@ -13,7 +13,7 @@ class AACAudioGenerator : public AudioGenerator, public Object {
 public:
 	AACAudioGenerator();
 
-	void open(AudioSource* resource) override;
+	void open(std::unique_ptr<AudioSource> resource) override;
 
 	void close() override;
 
@@ -22,8 +22,8 @@ public:
 private:
 	HAACDecoder decoder;
 
-	AudioSource* resource = nullptr;
-	int bytesRemaining;
+	std::unique_ptr<AudioSource> resource;
+	int bytesRemaining = 0;
 
 	std::vector<char> fillBuffer;
 	std::vector<char> dataBuffer;

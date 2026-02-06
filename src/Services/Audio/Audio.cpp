@@ -24,7 +24,7 @@ Audio::~Audio(){
 	}
 }
 
-void Audio::play(AudioGenerator* generator, AudioSource* source){
+void Audio::play(AudioGenerator* generator, std::unique_ptr<AudioSource> source){
 	if(!enabled) return;
 
 	if(playing){
@@ -35,7 +35,7 @@ void Audio::play(AudioGenerator* generator, AudioSource* source){
 		enablePin->driver->write(enablePin->port, true);
 	}
 
-	generator->open(source);
+	generator->open(std::move(source));
 	this->generator = generator;
 
 	playing = true;

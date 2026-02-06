@@ -8,7 +8,7 @@ class AudioGenerator {
 public:
 	virtual ~AudioGenerator() = default;
 
-	virtual void open(AudioSource* resource) = 0;
+	virtual void open(std::unique_ptr<AudioSource> resource) = 0;
 
 	virtual void close() = 0;
 
