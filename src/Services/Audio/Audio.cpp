@@ -101,3 +101,14 @@ void Audio::setEnabled(bool enabled){
 void Audio::setGain(float gain){
 	this->gain = gain;
 }
+
+bool Audio::isPlaying() const{
+	return playing;
+}
+
+bool Audio::waitEnd(TickType_t ticks){
+	if(xSemaphoreTake(playSemaphore, ticks) != pdTRUE) return false;
+
+	xSemaphoreGive(playSemaphore, 0);
+	return true;
+}

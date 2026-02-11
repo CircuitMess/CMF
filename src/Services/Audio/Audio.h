@@ -26,6 +26,17 @@ public:
 
 	void setGain(float gain);
 
+	bool isPlaying() const;
+
+	/**
+	 * Waits for current playback to finish, or ticks timeout elapses.
+	 * @param ticks Timeout, in FreeRTOS ticks
+	 * @return true - playback ended before timeout, false - timeouted
+	 */
+	bool waitEnd(TickType_t ticks);
+
+
+
 protected:
 	void tick(float deltaTime) noexcept override;
 
@@ -39,7 +50,7 @@ private:
 	static constexpr size_t BufSize = 1024;
 	std::array<int16_t, BufSize> dataBuf;
 
-	bool playing = false;
+	std::atomic_bool playing = false;
 
 	SemaphoreHandle_t playSemaphore;
 
