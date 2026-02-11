@@ -1,30 +1,26 @@
 #ifndef CMF_AUDIOSOURCE_H
 #define CMF_AUDIOSOURCE_H
 
-#include "Object/Class.h"
-#include <fstream>
-#include "Log/Log.h"
-#include "Object/Object.h"
+#include <cstdint>
+#include <cstddef>
 
-DEFINE_LOG(AudioSource)
-
-class AudioSource : public Object {
-	GENERATED_BODY(AudioSource, Object, void)
-
+class AudioSource {
 public:
-	virtual void open(const std::string& path){};
+	virtual ~AudioSource() = default;
 
-	virtual void close(){};
+	virtual void open() = 0;
+
+	virtual void close() = 0;
 
 	/**
-	 * Pull data from decoder.
-	 * @param buffer output, to be filled with decoded data
+	 * Pull data from the source.
+	 * @param buffer output, to be filled with raw data
 	 * @param bytes number of requested bytes
 	 * @return number of bytes actually written to provided buffer
 	 */
-	virtual size_t getData(uint8_t* buffer, size_t bytes){
-		return 0;
-	}
+	virtual size_t getData(uint8_t* buffer, size_t bytes) = 0;
+
+	virtual operator bool() const = 0;
 };
 
 #endif //CMF_AUDIOSOURCE_H
