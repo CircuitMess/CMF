@@ -12,6 +12,8 @@ class Audio : public AsyncEntity {
 	GENERATED_BODY(Audio, AsyncEntity, CONSTRUCTOR_PACK(StrongObjectPtr<I2S>, OutputPin))
 
 public:
+	typedef std::pair<AudioGenerator*, std::unique_ptr<AudioSource>> GenSourcePair;
+
 	Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin);
 
 	Audio(StrongObjectPtr<I2S> i2s);
@@ -19,6 +21,8 @@ public:
 	~Audio() override;
 
 	void play(AudioGenerator* generator, std::unique_ptr<AudioSource> source);
+
+	void play(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSource>>> sources);
 
 	void stop();
 
@@ -43,7 +47,9 @@ protected:
 private:
 	StrongObjectPtr<I2S> i2s;
 	std::optional<OutputPin> enablePin = std::nullopt;
-	AudioGenerator* generator;
+	AudioGenerator* currentGenerator;
+
+	std::queue<GenSourcePair> sourceQueue;
 
 	bool enabled = true;
 
@@ -51,6 +57,8 @@ private:
 	std::array<int16_t, BufSize> dataBuf;
 
 	std::atomic_bool playing = false;
+
+	SemaphoreHandle_t tickSemaphore;
 
 	SemaphoreHandle_t playSemaphore;
 
