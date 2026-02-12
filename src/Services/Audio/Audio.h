@@ -24,6 +24,10 @@ public:
 
 	void play(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSource>>> sources);
 
+	void enqueue(AudioGenerator* generator, std::unique_ptr<AudioSource> source);
+
+	void enqueue(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSource>>> sources);
+
 	void stop();
 
 	void setEnabled(bool enabled);

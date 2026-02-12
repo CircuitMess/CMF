@@ -87,6 +87,63 @@ void Audio::play(std::span<GenSourcePair> sources){
 	xSemaphoreGive(tickSemaphore);
 }
 
+void Audio::enqueue(AudioGenerator* generator, std::unique_ptr<AudioSource> source){
+	if(!playing){
+		play(generator, std::move(source));
+		return;
+	}
+
+	if(xSemaphoreTake(tickSemaphore, portMAX_DELAY) != pdTRUE){
+		CMF_LOG(Audio, LogLevel::Warning, "Couldn't take lock before queueing!");
+		return;
+	}
+
+	//Also check after lock was taken just in case we locked after the final tick()
+	if(!playing){
+		xSemaphoreGive(tickSemaphore);
+		play(generator, std::move(source));
+		return;
+	}
+
+	sourceQueue.emplace(generator, std::move(source));
+
+	xSemaphoreGive(tickSemaphore);
+}
+
+void Audio::enqueue(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSource>>> sources){
+	if(sources.empty()){
+		CMF_LOG(Audio, LogLevel::Warning, "Received empty sources span");
+		return;
+	}
+	if(sources.size() == 1){
+		enqueue(sources[0].first, std::move(sources[0].second));
+		return;
+	}
+
+	if(!playing){
+		play(sources);
+		return;
+	}
+
+	if(xSemaphoreTake(tickSemaphore, portMAX_DELAY) != pdTRUE){
+		CMF_LOG(Audio, LogLevel::Warning, "Couldn't take lock before queueing!");
+		return;
+	}
+
+	//Also check after tick lock was taken just in case we locked after the final tick
+	if(!playing){
+		xSemaphoreGive(tickSemaphore);
+		play(sources);
+		return;
+	}
+
+	for(int i = 0; i < sources.size(); i++){
+		sourceQueue.push(std::move(sources[i]));
+	}
+
+	xSemaphoreGive(tickSemaphore);
+}
+
 void Audio::stop(){
 	if(!enabled || !playing){
 		return;
