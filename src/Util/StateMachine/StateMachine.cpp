@@ -24,7 +24,7 @@ void StateMachine::tick(float deltaTime) noexcept{
 			const Class* previousType = current->getStaticClass();
 
 			current->onTransitionTo(*nextStateType);
-			current->destroy();
+			delete *current;
 			current = newObject<State>(*nextStateType, this);
 			current->onTransitionFrom(previousType);
 		}

@@ -54,11 +54,6 @@ public:
 	virtual void __postInitProperties() noexcept override;
 
 	/**
-	 * @brief Stops the thread.
-	 */
-	virtual void onDestroy() noexcept override;
-
-	/**
 	 * @brief Creates a native FreeRTOS thread.
 	 */
 	void start() noexcept;

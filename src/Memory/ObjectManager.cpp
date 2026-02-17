@@ -23,7 +23,7 @@ bool ObjectManager::isValid(const Object* object) noexcept{
 		return false;
 	}
 
-	return !object->isMarkedForDestroy() && getReferenceCount(object) > 0;
+	return getReferenceCount(object) > 0;
 }
 
 void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*/) noexcept{
@@ -48,10 +48,6 @@ void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = fals
 	if(keepAlive){
 		if(objectInfo.count > 0){
 			objectInfo.count--;
-		}
-
-		if(!(*object)->isMarkedForDestroy() && objectInfo.count == 0){
-			(*object)->destroy();
 		}
 	}
 }

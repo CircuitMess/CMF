@@ -37,33 +37,6 @@ void SyncEntity::__tick(float deltaTime) noexcept {
 
 		return false;
 	});
-
-	std::set<Object*> childrenToRemove;
-	forEachChild([&childrenToRemove](Object* child) {
-		if(!isValid(child) && !child->canDelete()){
-			if(SyncEntity* entity = cast<SyncEntity>(child)){
-				EndReason reason = EndReason::GarbageCollected;
-
-				if(ObjectManager::get()->getReferenceCount(entity) > 0){
-					reason = EndReason::Destroyed;
-				}
-
-				entity->end(reason);
-				entity->__end(reason);
-			}
-			childrenToRemove.insert(child);
-		}
-
-		return false;
-	});
-
-	for(Object* child : childrenToRemove){
-		if(child == nullptr){
-			continue;
-		}
-
-		child->destroy();
-	}
 }
 
 void SyncEntity::tick(float deltaTime) noexcept {}
@@ -89,17 +62,11 @@ void SyncEntity::__begin() noexcept {
 
 void SyncEntity::begin() noexcept {}
 
-void SyncEntity::__end(EndReason reason) noexcept {
-	Super::__end(reason);
-}
-
-void SyncEntity::end(EndReason reason) noexcept {}
-
 void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{
 	Super::onOwnerChanged(oldOwner);
 
 	// This is intentional, sync entities have to have an owner, otherwise their behavior will not work
-	if(getOwner() == nullptr && isValid(ApplicationStatics::getApplication()) && !ApplicationStatics::getApplication()->isShuttingDown()){
+	if(getOwner() == nullptr && isValid(ApplicationStatics::getApplication())){
 		setOwner(ApplicationStatics::getApplication());
 	}
 }

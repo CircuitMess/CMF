@@ -1,7 +1,5 @@
 #include "Entity.h"
 #include "Memory/ObjectMemory.h"
-#include "Statics/ApplicationStatics.h"
-#include "Core/Application.h"
 
 Entity::Entity() noexcept : Super() {}
 
@@ -20,9 +18,4 @@ void Entity::__begin() noexcept {
 void Entity::tick(float deltaTime) noexcept{}
 
 void Entity::__tick(float deltaTime) noexcept {
-}
-
-void Entity::end(EndReason reason) noexcept{}
-
-void Entity::__end(EndReason reason) noexcept {
 }

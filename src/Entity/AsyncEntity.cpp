@@ -20,6 +20,7 @@ AsyncEntity::~AsyncEntity() noexcept {
 	}
 
 	thread->stop(portMAX_DELAY);
+	// Thread will automatically get deleted as a child of this object, no need to explicitely delete it
 }
 
 void AsyncEntity::__postInitProperties() noexcept {
@@ -35,14 +36,6 @@ void AsyncEntity::setOwner(Object* object) noexcept{
 	if(object != nullptr && hasBegun()){
 		CMF_LOG(CMF, Warning, "Attempt to set owner '%s' of async entity '%s'. Async entities aren't allowed to have an owner.", getOwner()->getName().c_str(), getName().c_str());
 	}
-}
-
-void AsyncEntity::__onDestroy() noexcept{
-	if(thread.isValid()){
-		thread->destroy();
-	}
-
-	Super::__onDestroy();
 }
 
 TickType_t AsyncEntity::getEventScanningTime() const noexcept {
@@ -100,70 +93,5 @@ void AsyncEntity::tickHandle() noexcept{
 		return false;
 	});
 
-	std::set<Object*> childrenToRemove;
-	forEachChild([&childrenToRemove](Object* child) {
-		if(!isValid(child)){
-			return false;
-		}
-
-		if(!isValid(child) && !child->canDelete()){
-			if(SyncEntity* entity = cast<SyncEntity>(child)){
-				EndReason reason = EndReason::GarbageCollected;
-
-				if(ObjectManager::get()->getReferenceCount(entity) > 0){
-					reason = EndReason::Destroyed;
-				}
-
-				entity->end(reason);
-				entity->__end(reason);
-			}
-			childrenToRemove.insert(child);
-		}
-
-		return false;
-	});
-
-	for(Object* child : childrenToRemove){
-		if(child == nullptr){
-			continue;
-		}
-
-		child->destroy();
-	}
-
-	if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
-		forEachChild([](Object* child) {
-			if(!isValid(child)){
-				return false;
-			}
-
-			if(SyncEntity* entity = cast<SyncEntity>(child)){
-				entity->end(EndReason::Quit);
-				entity->__end(EndReason::Quit);
-			}
-
-			child->destroy();
-
-			return false;
-		});
-	}
-
-	if(!isValid(this) && !canDelete()){
-		EndReason reason = EndReason::GarbageCollected;
-
-		if(ObjectManager::get()->getReferenceCount(this) > 0){
-			reason = EndReason::Destroyed;
-		}
-
-		if(ApplicationStatics::getApplication() != nullptr && ApplicationStatics::getApplication()->isShuttingDown()){
-			reason = EndReason::Quit;
-		}
-
-		end(reason);
-		__end(reason);
-
-		destroy();
-	}else{
-		lastTickTime = currentTickTime;
-	}
+	lastTickTime = currentTickTime;
 }

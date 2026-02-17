@@ -33,7 +33,7 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	virtual ~Object() noexcept = default;
+	virtual ~Object() noexcept;
 
 	/**
 	 * @return Returns the ID of the object. This ID is unique for every object.
@@ -96,36 +96,7 @@ public:
 
 	virtual void __postInitProperties() noexcept;
 
-	/**
-	 * @brief Checks if the object can be deleted in regards to the multithreaded locking.
-	 * @return True if it can be deleted, false otherwise.
-	 */
-	bool canDelete() noexcept;
-
-	/**
-	 * @brief Marks the object for destroy, stopping all of its functionality and invalidating all smart pointers to it.
-	 * The object will be destroyed by the garbage collector in the next pass.
-	 */
-	void destroy() noexcept;
-
-	// TODO this doesn't get called on non-entity object, fix this shit.
-	/**
-	 * @brief
-	 */
-	virtual void onDestroy() noexcept;
-
-	/**
-	 * @brief
-	 */
-	virtual void __onDestroy() noexcept;
-
-	/**
-	 * @brief Checks if the object is marked for destroy.
-	 * @return True if marked for destroy, false otherwise.
-	 */
-	inline bool isMarkedForDestroy() const noexcept{
-		return markedForDestroy;
-	}
+	void operator delete(void* ptr) noexcept;
 
 	/**
 	 * @brief Sets the owner of the object.
@@ -254,8 +225,6 @@ private:
 
 	const uint32_t id;
 
-	std::atomic<bool> markedForDestroy;
-	std::atomic<bool> canBeDeleted;
 	WeakObjectPtr<Object> owner;
 	std::set<WeakObjectPtr<Object>> childrenObjects;
 	WeakObjectPtr<Object> instigator;

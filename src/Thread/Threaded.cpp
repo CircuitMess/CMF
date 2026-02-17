@@ -18,6 +18,8 @@ Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threa
 }
 
 Threaded::~Threaded() noexcept{
+	stop(portMAX_DELAY);
+
 	if(state != State::Stopped){
 		CMF_LOG(CMF, LogLevel::Error, "Thread was destroyed before being stopped.");
 		abort();
@@ -32,12 +34,6 @@ void Threaded::__postInitProperties() noexcept{
 	Super::__postInitProperties();
 
 	start();
-}
-
-void Threaded::onDestroy() noexcept{
-	stop(portMAX_DELAY);
-
-	Super::onDestroy();
 }
 
 void Threaded::start() noexcept{
