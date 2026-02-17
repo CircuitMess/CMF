@@ -7,10 +7,10 @@
 #include "Event/EventBroadcaster.h"
 
 class ButtonInput : public AsyncEntity {
-	GENERATED_BODY(ButtonInput, AsyncEntity, void)
+	GENERATED_BODY(ButtonInput, AsyncEntity, CONSTRUCTOR_PACK(const std::vector<std::pair<Enum<int>, InputPin>>&))
 
 public:
-	ButtonInput();
+	ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations);
 
 	enum class Action : uint8_t {
 		Release, Press
@@ -38,6 +38,8 @@ private:
 
 	std::unordered_map<int, bool> btnState;
 	std::unordered_map<int, uint64_t> dbTime;
+
+	std::mutex accessMutex;
 
 	static constexpr uint64_t SleepTime = 5; // [ms]
 	static constexpr uint64_t DebounceTime = 5; // [ms]
