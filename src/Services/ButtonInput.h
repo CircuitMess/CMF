@@ -19,7 +19,6 @@ public:
 	DECLARE_EVENT(ButtonInputEvent, ButtonInput, Enum<int>, Action)
 	ButtonInputEvent OnButtonEvent = ButtonInputEvent(this);
 
-	//TODO - sve naknadne registracije moraju biti syncane s tickom ButtonInput threada
 	void reg(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) noexcept;
 
 	void reg(Enum<int> button, InputPin pin) noexcept;
@@ -39,6 +38,8 @@ private:
 
 	std::unordered_map<int, bool> btnState;
 	std::unordered_map<int, uint64_t> dbTime;
+
+	std::mutex accessMutex;
 
 	static constexpr uint64_t SleepTime = 5; // [ms]
 	static constexpr uint64_t DebounceTime = 5; // [ms]

@@ -12,6 +12,8 @@ void ButtonInput::reg(const std::vector<std::pair<Enum<int>, InputPin>>& registr
 }
 
 void ButtonInput::reg(Enum<int> button, InputPin pin) noexcept{
+	std::lock_guard guard(accessMutex);
+
 	inputSources.insert(StrongObjectPtr<InputDriver>(pin.driver));
 	buttons[button] = pin;
 	dbTime[button] = 0;
@@ -19,15 +21,20 @@ void ButtonInput::reg(Enum<int> button, InputPin pin) noexcept{
 }
 
 bool ButtonInput::getState(Enum<int> button) noexcept{
+	std::lock_guard guard(accessMutex);
+
 	if(!btnState.contains(button)){
 		CMF_LOG(CMF, Error, "Button %d not registered", (int) button);
 		return false;
 	}
+
 	return btnState[button];
 }
 
 void ButtonInput::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
+
+	std::lock_guard guard(accessMutex);
 
 	for(auto& source: inputSources){
 		source->scan();
@@ -37,8 +44,7 @@ void ButtonInput::tick(float deltaTime) noexcept{
 		const auto btn = pair.first;
 		const auto pin = pair.second;
 
-
-		bool state = (bool) pin.driver->read(pin.port);
+		const bool state = static_cast<bool>(pin.driver->read(pin.port));
 		if(state){
 			pressed(btn);
 		}else{
@@ -58,7 +64,9 @@ void ButtonInput::pressed(int btn){
 	if(dbTime[btn] == 0){
 		dbTime[btn] = t;
 		return;
-	}else if(t - dbTime[btn] < DebounceTime){
+	}
+
+	if(t - dbTime[btn] < DebounceTime){
 		return;
 	}
 
