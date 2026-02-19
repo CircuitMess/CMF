@@ -8,8 +8,11 @@ Audio::Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin) : Audio(std::move(i2
 }
 
 Audio::Audio(StrongObjectPtr<I2S> i2s) : AsyncEntity(0, 4 * 1024, 7, -1), i2s(std::move(i2s)){
+	tickSemaphore = xSemaphoreCreateBinary();
+	xSemaphoreTake(tickSemaphore, 0);
+
 	playSemaphore = xSemaphoreCreateBinary();
-	xSemaphoreTake(playSemaphore, 0);
+	xSemaphoreGive(playSemaphore);
 
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, true);
@@ -36,59 +39,172 @@ void Audio::play(AudioGenerator* generator, std::unique_ptr<AudioSource> source)
 	}
 
 	generator->open(std::move(source));
-	this->generator = generator;
+	this->currentGenerator = generator;
 
 	playing = true;
+	if(xSemaphoreTake(playSemaphore, 0) == pdFALSE){
+		CMF_LOG(Audio, LogLevel::Warning, "play semaphore shouldn't be taken!");
+	}
 
-	xSemaphoreGive(playSemaphore);
+	xSemaphoreGive(tickSemaphore);
 }
 
-void Audio::stop() {
-	if(!enabled || !playing) {
+void Audio::play(std::span<GenSourcePair> sources){
+	if(sources.empty()){
+		CMF_LOG(Audio, LogLevel::Warning, "Received empty sources span");
+		return;
+	}
+	if(sources.size() == 1){
+		play(sources[0].first, std::move(sources[0].second));
 		return;
 	}
 
-	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
+	if(!enabled) return;
+
+	if(playing){
+		stop();
+	}
+
+	if(enablePin){
+		enablePin->driver->write(enablePin->port, true);
+	}
+
+	auto pair = std::move(sources[0]);
+
+
+	this->currentGenerator = pair.first;
+	currentGenerator->open(std::move(pair.second));
+
+	playing = true;
+	if(xSemaphoreTake(playSemaphore, 0) == pdFALSE){
+		CMF_LOG(Audio, LogLevel::Warning, "play semaphore shouldn't be taken!");
+	}
+
+	for(int i = 1; i < sources.size(); i++){
+		sourceQueue.push(std::move(sources[i]));
+	}
+
+	xSemaphoreGive(tickSemaphore);
+}
+
+void Audio::enqueue(AudioGenerator* generator, std::unique_ptr<AudioSource> source){
+	if(!playing){
+		play(generator, std::move(source));
+		return;
+	}
+
+	if(xSemaphoreTake(tickSemaphore, portMAX_DELAY) != pdTRUE){
+		CMF_LOG(Audio, LogLevel::Warning, "Couldn't take lock before queueing!");
+		return;
+	}
+
+	//Also check after lock was taken just in case we locked after the final tick()
+	if(!playing){
+		xSemaphoreGive(tickSemaphore);
+		play(generator, std::move(source));
+		return;
+	}
+
+	sourceQueue.emplace(generator, std::move(source));
+
+	xSemaphoreGive(tickSemaphore);
+}
+
+void Audio::enqueue(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSource>>> sources){
+	if(sources.empty()){
+		CMF_LOG(Audio, LogLevel::Warning, "Received empty sources span");
+		return;
+	}
+	if(sources.size() == 1){
+		enqueue(sources[0].first, std::move(sources[0].second));
+		return;
+	}
+
+	if(!playing){
+		play(sources);
+		return;
+	}
+
+	if(xSemaphoreTake(tickSemaphore, portMAX_DELAY) != pdTRUE){
+		CMF_LOG(Audio, LogLevel::Warning, "Couldn't take lock before queueing!");
+		return;
+	}
+
+	//Also check after tick lock was taken just in case we locked after the final tick
+	if(!playing){
+		xSemaphoreGive(tickSemaphore);
+		play(sources);
+		return;
+	}
+
+	for(int i = 0; i < sources.size(); i++){
+		sourceQueue.push(std::move(sources[i]));
+	}
+
+	xSemaphoreGive(tickSemaphore);
+}
+
+void Audio::stop(){
+	if(!enabled || !playing){
+		return;
+	}
+
+	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
 		return;
 	}
 
 	if(enablePin){
 		enablePin->driver->write(enablePin->port, false);
 	}
-	generator->close();
+	currentGenerator->close();
+	while(!sourceQueue.empty()){
+		sourceQueue.pop();
+	}
 	playing = false;
+	xSemaphoreGive(playSemaphore);
 }
 
 void Audio::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
 
-	if(!xSemaphoreTake(playSemaphore, portMAX_DELAY)) {
+	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
 		return;
 	}
 
-	if(!playing) {
+	if(!playing){
 		return;
 	}
 
-	const size_t bytesToTransfer = generator->getData((uint8_t*)dataBuf.data(), BufSize * sizeof(int16_t));
+	const size_t bytesToTransfer = currentGenerator->getData((uint8_t*)dataBuf.data(), BufSize * sizeof(int16_t));
 
 	CMF_LOG(Audio, LogLevel::Debug, "audio tick bytes: %d", bytesToTransfer);
 
 	if(bytesToTransfer == 0){
-		xSemaphoreGive(playSemaphore);
-		stop();
-		return;
+		if(sourceQueue.empty()){
+			CMF_LOG(Audio, LogLevel::Info, "SourceQueue empty, stopping");
+			xSemaphoreGive(tickSemaphore);
+			stop();
+			return;
+		}
+
+		CMF_LOG(Audio, LogLevel::Info, "Popping next source/gen from queue");
+
+		auto pair = std::move(sourceQueue.front());
+		sourceQueue.pop();
+
+		this->currentGenerator = pair.first;
+		currentGenerator->open(std::move(pair.second));
 	}
 
 	if(gain != 1.0f){
-		for(auto& sample: dataBuf){
-			sample = (int16_t) (sample * gain);
+		for(auto& sample : dataBuf){
+			sample = (int16_t)(sample * gain);
 		}
 	}
 
-	i2s->write(reinterpret_cast<uint8_t *>(dataBuf.data()), bytesToTransfer);
+	i2s->write(reinterpret_cast<uint8_t*>(dataBuf.data()), bytesToTransfer);
 
-	xSemaphoreGive(playSemaphore);
+	xSemaphoreGive(tickSemaphore);
 }
 
 void Audio::setEnabled(bool enabled){
@@ -100,4 +216,15 @@ void Audio::setEnabled(bool enabled){
 
 void Audio::setGain(float gain){
 	this->gain = gain;
+}
+
+bool Audio::isPlaying() const{
+	return playing;
+}
+
+bool Audio::waitEnd(TickType_t ticks){
+	if(xSemaphoreTake(playSemaphore, ticks) != pdTRUE) return false;
+
+	xSemaphoreGive(playSemaphore);
+	return true;
 }
