@@ -16,6 +16,10 @@ config CMF_CAMERA
     bool "Include camera extension"
     default "n"
 
+config CMF_BATTERY
+    bool "Include battery service"
+    default "n"
+
 config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
