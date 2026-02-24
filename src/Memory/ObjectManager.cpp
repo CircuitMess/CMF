@@ -11,7 +11,13 @@ uint32_t ObjectManager::getReferenceCount(const Object* object) noexcept{
 		return 0;
 	}
 
-	return objectReferenceTree[const_cast<Object*>(object)].count;
+	std::lock_guard lock(mutex);
+
+	if(!objectReferenceMap.contains(const_cast<Object*>(object))){
+		return 0;
+	}
+
+	return objectReferenceMap[const_cast<Object*>(object)].count;
 }
 
 bool ObjectManager::isValid(const Object* object) noexcept{
@@ -19,15 +25,21 @@ bool ObjectManager::isValid(const Object* object) noexcept{
 		return false;
 	}
 
-	if(!objectReferenceTree.contains(const_cast<Object*>(object))){
-		return false;
+	{
+		std::lock_guard lock(mutex);
+
+		if(!objectReferenceMap.contains(const_cast<Object*>(object))){
+			return false;
+		}
 	}
 
 	return getReferenceCount(object) > 0;
 }
 
 void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*/) noexcept{
-	ObjectRefInfo& objectInfo = objectReferenceTree[*object];
+	std::lock_guard lock(mutex);
+
+	ObjectRefInfo& objectInfo = objectReferenceMap[*object];
 
 	objectInfo.objectPointers.insert(object);
 
@@ -37,11 +49,13 @@ void ObjectManager::registerReference(Object** object, bool keepAlive/* = false*
 }
 
 void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = false*/) noexcept{
-	if(!objectReferenceTree.contains(*object)){
+	std::lock_guard lock(mutex);
+
+	if(!objectReferenceMap.contains(*object)){
 		return;
 	}
 
-	ObjectRefInfo& objectInfo = objectReferenceTree[*object];
+	ObjectRefInfo& objectInfo = objectReferenceMap[*object];
 
 	objectInfo.objectPointers.erase(object);
 
@@ -52,12 +66,20 @@ void ObjectManager::unregisterReference(Object** object, bool keepAlive/* = fals
 	}
 }
 
-void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) const noexcept{
+void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) noexcept{
 	if(fn == nullptr){
 		return;
 	}
 
-	for(Object* object : objectReferenceTree.keys()){
+	std::lock_guard lock(mutex);
+
+	std::set<Object*> keys;
+
+	for(std::pair<Object* const, ObjectRefInfo>& pair : objectReferenceMap){
+		keys.insert(pair.first);
+	}
+
+	for(Object* object : keys){
 		if(fn(object)){
 			break;
 		}
@@ -65,11 +87,13 @@ void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) const 
 }
 
 void ObjectManager::onObjectDeleted(Object* object) noexcept{
-	if(!objectReferenceTree.contains(object)){
+	std::lock_guard lock(mutex);
+
+	if(!objectReferenceMap.contains(object)){
 		return;
 	}
 
-	ObjectRefInfo& objectInfo = objectReferenceTree[object];
+	ObjectRefInfo& objectInfo = objectReferenceMap[object];
 
 	for(Object** ptr : objectInfo.objectPointers){
 		*ptr = nullptr;
@@ -77,5 +101,5 @@ void ObjectManager::onObjectDeleted(Object* object) noexcept{
 
 	objectInfo.count = 0;
 
-	objectReferenceTree.remove(object);
+	objectReferenceMap.erase(object);
 }

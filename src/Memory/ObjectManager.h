@@ -2,7 +2,9 @@
 #define CMF_OBJECTMANAGER_H
 
 #include <functional>
-#include "Containers/BinaryTree.h"
+#include <map>
+#include <set>
+#include <mutex>
 
 class Object;
 
@@ -56,7 +58,7 @@ public:
 	 * @brief Iterated through all managed objects and calls the given callback function for each until the callback returns true.
 	 * @param fn The callback function being executed for each object until true is returned.
 	 */
-	void forEachObject(const std::function<bool(Object*)>& fn) const noexcept;
+	void forEachObject(const std::function<bool(Object*)>& fn) noexcept;
 
 	/**
 	 * @brief Called when an object is deleted from memory by the garbage collector.
@@ -76,7 +78,8 @@ private:
 	};
 
 private:
-	BinaryTree<Object*, ObjectRefInfo> objectReferenceTree;
+	std::mutex mutex;
+	std::map<Object*, ObjectRefInfo> objectReferenceMap;
 };
 
 #endif //CMF_OBJECTMANAGER_H
