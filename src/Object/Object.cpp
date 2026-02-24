@@ -12,17 +12,20 @@ const Object::ClassType* Object::objectStaticClass = new Object::ClassType(stati
 Object::Object() noexcept : id(ObjectIndex++){}
 
 Object::~Object() noexcept {
-	forEachChild([](const Object* child){
-		if(isValid(child)){
-			return false;
+	const std::set<WeakObjectPtr<Object>> children = childrenObjects;
+
+	for(const WeakObjectPtr<Object>& child : children){
+		if(!isValid(child)){
+			continue;
 		}
 
-		delete child;
+		delete *child;
+	}
 
-		return false;
-	});
+	if(owner != nullptr){
+		owner->removeChild(this);
+	}
 }
-
 std::string Object::getName() const noexcept {
 	return getStaticClass()->getName().append("_").append(std::to_string(getID()));
 }
@@ -58,7 +61,8 @@ void Object::operator delete(void* ptr) noexcept {
 
 	manager->onObjectDeleted(object);
 
-	::delete object;
+	// Since destructor was already called, we only need to 'free' the memory here.
+	std::free(ptr);
 }
 
 void Object::setOwner(Object* object) noexcept{
