@@ -3,9 +3,7 @@
 
 #include "Entity.h"
 #include "Object/Class.h"
-#include <set>
 #include "Memory/SmartPtr/StrongObjectPtr.h"
-#include "Memory/SmartPtr/WeakObjectPtr.h"
 #include "Thread/Threaded.h"
 
 class SyncEntity;
@@ -44,11 +42,6 @@ protected:
 	 * @param object The owner object, always ignored and set to nullptr.
 	 */
 	virtual void setOwner(Object* object) noexcept override final;
-
-	/**
-	 * @brief Stops and destroys the thread.
-	 */
-	virtual void __onDestroy() noexcept override;
 
 	/**
 	 * @return The maximum time the object can spend scanning and executing events.

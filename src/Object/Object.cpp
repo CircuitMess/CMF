@@ -11,6 +11,21 @@ const Object::ClassType* Object::objectStaticClass = new Object::ClassType(stati
 
 Object::Object() noexcept : id(ObjectIndex++){}
 
+Object::~Object() noexcept {
+	const std::set<WeakObjectPtr<Object>> children = childrenObjects;
+
+	for(const WeakObjectPtr<Object>& child : children){
+		if(!isValid(child)){
+			continue;
+		}
+
+		delete *child;
+	}
+
+	if(owner != nullptr){
+		owner->removeChild(this);
+	}
+}
 std::string Object::getName() const noexcept {
 	return getStaticClass()->getName().append("_").append(std::to_string(getID()));
 }
@@ -27,40 +42,27 @@ void Object::postInitProperties() noexcept{}
 
 void Object::__postInitProperties() noexcept {}
 
-bool Object::canDelete() noexcept{
-	std::lock_guard lock(destroyMutex);
+void Object::operator delete(void* ptr) noexcept {
+	// No member function calls or any operations on member variables here, the destructor is called before the operator delete
+	if(ptr == nullptr){
+		return;
+	}
 
-	return canBeDeleted;
-}
+	ObjectManager* manager = ObjectManager::get();
+	if(manager == nullptr){
+		return;
+	}
 
-void Object::destroy() noexcept{
-	std::lock_guard lock(destroyMutex);
+	Object* object = static_cast<Object*>(ptr);
 
-	markedForDestroy = true;
+	if(!isValid(object)){
+		return;
+	}
 
-	onDestroy();
-	__onDestroy();
-}
+	manager->onObjectDeleted(object);
 
-void Object::onDestroy() noexcept{}
-
-void Object::__onDestroy() noexcept {
-	forEachChild([](Object* child){
-		if(isValid(child)){
-			return false;
-		}
-
-		Application* app = ApplicationStatics::getApplication();
-		if(isValid(app) && !app->isShuttingDown()){
-			child->setOwner(ApplicationStatics::getApplication());
-		}else{
-			child->destroy();
-		}
-
-		return false;
-	});
-
-	canBeDeleted = true;
+	// Since destructor was already called, we only need to 'free' the memory here.
+	std::free(ptr);
 }
 
 void Object::setOwner(Object* object) noexcept{

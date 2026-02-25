@@ -118,14 +118,6 @@ public:
 	}
 
 	/**
-	 * @brief Marks if the application is in the middle of shutting down or not.
-	 * @return If the application is shutting down, true, otherwise false.
-	 */
-	inline bool isShuttingDown() const noexcept {
-		return shuttingDown;
-	}
-
-	/**
 	 * @brief Used to register object instances that should be kept alive passively as long as the application exists.
 	 * @param object The object instance to keep alive.
 	 */
@@ -184,14 +176,16 @@ public:
 	 * @return
 	 */
 	template<typename T>
-	T* getService() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& service : services){
-			if(!service.isValid()){
-				continue;
-			}
+	T* getService(const std::function<bool(const Object*)>& fn =
+	[](const Object* device) {return cast<T>(device) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
 
-			if(T* serviceObject = cast<T>(*service)){
-				return serviceObject;
+		for(const StrongObjectPtr<Object>& service : services){
+			if(fn(*service)){
+				return cast<T>(*service);
 			}
 		}
 
@@ -205,14 +199,16 @@ public:
 	 * @return
 	 */
 	template<typename T>
-	T* getDriver() const noexcept requires(std::derived_from<T, Object>) {
-		for(const StrongObjectPtr<Object>& driver : drivers){
-			if(!driver.isValid()){
-				continue;
-			}
+	T* getDriver(const std::function<bool(const Object*)>& fn =
+	[](const Object* device) {return cast<T>(device) != nullptr;})
+	const noexcept requires(std::derived_from<T, Object>) {
+		if(!fn){
+			return nullptr;
+		}
 
-			if(T* driverObject = cast<T>(*driver)){
-				return driverObject;
+		for(const StrongObjectPtr<Object>& driver : drivers){
+			if(fn(*driver)){
+				return cast<T>(*driver);
 			}
 		}
 
@@ -220,16 +216,6 @@ public:
 	}
 
 protected:
-	/**
-	 * @brief
-	 */
-	virtual void __postInitProperties() noexcept override;
-
-	/**
-	 * @brief
-	 * @param reason The reason why the entity instance stopped ticking and is getting destroyed.
-	 */
-	virtual void __end(EndReason reason) noexcept override;
 
 	/**
 	 * @brief
@@ -313,7 +299,6 @@ private:
 private:
 	std::set<StrongObjectPtr<Singleton>> singletons;
 	std::set<StrongObjectPtr<Object>> lifetimeObjects;
-	bool shuttingDown;
 	std::mutex registrationMutex;
 
 	std::set<StrongObjectPtr<Object>> periphery;

@@ -5,15 +5,6 @@
 #include "Object/Class.h"
 
 /**
- * @brief End reason enum, representing the reason why the entity is being destroyed.
- */
-enum class EndReason : uint8_t {
-	Destroyed,
-	GarbageCollected,
-	Quit
-};
-
-/**
  * @brief The base entity class representing an object that has begin, tick and end lifetime functionality.
  */
 class Entity : public Object {
@@ -50,14 +41,6 @@ protected:
 	virtual void tick(float deltaTime) noexcept;
 
 	virtual void __tick(float deltaTime) noexcept;
-
-	/**
-	 * @brief Called after the final tick, marks the end of the entities lifetime with given reason.
-	 * @param reason The reason for end of life.
-	 */
-	virtual void end(EndReason reason) noexcept;
-
-	virtual void __end(EndReason reason) noexcept;
 
 protected:
 	bool begun;

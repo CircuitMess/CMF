@@ -39,10 +39,6 @@ public:
 
 	virtual void begin() noexcept override;
 
-	virtual void __end(EndReason reason) noexcept override;
-
-	virtual void end(EndReason reason) noexcept override;
-
 protected:
 	/**
 	 * @brief Ensures that the sync entity has an owner. Even if invalid owner is set, the owner of the entity will be set to the application instance.

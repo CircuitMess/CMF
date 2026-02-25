@@ -81,10 +81,13 @@ public:
 		clear();
 
 		std::lock_guard guard(accessMutex);
+		allocator.deallocate(buffer, bufferSize);
 		buffer = nullptr;
 		begin = end = 0;
 		bufferSize = 0;
 		qSize = 0;
+
+		vSemaphoreDelete(waitSemaphore);
 	}
 
 	/**

@@ -4,38 +4,37 @@ Application::Application(TickType_t interval /*= 0*/, size_t stackSize /*= 12 * 
 	if(ApplicationInstance == nullptr){
 		ApplicationInstance = this;
 	}
+
+	eventScanner = newObject<EventScanner>();
 }
 
 Application::~Application() noexcept {
 	if(ApplicationInstance == this){
 		ApplicationInstance = nullptr;
+	}else{
+		return;
 	}
-}
 
-void Application::registerLifetimeObject(Object* object) noexcept{
-	lifetimeObjects.insert(object);
-}
+	ObjectManager* manager = ObjectManager::get();
+	if(manager == nullptr){
+		return;
+	}
 
-void Application::__postInitProperties() noexcept {
-	eventScanner = newObject<EventScanner>();
+	manager->forEachObject([this](Object* object) {
+		if(object == this) {
+			return false;
+		}
 
-	Super::__postInitProperties();
-}
-
-void Application::__end(EndReason reason) noexcept {
-	// TODO right now only Quit reason is supported, this needs to be expanded in the future
-	reason = EndReason::Quit;
-	shuttingDown = true;
-
-	Super::__end(reason);
-
-	ObjectManager::get()->forEachObject([](Object* object) {
-		if(AsyncEntity* entity = cast<AsyncEntity>(object)){
-			entity->destroy();
+		if(AsyncEntity* asyncEntity = cast<AsyncEntity>(object)){
+			delete asyncEntity;
 		}
 
 		return false;
 	});
+}
+
+void Application::registerLifetimeObject(Object* object) noexcept{
+	lifetimeObjects.insert(object);
 }
 
 SubclassOf<GarbageCollector> Application::getGarbageCollectorClass() const noexcept{

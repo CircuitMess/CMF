@@ -8,6 +8,7 @@
 #include "Util/stdafx.h"
 
 /**
+ * **WARNING** Not in use, not fully optimized when it comes to memory usage
  * @brief A binary tree of key-value pairs. The tree is constructed using the comparison operators of the type of key given.
  * @tparam K The type of key. The key type must have overridden comparison operators.
  * @tparam V The type of value.

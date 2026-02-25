@@ -21,9 +21,8 @@ void GarbageCollector::tick(float deltaTime) noexcept{
 			continue;
 		}
 
-		if(object->canDelete() || ObjectManager::get()->getReferenceCount(object) == 0){
-			ObjectManager::get()->onObjectDeleted(object);
-
+		if(ObjectManager::get()->getReferenceCount(object) == 0){
+			CMF_LOG(CMF, Warning, "Object was deleted via garbage collector.");
 			delete object;
 		}
 	}
