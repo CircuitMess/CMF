@@ -47,6 +47,14 @@ ADCReader::ADCReader(gpio_num_t gpio, adc_oneshot_chan_cfg_t config, bool calibr
 	}
 }
 
+ADCReader::~ADCReader(){
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+	adc_cali_delete_scheme_curve_fitting(cali_handle);
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+	adc_cali_delete_scheme_line_fitting(cali_handle);
+#endif
+}
+
 float ADCReader::sample(){
 	int raw = 0;
 	if(adc->read(chan, raw, cali_handle) != ESP_OK){

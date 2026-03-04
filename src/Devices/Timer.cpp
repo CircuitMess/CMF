@@ -67,3 +67,12 @@ void Timer::single(uint32_t delay, std::function<void()> ISR){
 
 	esp_timer_start_once(timer, delay * 1000);
 }
+
+void IRAM_ATTR Timer::setPeriod(uint32_t period){
+	if(esp_timer_is_active(timer)){
+		ESP_LOGE(TAG, "setPeriod called while timer is running");
+		return;
+	}
+
+	this->period = period*1000;
+}

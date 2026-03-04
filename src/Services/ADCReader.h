@@ -38,6 +38,10 @@ public:
 		last = -1;
 	}
 
+	void setFactor(float factor){
+		this->factor = factor;
+	}
+
 private:
 	float factor;
 	float last = -1;
@@ -54,12 +58,15 @@ public:
 	 * @param filter optional filter applied after reading, must be an ADCFilter implementation
 	 */
 	ADCReader(gpio_num_t gpio = GPIO_NUM_NC, adc_oneshot_chan_cfg_t config = {}, bool calibration = false, StrongObjectPtr<ADCFilter> filter = nullptr);
+	~ADCReader() override;
 
 	/** Sample and return new value. */
 	float sample();
 
 	/** Return current value without sampling. */
 	float getValue() const;
+
+	void reinit();
 
 private:
 	StrongObjectPtr<ADCUnit> adc;
