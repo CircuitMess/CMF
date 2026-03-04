@@ -1,6 +1,8 @@
 #include "RM_TempHumModule.h"
 #include <Periphery/I2CDevice.h>
 
+#include "Util/stdafx.h"
+
 RM_TempHumModule::RM_TempHumModule(const Modules::BusPins& busPins) : ModuleDevice(Modules::Type::RM_TempHum, busPins){
 	i2c = busPins.i2c->addDevice(Addr);
 	assert(i2c != nullptr);

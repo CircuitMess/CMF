@@ -15,10 +15,9 @@
 
 
 class Timer : public Object {
-	GENERATED_BODY(Timer, Object, void)
+	GENERATED_BODY(Timer, Object, CONSTRUCTOR_PACK(uint32_t, std::function<void()>, const char*))
 
 public:
-	Timer() = default;
 	/**
 	 * @param period Time between periodic ISR calls [ms]
 	 * @param ISR ISR routine to be called when period time runs out. Must be non-blocking (e.g. using fromISR functions)
@@ -40,6 +39,8 @@ public:
 	 */
 
 	static void single(uint32_t delay, std::function<void()> ISR);
+
+	void setPeriod(uint32_t period);
 
 private:
 	static void interrupt(void* arg);

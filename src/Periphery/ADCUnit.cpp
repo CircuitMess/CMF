@@ -2,6 +2,8 @@
 #include "Log/Log.h"
 #include "Memory/ObjectMemory.h"
 
+DEFINE_LOG(ADCUnit)
+
 StrongObjectPtr<ADCUnit> ADCUnit::units[SOC_ADC_PERIPH_NUM] = { nullptr };
 
 ADCUnit* ADCUnit::getADCUnit(adc_unit_t unit){
@@ -10,6 +12,18 @@ ADCUnit* ADCUnit::getADCUnit(adc_unit_t unit){
 	}
 
 	return units[unit].get();
+}
+
+ADCUnit* ADCUnit::getADCUnit(gpio_num_t gpio){
+	adc_channel_t chan;
+	adc_unit_t unit;
+	auto err = adc_oneshot_io_to_channel(gpio, &unit, &chan);
+	if(err == ESP_ERR_NOT_FOUND){
+		CMF_LOG(ADCUnit, Error, "GPIO %d is not a valid ADC pin", gpio);
+	}else if(err == ESP_ERR_NOT_FOUND){
+		CMF_LOG(ADCUnit, Error, "Invalid getADCUnit argument");
+	}
+	return getADCUnit(unit);
 }
 
 ADCUnit::ADCUnit(adc_unit_t unit) : Super(), unit(unit){
@@ -46,4 +60,14 @@ esp_err_t ADCUnit::read(adc_channel_t chan, int& valueOut, const adc_cali_handle
 	}else{
 		return adc_oneshot_read(hndl, chan, &valueOut);
 	}
+}
+
+void ADCUnit::reinit(){
+	ESP_ERROR_CHECK(adc_oneshot_del_unit(hndl));
+	const adc_oneshot_unit_init_cfg_t config = {
+		.unit_id = unit,
+		.clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+		.ulp_mode = ADC_ULP_MODE_DISABLE
+};
+	ESP_ERROR_CHECK(adc_oneshot_new_unit(&config, &hndl));
 }
