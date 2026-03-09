@@ -1,15 +1,22 @@
 #include "BM8563.h"
+#include "Periphery/I2CMaster.h"
 
 static const char* TAG = "BM8563";
 
-BM8563::BM8563(std::unique_ptr<I2CDevice> i2cDevice, uint8_t Addr) : i2c(std::move(i2cDevice)), Addr(Addr){
-	if(!i2c){
+BM8563::BM8563(I2CMaster* i2c, uint8_t Addr) : Addr(Addr){
+	if(!dev){
 		ESP_LOGE(TAG, "No I2C peripheral provided");
 		abort();
 	}
 
+	dev = i2c->addDevice(Addr);
+	if(!dev){
+		ESP_LOGE(TAG, "I2C device is null");
+		abort();
+	}
+
 	// Clear status registers (0x0 and 0x1)
-	if(const auto ret = i2c->write({ 0, 0, 0 }, 10); ret != ESP_OK){
+	if(const auto ret = dev->write({ 0, 0, 0 }, 10); ret != ESP_OK){
 		ESP_LOGE(TAG, "Error clearing status registers: %d", ret);
 		abort();
 	}
@@ -18,7 +25,7 @@ BM8563::BM8563(std::unique_ptr<I2CDevice> i2cDevice, uint8_t Addr) : i2c(std::mo
 tm BM8563::getTime(){
 	uint8_t data[7];
 	constexpr uint8_t writeData = 0x02;
-	if(i2c->write_read(&writeData, 1, data, 7) != ESP_OK) return {};
+	if(dev->write_read(&writeData, 1, data, 7) != ESP_OK) return {};
 
 	tm time = {};
 
@@ -85,7 +92,7 @@ void BM8563::setTime(const tm& time){
 
 	uint8_t wdata[8] = { 0x02 };
 	memcpy(wdata + 1, data, 7);
-	i2c->write(wdata, 8);
+	dev->write(wdata, 8);
 }
 
 uint8_t BM8563::bcd2dec(uint8_t bcd){

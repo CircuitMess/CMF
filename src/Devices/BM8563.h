@@ -11,15 +11,15 @@
  */
 
 class BM8563 : public Object {
-	GENERATED_BODY(BM8563, Object, CONSTRUCTOR_PACK(std::unique_ptr<I2CDevice>, uint8_t))
+	GENERATED_BODY(BM8563, Object, CONSTRUCTOR_PACK(I2CMaster*, uint8_t))
 public:
-	explicit BM8563(std::unique_ptr<I2CDevice> i2cDevice = {}, uint8_t Addr = 0x51);
+	explicit BM8563(I2CMaster* i2c, uint8_t Addr = 0x51);
 
 	tm getTime();
 	void setTime(const tm& time);
 
 private:
-	std::unique_ptr<I2CDevice> i2c;
+	std::unique_ptr<I2CDevice> dev;
 	uint8_t Addr = 0x51;
 
 	uint8_t bcd2dec(uint8_t bcd);
