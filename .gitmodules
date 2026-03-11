@@ -1,3 +1,6 @@
 [submodule "lib/glm"]
 	path = lib/glm
 	url = https://github.com/g-truc/glm
+[submodule "lib/SC7A20H"]
+	path = lib/SC7A20H
+	url = https://github.com/CircuitMess/SC7A20H-pid
