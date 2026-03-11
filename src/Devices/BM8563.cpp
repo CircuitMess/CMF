@@ -4,7 +4,7 @@
 static const char* TAG = "BM8563";
 
 BM8563::BM8563(I2CMaster* i2c, uint8_t Addr) : Addr(Addr){
-	if(!dev){
+	if(!i2c){
 		ESP_LOGE(TAG, "No I2C peripheral provided");
 		abort();
 	}
