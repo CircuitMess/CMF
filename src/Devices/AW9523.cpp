@@ -1,7 +1,7 @@
 #include "AW9523.h"
 #include "Util/stdafx.h"
 #include <esp_log.h>
-
+#include <Core/Application.h>
 #define REG_RESET 0x7F
 #define REG_ID 0x10
 #define REG_CONF 0x11
@@ -29,7 +29,18 @@ static const char* TAG = "AW9523";
 
 const uint8_t AW9523::dimmap[16] = { 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 12, 13, 14, 15 };
 
-AW9523::AW9523(std::unique_ptr<I2CDevice> device) : dev(std::move(device)){
+AW9523::AW9523(I2CMaster* i2c, uint8_t addr){
+	if(i2c == nullptr){
+		return;
+	}
+
+	const Application* app = getApp();
+	if(app == nullptr){
+		return;
+	}
+
+	dev = std::move(i2c->addDevice(addr));
+
 	if(!dev){
 		ESP_LOGE(TAG, "I2C device is null");
 		abort();

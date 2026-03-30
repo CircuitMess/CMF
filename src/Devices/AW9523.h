@@ -3,6 +3,7 @@
 
 #include "Object/Class.h"
 #include "Object/Object.h"
+#include "Periphery/I2CMaster.h"
 #include "Periphery/I2CDevice.h"
 
 /**
@@ -12,9 +13,9 @@
 
 
 class AW9523 : public Object {
-	GENERATED_BODY(AW9523, Object, CONSTRUCTOR_PACK(std::unique_ptr<I2CDevice>))
+	GENERATED_BODY(AW9523, Object, CONSTRUCTOR_PACK(I2CMaster*))
 public:
-	explicit AW9523(std::unique_ptr<I2CDevice> device = {});
+	explicit AW9523(I2CMaster* i2c = nullptr, uint8_t addr = 0);
 
 	void resetDimOutputs();
 

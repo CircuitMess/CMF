@@ -22,8 +22,8 @@ struct ServoDef {
 
 template<typename Servo>
 class Servos : public Object {
-	GENERATED_BODY(Servos, Object);
-	TEMPLATE_ATTRIBUTES(Servo);
+	GENERATED_BODY(Servos, Object, void)
+	TEMPLATE_ATTRIBUTES(Servo)
 
 public:
 	Servos() = default;
@@ -59,7 +59,6 @@ public:
 
 		const OutputPin& pin = pins[servo];
 
-		TRACE_LOG("%lld", millis());
 		pin.driver->write(pin.port, mapToServo(val, servo));
 	}
 

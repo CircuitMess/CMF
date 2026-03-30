@@ -1,5 +1,6 @@
 #include "RM_TempHumModule.h"
 #include <Periphery/I2CDevice.h>
+#include <Util/stdafx.h>
 
 #include "Util/stdafx.h"
 

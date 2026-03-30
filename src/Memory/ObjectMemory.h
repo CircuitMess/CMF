@@ -166,7 +166,12 @@ inline bool objectFromByteArray(T* object, const std::vector<uint8_t>& data) noe
 	uint64_t classID = 0;
 	archive << classID;
 
-	if(!object->isA(Class::getClasByID(classID))) {
+	const Class* cls = Class::getClasByID(classID);
+	if(cls == nullptr) {
+		return false;
+	}
+
+	if(!object->isA(cls)) {
 		return false;
 	}
 

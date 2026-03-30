@@ -10,7 +10,7 @@ class ButtonInput : public AsyncEntity {
 	GENERATED_BODY(ButtonInput, AsyncEntity, CONSTRUCTOR_PACK(const std::vector<std::pair<Enum<int>, InputPin>>&))
 
 public:
-	ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations);
+	ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations = {});
 
 	enum class Action : uint8_t {
 		Release, Press

@@ -17,7 +17,7 @@ DEFINE_LOG(Motors)
 
 template<typename Motor>
 class Motors : public Object {
-	GENERATED_BODY(Motors, Object)
+	GENERATED_BODY(Motors, Object, void)
 	TEMPLATE_ATTRIBUTES(Motor)
 
 public:
