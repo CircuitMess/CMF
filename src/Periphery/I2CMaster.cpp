@@ -44,7 +44,9 @@ std::unique_ptr<I2CDevice> I2CMaster::addDevice(uint16_t addr, i2c_addr_bit_len_
 	};
 
 	i2c_master_dev_handle_t devHndl;
-	if(i2c_master_bus_add_device(hndl, &cfg, &devHndl) != ESP_OK) return {};
+	if(i2c_master_bus_add_device(hndl, &cfg, &devHndl) != ESP_OK) {
+		return {};
+	}
 
 	return std::make_unique<I2CDevice>(this, devHndl);
 }

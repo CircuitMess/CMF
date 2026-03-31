@@ -71,12 +71,14 @@ void ObjectManager::forEachObject(const std::function<bool(Object*)>& fn) noexce
 		return;
 	}
 
-	std::lock_guard lock(mutex);
-
 	std::set<Object*> keys;
 
-	for(std::pair<Object* const, ObjectRefInfo>& pair : objectReferenceMap){
-		keys.insert(pair.first);
+	{
+		std::lock_guard lock(mutex);
+
+		for(std::pair<Object* const, ObjectRefInfo>& pair : objectReferenceMap){
+			keys.insert(pair.first);
+		}
 	}
 
 	for(Object* object : keys){

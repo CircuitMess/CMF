@@ -7,7 +7,8 @@
 template<typename LED, typename DataT>
 class LEDBlinkFunction : public LEDFunction<LED, DataT> {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDBlinkFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>))
+	GENERATED_BODY(LEDBlinkFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), void)
+
 public:
 	LEDBlinkFunction() = default;
 
