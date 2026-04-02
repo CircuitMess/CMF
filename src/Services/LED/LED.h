@@ -258,6 +258,11 @@ public:
 		return rgbs->getValue(led);
 	}
 
+	void forceUpdate() noexcept {
+		monos->tick(0.0f);
+		rgbs->tick(0.0f);
+	}
+
 private:
 	StrongObjectPtr<LEDBase<Monos, float>> monos;
 	StrongObjectPtr<LEDBase<RGBs, glm::vec3>> rgbs;
