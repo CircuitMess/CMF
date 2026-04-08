@@ -58,7 +58,7 @@ LIS2DW12::Sample LIS2DW12::pollFIFO(TickType_t timeout) const {
 }
 
 void LIS2DW12::init(Config config, PinConfig pins){
-	lis2dw12_reset_set(&ctx);
+	lis2dw12_reset_set(&ctx, 1);
 	uint8_t resetVal;
 	do {
 		lis2dw12_reset_get(&ctx, &resetVal);
