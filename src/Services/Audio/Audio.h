@@ -43,8 +43,6 @@ public:
 	 */
 	bool waitEnd(TickType_t ticks);
 
-
-
 protected:
 	void tick(float deltaTime) noexcept override;
 

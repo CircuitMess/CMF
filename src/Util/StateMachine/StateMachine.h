@@ -26,6 +26,12 @@ public:
 	 */
 	void setStartingStateType(const SubclassOf<State>& type) noexcept;
 
+	/**
+	 * @brief
+	 * @return
+	 */
+	State* getActiveState() const noexcept;
+
 protected:
 	/**
 	 * @brief Checks if the current state is ready to transition to another one.

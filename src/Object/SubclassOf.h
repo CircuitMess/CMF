@@ -14,14 +14,14 @@ public:
 	/**
 	 * @brief Constructs a default SubclassOf which will be set to null.
 	 */
-	inline SubclassOf() noexcept = default;
+	inline constexpr SubclassOf() noexcept = default;
 
 	/**
 	 * @brief Constructs a SubclassOf from the given object, if object is of class T or derives class T.
 	 * If not, the constructed SubclassOf is null.
 	 * @param object Object from which the SubclassOf will be constructed.
 	 */
-	explicit inline SubclassOf(const Object* object) noexcept {
+	explicit inline constexpr SubclassOf(const Object* object) noexcept {
 		if(object == nullptr){
 			return;
 		}
@@ -35,7 +35,7 @@ public:
 	 * @brief Constructs a SubclassOf from a given class, if that class is class of T, or extended object type.
 	 * @param cls Class used for construction.
 	 */
-	inline SubclassOf(const Class* cls) noexcept {
+	inline constexpr SubclassOf(const Class* cls) noexcept {
 		if(cls == nullptr){
 			return;
 		}
@@ -48,7 +48,7 @@ public:
 	/**
 	 * @brief Constructs a SubclassOf with a nullptr_t parameter type that is always null.
 	 */
-	inline SubclassOf(nullptr_t) noexcept {}
+	inline constexpr SubclassOf(nullptr_t) noexcept {}
 
 	/**
 	 * @brief Default constructor.
@@ -58,14 +58,14 @@ public:
 	/**
 	 * @return The pointer to the class used for construction of the SubclassOf instance.
 	 */
-	inline const Class* operator *() const noexcept {
+	inline constexpr const Class* operator *() const noexcept {
 		return subclass;
 	}
 
 	/**
 	 * @return The pointer to the class used for construction of the SubclassOf instance.
 	 */
-	inline const Class* operator ->() const noexcept {
+	inline constexpr const Class* operator ->() const noexcept {
 		return subclass;
 	}
 
@@ -73,7 +73,7 @@ public:
 	 * @param other Compared SubclassOf.
 	 * @return True if both SubclassOf instances are the same (if they point to the same Class instance).
 	 */
-	inline bool operator == (const SubclassOf& other) const noexcept {
+	inline constexpr bool operator == (const SubclassOf& other) const noexcept {
 		return subclass == other.subclass;
 	}
 
@@ -81,14 +81,14 @@ public:
 	 * @param other Compared class.
 	 * @return True if this instance has the same underlying class as the given comparison parameter.
 	 */
-	inline bool operator == (const Class* other) const noexcept {
+	inline constexpr bool operator == (const Class* other) const noexcept {
 		return subclass == other;
 	}
 
 	/**
 	 * @return True if this SubclassOf is null.
 	 */
-	inline bool operator == (nullptr_t) const noexcept {
+	inline constexpr bool operator == (nullptr_t) const noexcept {
 		return subclass == nullptr;
 	}
 

@@ -15,6 +15,10 @@ void StateMachine::setStartingStateType(const SubclassOf<State>& type) noexcept{
 	startingStateType = type;
 }
 
+State* StateMachine::getActiveState() const noexcept {
+	return current.get();
+}
+
 void StateMachine::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
 
