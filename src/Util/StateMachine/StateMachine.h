@@ -32,6 +32,12 @@ public:
 	 */
 	State* getActiveState() const noexcept;
 
+	/**
+	 * @brief This is used to avoid large pauses between states when transitioning
+	 * @return 0 if there is next state to go to, otherwise default of AsyncEntity
+	 */
+	virtual TickType_t getEventScanningTime() const noexcept override;
+
 protected:
 	/**
 	 * @brief Checks if the current state is ready to transition to another one.

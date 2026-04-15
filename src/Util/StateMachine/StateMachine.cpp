@@ -19,6 +19,18 @@ State* StateMachine::getActiveState() const noexcept {
 	return current.get();
 }
 
+TickType_t StateMachine::getEventScanningTime() const noexcept{
+	if(startingStateType != nullptr){
+		return 0;
+	}
+
+	if(current.isValid() && current->transitionTo() != nullptr){
+		return 0;
+	}
+
+	return AsyncEntity::getEventScanningTime();
+}
+
 void StateMachine::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
 
