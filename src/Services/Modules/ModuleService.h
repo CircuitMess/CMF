@@ -55,7 +55,7 @@ public:
 	 * Action - Insert or Remove
 	 */
 	DECLARE_EVENT(ModulesEvent, ModuleService, uint8_t, Modules::Type, Action)
-	ModulesEvent modulesEvent{ this };
+	ModulesEvent ModulesEvent{ this };
 
 	StrongObjectPtr<ModuleDevice> getDevice(uint8_t bus = 0){
 		if(bus >= NumBus) return nullptr;

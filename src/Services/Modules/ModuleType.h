@@ -27,6 +27,8 @@ enum class Type : uint8_t {
 #ifdef CONFIG_RM_PerfBoard
 	RM_PerfBoard,
 #endif
+
+	COUNT
 };
 
 /**
