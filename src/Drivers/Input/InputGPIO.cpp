@@ -38,7 +38,9 @@ void InputGPIO::performRegister(const InputPinDef& input) noexcept{
 		case PullMode::Down:
 			gpio->setPulldown(pin, true);
 			break;
-		default:
+		case PullMode::None:
+			gpio->setPullup(pin, false);
+			gpio->setPulldown(pin, false);
 			break;
 	}
 }

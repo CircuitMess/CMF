@@ -106,7 +106,7 @@ private:
 			busContexts[bus].type = Modules::Type::Unknown;
 
 			ESP_LOGI(TAG, "Module %d removed from bus %d", (int) removed, bus);
-			modulesEvent.broadcast(bus, removed, Action::Remove);
+			ModulesEvent.broadcast(bus, removed, Action::Remove);
 
 			busContexts[bus].instance = nullptr;
 
@@ -118,7 +118,7 @@ private:
 			busContexts[bus].inserted = true;
 
 			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) type, bus);
-			modulesEvent.broadcast(bus, type, Action::Insert);
+			ModulesEvent.broadcast(bus, type, Action::Insert);
 
 			if(type != Modules::Type::Unknown){
 				registerSubAddressPinsModule(bus, type);
