@@ -1,10 +1,15 @@
 #include "GarbageCollector.h"
 #include "ObjectManager.h"
+#include "Util/stdafx.h"
 
-GarbageCollector::GarbageCollector() noexcept : Super(120 * 1000) {}
+GarbageCollector::GarbageCollector() noexcept : lastCollection(millis()) {}
 
 void GarbageCollector::tick(float deltaTime) noexcept{
-	Super::tick(deltaTime);
+	if(millis() - lastCollection < Interval){
+		return;
+	}
+
+	lastCollection = millis();
 
 	std::set<Object*> objectsToDelete;
 

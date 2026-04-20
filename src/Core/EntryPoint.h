@@ -33,7 +33,7 @@ public:
 
 		SubclassOf<GarbageCollector> garbageCollectorClass = App->getGarbageCollectorClass();
 		if(garbageCollectorClass == nullptr){
-			TrashCollector = newObject<GarbageCollector>();
+			TrashCollector = newObject<GarbageCollector>(*App);
 		}else{
 			TrashCollector = newObject<GarbageCollector>(*garbageCollectorClass);
 		}

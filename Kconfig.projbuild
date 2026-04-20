@@ -20,6 +20,11 @@ config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
 
+config CMF_GARBAGE_COLLECTOR_INTERVAL
+    int "Garbage collection interval"
+    range 0 4294967295
+    default 120000
+
 menu "I2C settings"
 
     config CMF_I2C_default_timeout
@@ -113,7 +118,7 @@ menu "Thread properties"
         config CMF_APPLICATION_TICK_INTERVAL
             int "Tick interval"
             range 0 4294967295
-            default 120000
+            default 10000
         config CMF_APPLICATION_STACK_SIZE
             int "Stack size"
             range 2048 4294967295
