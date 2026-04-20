@@ -18,7 +18,7 @@ public:
 	 * @brief Constructs the state machine which starts ticking immediately and waits for the starting state type to be set.
 	 * @param interval The ticking interval of the state machine.
 	 */
-	explicit StateMachine(TickType_t interval = 0, size_t stackSize = 8 * 1024, uint8_t threadPriority = 0, int8_t cpuCore = -1) noexcept;
+	explicit StateMachine(TickType_t interval = CONFIG_CMF_STATEMACHINE_TICK_INTERVAL, size_t stackSize = CONFIG_CMF_STATEMACHINE_STACK_SIZE, uint8_t threadPriority = CONFIG_CMF_STATEMACHINE_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_STATEMACHINE_CPU_CORE) noexcept;
 
 	/**
 	 * @brief Sets the starting state type and triggers the state machine to start ticking.

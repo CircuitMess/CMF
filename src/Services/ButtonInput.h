@@ -41,7 +41,6 @@ private:
 
 	std::mutex accessMutex;
 
-	static constexpr uint64_t SleepTime = 5; // [ms]
 	static constexpr uint64_t DebounceTime = 5; // [ms]
 };
 

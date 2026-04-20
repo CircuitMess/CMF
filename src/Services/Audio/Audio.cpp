@@ -7,7 +7,8 @@ Audio::Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin) : Audio(std::move(i2
 	this->enablePin = enablePin;
 }
 
-Audio::Audio(StrongObjectPtr<I2S> i2s) : AsyncEntity(0, 4 * 1024, 7, -1), i2s(std::move(i2s)){
+Audio::Audio(StrongObjectPtr<I2S> i2s) :
+		Super(CONFIG_CMF_AUDIO_TICK_INTERVAL, CONFIG_CMF_AUDIO_STACK_SIZE, CONFIG_CMF_AUDIO_THREAD_PRIORITY, CONFIG_CMF_AUDIO_CPU_CORE), i2s(std::move(i2s)){
 	tickSemaphore = xSemaphoreCreateBinary();
 	xSemaphoreTake(tickSemaphore, 0);
 

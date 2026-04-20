@@ -24,7 +24,8 @@ public:
 	 * @param threadPriority Thread priority.
 	 * @param cpuCore The core of execution.
 	 */
-	explicit AsyncEntity(TickType_t interval = 0, size_t threadStackSize = 4 * 1024, uint8_t threadPriority = 5, int8_t cpuCore = -1) noexcept;
+	explicit AsyncEntity(TickType_t interval = CONFIG_CMF_ASYNCENTITY_TICK_INTERVAL, size_t threadStackSize = CONFIG_CMF_ASYNCENTITY_STACK_SIZE,
+		uint8_t threadPriority = CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_ASYNCENTITY_CPU_CORE) noexcept;
 
 	/**
 	 * @brief Stops the thread if still running, then destroys the entity.

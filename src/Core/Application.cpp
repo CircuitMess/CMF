@@ -1,6 +1,8 @@
 #include "Application.h"
 
-Application::Application(TickType_t interval /*= 0*/, size_t stackSize /*= 12 * 1024*/, uint8_t threadPriority /*= 5*/, int8_t cpuCore /*= -1*/) noexcept : Super(interval, stackSize, threadPriority, cpuCore) {
+Application::Application(TickType_t interval /*= CONFIG_CMF_APPLICATION_TICK_INTERVAL*/, size_t stackSize /*= CONFIG_CMF_APPLICATION_STACK_SIZE*/,
+	uint8_t threadPriority /*= CONFIG_CMF_APPLICATION_THREAD_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_APPLICATION_CPU_CORE*/) noexcept :
+		Super(interval, stackSize, threadPriority, cpuCore) {
 	if(ApplicationInstance == nullptr){
 		ApplicationInstance = this;
 	}

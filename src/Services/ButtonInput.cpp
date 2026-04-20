@@ -1,7 +1,8 @@
 #include "ButtonInput.h"
 #include "Log/Log.h"
 
-ButtonInput::ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) : Super(SleepTime / portTICK_PERIOD_MS, 4 * 1024, 10, -1){
+ButtonInput::ButtonInput(const std::vector<std::pair<Enum<int>, InputPin>>& registrations) :
+		Super(CONFIG_CMF_BUTTONINPUT_TICK_INTERVAL, CONFIG_CMF_BUTTONINPUT_STACK_SIZE, CONFIG_CMF_BUTTONINPUT_THREAD_PRIORITY, CONFIG_CMF_BUTTONINPUT_CPU_CORE){
 	reg(registrations);
 }
 
