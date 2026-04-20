@@ -7,7 +7,8 @@
 #include "Core/Application.h"
 #include "Class.h"
 
-const Object::ClassType* Object::objectStaticClass = new Object::ClassType(static_cast<uint64_t>(STRING_HASH("Object")) << 32);
+constexpr Object::ClassType Object::objectStaticClass;
+const ClassRegistrar Object::__objectClassRegistrar{&Object::objectStaticClass};
 
 Object::Object() noexcept : id(ObjectIndex++){}
 
@@ -28,14 +29,6 @@ Object::~Object() noexcept {
 }
 std::string Object::getName() const noexcept {
 	return getStaticClass()->getName().append("_").append(std::to_string(getID()));
-}
-
-bool Object::isA(const Class* other) const noexcept {
-	if(other == nullptr) {
-		return false;
-	}
-
-	return other->getID() == staticClass()->getID();
 }
 
 void Object::postInitProperties() noexcept{}

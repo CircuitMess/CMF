@@ -1,6 +1,7 @@
 #ifndef CMF_AUDIOGENERATOR_H
 #define CMF_AUDIOGENERATOR_H
 
+#include <memory>
 #include "Object/Class.h"
 #include "AudioSource.h"
 

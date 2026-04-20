@@ -18,26 +18,6 @@ void ClassRegistry::registerClass(const Class* cls) noexcept{
 	classes[cls->getID()] = cls;
 }
 
-uint64_t Class::getID() const noexcept{
-	return classID;
-}
-
-bool Class::isA(const Class *other) const noexcept {
-	if(other == nullptr) {
-		return false;
-	}
-
-	return other->getID() == getID();
-}
-
-Class::Class(uint64_t ID) noexcept : classID(ID) {
-	if(registry == nullptr){
-		registry = new ClassRegistry();
-	}
-
-	registry->registerClass(this);
-}
-
 StrongObjectPtr<Object> Class::__createObject(void* arguments) const noexcept {
 	void* temp = operator new(sizeof(Object));
 	if(temp == nullptr){
