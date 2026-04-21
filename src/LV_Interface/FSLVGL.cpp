@@ -61,16 +61,7 @@ void* FSLVGL::lvOpen(const char* path, lv_fs_mode_t mode){
 		return filePtr;
 	};
 
-	std::string stringPath = path;
-	const char* ArchivePrefixes[] = { "/Anim", "/Bg", "/GameSplash", "/LevelUp", "/Menu", "/OS", "/Pingo", "/Stats" };
-	bool archivePrefixFound = false;
-	for(const auto& prefix: ArchivePrefixes){
-		if(stringPath.starts_with(prefix)){
-			archivePrefixFound = true;
-			break;
-		}
-	}
-	if(cache && archivePrefixFound){
+	if(cache){
 		file = cache->open(path);
 		if(file) return mkPtr(file);
 	}
