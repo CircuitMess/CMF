@@ -53,7 +53,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	virtual ~SubclassOf() noexcept = default;
+	virtual constexpr ~SubclassOf() noexcept = default;
 
 	/**
 	 * @return The pointer to the class used for construction of the SubclassOf instance.

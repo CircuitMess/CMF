@@ -1,9 +1,10 @@
 #ifndef CMF_AACSOURCE_H
 #define CMF_AACSOURCE_H
 
-#include "Object/Class.h"
+#include "Object/Object.h"
 #include "AudioGenerator.h"
 #include <aacdec.h>
+#include <memory>
 
 class AACAudioGenerator : public AudioGenerator, public Object {
 	GENERATED_BODY(AACAudioGenerator, Object, void)

@@ -1,8 +1,8 @@
 #ifndef CMF_AUDIOGENERATOR_H
 #define CMF_AUDIOGENERATOR_H
 
-#include "Object/Class.h"
 #include "AudioSource.h"
+#include <memory>
 
 class AudioGenerator {
 public:

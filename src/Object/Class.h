@@ -4,7 +4,11 @@
 #include <cinttypes>
 #include <map>
 #include <string>
-#include <Object/Object.h>
+#include <tuple>
+#include "Memory/SmartPtr/StrongObjectPtr.h"
+
+class Object;
+class Class;
 
 /**
  * @brief Class registry is used internally by CMF to track all existing object classes by their ID.
@@ -20,7 +24,7 @@ public:
 	 * @param ID ID of the wanted class.
 	 * @return The class matching the given ID. If no class matches it, returns nullptr.
 	 */
-	const class Class* getClass(uint64_t ID) const noexcept;
+	const Class* getClass(uint64_t ID) const noexcept;
 
 	/**
 	 * @brief Registers a class, called by each class when constructed.

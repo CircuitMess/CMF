@@ -14,9 +14,7 @@
 #include "Containers/Queue.h"
 #include "Containers/Archive.h"
 #include "ObjectConstruct.h"
-
-class Class;
-class ClassRegistry;
+#include "Class.h"
 
 /**
  * @brief The Object class is the backbone of the whole framework, and the basis behind most functionality.
