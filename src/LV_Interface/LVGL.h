@@ -25,6 +25,12 @@ public:
 
 	void resetDisplayRefreshTimer();
 
+	/** Starts the LVGL thread. Must be called after startScreen(). */
+	void startThread() noexcept;
+
+protected:
+	void __postInitProperties() noexcept override;
+
 private:
 	Display* display;
 
@@ -35,6 +41,8 @@ private:
 	static void flush(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map);
 
 	std::unique_ptr<LVScreen> currentScreen;
+
+	bool threadStarted = false;
 };
 
 #endif //CMF_LVGL_H
