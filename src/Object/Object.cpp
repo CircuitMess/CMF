@@ -129,12 +129,14 @@ void Object::scanEvents(TickType_t wait) noexcept{
 
 	const uint64_t begin = millis();
 
-	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle, std::max(static_cast<int64_t>(0), static_cast<int64_t>(wait) - (static_cast<int64_t>(millis()) - static_cast<int64_t>(begin)))); ){
+	auto eventWaitTime = std::max(static_cast<int64_t>(0), static_cast<int64_t>(wait) - (static_cast<int64_t>(millis()) - static_cast<int64_t>(begin)));
+	for(EventHandleBase* handle = nullptr; readyEventHandles.pop(handle,eventWaitTime ); ){
 		if(handle == nullptr){
 			continue;
 		}
 
 		handle->scan(0);
+		eventWaitTime = 0;
 	}
 
 	// WARNING: This will not work, or will create an infinite loop if owner system is abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
