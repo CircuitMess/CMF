@@ -290,7 +290,7 @@ private:
 	 */
 	void registerSubAddressPinsInput(uint8_t bus){
 		for(const auto& pin : busPins[bus].subAddressPins){
-			pin.inputDriver->registerInput({ pin.port });
+			if(pin.inputDriver) pin.inputDriver->registerInput({ pin.port });
 		}
 	}
 
@@ -298,9 +298,9 @@ private:
 		const auto& pinModes = Modules::GetPinModeMap().at(type);
 		for(uint8_t i = 0; i < pinModes.size(); i++){
 			const auto& pin = busPins[bus].subAddressPins[i];
-			if(pinModes[i] == Modules::PinMode::Input){
+			if(pinModes[i] == Modules::PinMode::Input && pin.inputDriver){
 				pin.inputDriver->registerInput({ pin.port });
-			}else if(pinModes[i] == Modules::PinMode::Output){
+			}else if(pinModes[i] == Modules::PinMode::Output && pin.outputDriver){
 				pin.outputDriver->registerOutput({ pin.port });
 			}
 		}

@@ -11,6 +11,7 @@ public:
 	RM_LEDModule(const Modules::BusPins& busPins = {});
 
 	void set(bool state);
+	void setLevel(float level);
 };
 
 
