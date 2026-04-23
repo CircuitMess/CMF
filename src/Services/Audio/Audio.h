@@ -6,6 +6,7 @@
 #include "Entity/AsyncEntity.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "AudioGenerator.h"
+#include "Event/EventBroadcaster.h"
 #include "Periphery/I2S.h"
 
 class Audio : public AsyncEntity {
@@ -43,6 +44,12 @@ public:
 	 */
 	bool waitEnd(TickType_t ticks);
 
+	/**
+	 * bool status - true - audio started playing, false - audio stopped playing
+	 */
+	DECLARE_EVENT(AudioStatus, Audio, bool);
+	AudioStatus OnAudioStatusChanged{this};
+
 protected:
 	void tick(float deltaTime) noexcept override;
 
@@ -65,6 +72,8 @@ private:
 	SemaphoreHandle_t playSemaphore;
 
 	float gain = 1.0f;
+
+	void internalStop();
 };
 
 #endif //CMF_AUDIO_H
