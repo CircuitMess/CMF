@@ -48,5 +48,6 @@ void StateMachine::tick(float deltaTime) noexcept{
 		}
 	}else if(startingStateType != nullptr) {
 		current = newObject<State>(*startingStateType, this);
+		startingStateType = nullptr;
 	}
 }
