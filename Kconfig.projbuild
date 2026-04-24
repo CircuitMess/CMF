@@ -136,6 +136,33 @@ menu "Thread properties"
 
     endmenu
 
+    menu "LED Service"
+
+        config CMF_LED_TICK_INTERVAL
+            int "Tick interval"
+            range 0 4294967295
+            default 4294967295
+        config CMF_LED_MINIMAL_TICK_INTERVAL
+            int "Minimal tick interval"
+            range 0 4294967295
+            default 10
+        config CMF_LED_STACK_SIZE
+            int "Stack size"
+            range 2048 4294967295
+            default 3072
+        config CMF_LED_THREAD_PRIORITY
+            int "Priority"
+            range 0 25
+            default 4
+        config CMF_LED_CPU_CORE
+            int "CPU core"
+            range -1 1
+            default -1
+            help
+                Pin the thread to a CPU core, if -1, it is not pinned but assigned automatically to a free CPU core.
+
+    endmenu
+
     menu "ButtonInput"
 
         config CMF_BUTTONINPUT_TICK_INTERVAL
