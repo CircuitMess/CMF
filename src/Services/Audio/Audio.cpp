@@ -32,7 +32,9 @@ void Audio::play(AudioGenerator* generator, std::unique_ptr<AudioSource> source)
 	if(!enabled) return;
 
 	if(playing){
-		stop();
+		internalStop();
+	}else{
+		OnAudioStatusChanged.broadcast(true);
 	}
 
 	if(enablePin){
@@ -63,7 +65,9 @@ void Audio::play(std::span<GenSourcePair> sources){
 	if(!enabled) return;
 
 	if(playing){
-		stop();
+		internalStop();
+	}else{
+		OnAudioStatusChanged.broadcast(true);
 	}
 
 	if(enablePin){
@@ -146,23 +150,10 @@ void Audio::enqueue(std::span<std::pair<AudioGenerator*, std::unique_ptr<AudioSo
 }
 
 void Audio::stop(){
-	if(!enabled || !playing){
-		return;
+	if(playing){
+		OnAudioStatusChanged.broadcast(false);
 	}
-
-	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
-		return;
-	}
-
-	if(enablePin){
-		enablePin->driver->write(enablePin->port, false);
-	}
-	currentGenerator->close();
-	while(!sourceQueue.empty()){
-		sourceQueue.pop();
-	}
-	playing = false;
-	xSemaphoreGive(playSemaphore);
+	internalStop();
 }
 
 void Audio::tick(float deltaTime) noexcept{
@@ -206,6 +197,26 @@ void Audio::tick(float deltaTime) noexcept{
 	i2s->write(reinterpret_cast<uint8_t*>(dataBuf.data()), bytesToTransfer);
 
 	xSemaphoreGive(tickSemaphore);
+}
+
+void Audio::internalStop(){
+	if(!enabled || !playing){
+		return;
+	}
+
+	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
+		return;
+	}
+
+	if(enablePin){
+		enablePin->driver->write(enablePin->port, false);
+	}
+	currentGenerator->close();
+	while(!sourceQueue.empty()){
+		sourceQueue.pop();
+	}
+	playing = false;
+	xSemaphoreGive(playSemaphore);
 }
 
 void Audio::setEnabled(bool enabled){

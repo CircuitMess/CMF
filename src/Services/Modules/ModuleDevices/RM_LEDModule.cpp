@@ -5,11 +5,12 @@ RM_LEDModule::RM_LEDModule(const Modules::BusPins& busPins) : Super(Modules::Typ
 }
 
 void RM_LEDModule::set(bool state){
-	ESP_LOGI("RM_LEDModule", "Setting LED to %d", state);
-/*	if(pins.subAddressPins[0].outputDriver){
-		ESP_LOGI("RM_LEDModule", "writing to driver");
-		pins.subAddressPins[0].outputDriver->write(pins.subAddressPins[0].port, !state);
-	}*/
-	gpio_set_direction(static_cast<gpio_num_t>(pins.subAddressPins[0].port), GPIO_MODE_OUTPUT);
-	gpio_set_level(static_cast<gpio_num_t>(pins.subAddressPins[0].port), !state);
+	setLevel(state ? 1.0f : 0.0f);
+}
+
+void RM_LEDModule::setLevel(float level){
+	ESP_LOGI("RM_LEDModule", "Setting LED level to %.2f", level);
+	if(pins.subAddressPins[0].outputDriver){
+		pins.subAddressPins[0].outputDriver->write(pins.subAddressPins[0].port, level);
+	}
 }

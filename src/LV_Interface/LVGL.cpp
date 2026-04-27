@@ -8,6 +8,16 @@
 #include <draw/sw/blend/lv_draw_sw_blend_private.h>
 #include <themes/lv_theme_private.h>
 
+void LVGL::__postInitProperties() noexcept {
+	// Thread is not started automatically; call startThread() after startScreen().
+}
+
+void LVGL::startThread() noexcept {
+	if(threadStarted) return;
+	threadStarted = true;
+	AsyncEntity::__postInitProperties();
+}
+
 LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : AsyncEntity(0, 8192, 5, 1), display(display){
 	lv_init();
 
