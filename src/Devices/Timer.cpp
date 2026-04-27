@@ -1,9 +1,9 @@
 #include "Timer.h"
-#include <esp_log.h>
+#include "Log/Log.h"
 
 #include <utility>
 
-static const char* TAG = "Timer";
+DEFINE_LOG(Timer)
 
 Timer::Timer(uint32_t period, std::function<void()> ISR, const char* name) : period(period * 1000), ISR(std::move(ISR)){
 	char timerName[32];
@@ -70,7 +70,7 @@ void Timer::single(uint32_t delay, std::function<void()> ISR){
 
 void IRAM_ATTR Timer::setPeriod(uint32_t period){
 	if(esp_timer_is_active(timer)){
-		ESP_LOGE(TAG, "setPeriod called while timer is running");
+		CMF_LOG(Timer, LogLevel::Error, "setPeriod called while timer is running");
 		return;
 	}
 

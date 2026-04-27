@@ -1,11 +1,12 @@
 #include "LIS2DW12.h"
+#include "Log/Log.h"
 
-static constexpr const char* TAG = "LIS2DW12";
+DEFINE_LOG(LIS2DW12)
 
 LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Config config, uint8_t addr) : i2c(std::move(i2cDevice)), Addr(addr), config(config), pins(pinConfig),
 																				 dispatcherThread([this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8){
 	if(!i2c){
-		ESP_LOGE(TAG, "No I2C peripheral provided");
+		CMF_LOG(LIS2DW12, LogLevel::Error, "No I2C peripheral provided");
 		abort();
 	}
 
@@ -45,13 +46,13 @@ LIS2DW12::Sample LIS2DW12::getSample(){
 
 LIS2DW12::Sample LIS2DW12::pollFIFO(TickType_t timeout) const {
 	if(!queue){
-		ESP_LOGE(TAG, "FIFO not enabled");
+		CMF_LOG(LIS2DW12, LogLevel::Error, "FIFO not enabled");
 		return Sample{};
 	}
 
 	Sample sample{};
 	if(xQueueReceive(queue, &sample, timeout) != pdTRUE){
-		ESP_LOGW(TAG, "Timeout waiting for FIFO sample");
+		CMF_LOG(LIS2DW12, LogLevel::Warning, "Timeout waiting for FIFO sample");
 		return Sample{};
 	}
 	return sample;
@@ -67,7 +68,7 @@ void LIS2DW12::init(Config config, PinConfig pins){
 	uint8_t id;
 	lis2dw12_device_id_get(&ctx, &id);
 	if(id != LIS2DW12_ID){
-		ESP_LOGE(TAG, "Init error, got ID 0x%x, expected 0x%x", id, LIS2DW12_ID);
+		CMF_LOG(LIS2DW12, LogLevel::Error, "Init error, got ID 0x%x, expected 0x%x", id, LIS2DW12_ID);
 		abort();
 	}
 
@@ -181,9 +182,12 @@ void IRAM_ATTR LIS2DW12::isr(void* arg){
 }
 
 void LIS2DW12::dispatcherFunc(){
-	if(xSemaphoreTake(dispatcherSem, portMAX_DELAY) != pdTRUE) return;
+	if(xSemaphoreTake(dispatcherSem, portMAX_DELAY) != pdTRUE){
+		CMF_LOG(LIS2DW12, LogLevel::Warning, "Failed taking dispatcher semaphore");
+		return;
+	}
 
-	printf("dispatcher unblocked\n");
+	CMF_LOG(LIS2DW12, LogLevel::Verbose, "dispatcher unblocked");
 
 	while(gpio_get_level(pins.int1) || gpio_get_level(pins.int2)){
 		fetchEvents();

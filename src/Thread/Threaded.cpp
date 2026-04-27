@@ -67,10 +67,16 @@ void Threaded::start() noexcept{
 
 	if(core == -1){
 		const auto ret = xTaskCreate(function, name.c_str(), stackSize, this, priority, &task);
-		assert(ret == pdPASS);
+		if(ret != pdPASS){
+			CMF_LOG(CMF, LogLevel::Error, "xTaskCreate failed for thread '%s' (ret=%d)", name.c_str(), (int) ret);
+			assert(ret == pdPASS);
+		}
 	}else{
 		const auto ret = xTaskCreatePinnedToCore(function, name.c_str(), stackSize, this, priority, &task, core);
-		assert(ret == pdPASS);
+		if(ret != pdPASS){
+			CMF_LOG(CMF, LogLevel::Error, "xTaskCreatePinnedToCore failed for thread '%s' on core %d (ret=%d)", name.c_str(), (int) core, (int) ret);
+			assert(ret == pdPASS);
+		}
 	}
 }
 

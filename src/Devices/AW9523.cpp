@@ -1,6 +1,6 @@
 #include "AW9523.h"
 #include "Util/stdafx.h"
-#include <esp_log.h>
+#include "Log/Log.h"
 #include <Core/Application.h>
 #define REG_RESET 0x7F
 #define REG_ID 0x10
@@ -25,35 +25,37 @@ static uint8_t AW_BIT(uint8_t pin){ return (pin <= 7) ? pin : (pin - 8); }
 
 static uint8_t AW_MASK(uint8_t pin){ return 1 << AW_BIT(pin); }
 
-static const char* TAG = "AW9523";
+DEFINE_LOG(AW9523)
 
 const uint8_t AW9523::dimmap[16] = { 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 12, 13, 14, 15 };
 
 AW9523::AW9523(I2CMaster* i2c, uint8_t addr){
 	if(i2c == nullptr){
+		CMF_LOG(AW9523, LogLevel::Error, "I2C master is null, aborting initialization");
 		return;
 	}
 
 	const Application* app = getApp();
 	if(app == nullptr){
+		CMF_LOG(AW9523, LogLevel::Error, "Application instance unavailable, aborting initialization");
 		return;
 	}
 
 	dev = std::move(i2c->addDevice(addr));
 
 	if(!dev){
-		ESP_LOGE(TAG, "I2C device is null");
+		CMF_LOG(AW9523, LogLevel::Error, "I2C device is null");
 		abort();
 	}
 
 	uint8_t id = 0;
 	if(dev->readRegister(REG_ID, id) != ESP_OK){
-		ESP_LOGE(TAG, "Transmission error");
+		CMF_LOG(AW9523, LogLevel::Error, "Transmission error reading ID register");
 		abort();
 	}
 
 	if(id != VAL_ID){
-		ESP_LOGE(TAG, "ID missmatch: expected %d, got %d", VAL_ID, id);
+		CMF_LOG(AW9523, LogLevel::Error, "ID missmatch: expected %d, got %d", VAL_ID, id);
 		return;
 	}
 

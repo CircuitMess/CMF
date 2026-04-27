@@ -1,12 +1,14 @@
 #include "LVGL.h"
 #include "InputLVGL.h"
-#include <esp_log.h>
+#include "Log/Log.h"
 #include <core/lv_global.h>
 #include <draw/lv_image_decoder.h>
 #include <draw/lv_image_decoder_private.h>
 #include <draw/sw/blend/lv_draw_sw_blend_to_rgb565.h>
 #include <draw/sw/blend/lv_draw_sw_blend_private.h>
 #include <themes/lv_theme_private.h>
+
+DEFINE_LOG(LVGL)
 
 void LVGL::__postInitProperties() noexcept {
 	// Thread is not started automatically; call startThread() after startScreen().
@@ -105,7 +107,7 @@ void LVGL::drawImage(const char* src){
 	const lv_image_decoder_args_t args = { .no_cache = true };
 	lv_result_t res = lv_image_decoder_open(&decoder, src, &args);
 	if(res != LV_RESULT_OK){
-		ESP_LOGE("LVGL::drawImage", "Failed opening image file %s", src);
+		CMF_LOG(LVGL, LogLevel::Error, "drawImage: Failed opening image file %s", src);
 		return;
 	}
 

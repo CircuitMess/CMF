@@ -86,7 +86,10 @@ public:
 	void dereg(Motor motor){
 		std::lock_guard guard(accessMutex);
 
-		if(!motorPins.count(motor)) return;
+		if(!motorPins.count(motor)){
+			CMF_LOG(Motors, LogLevel::Warning, "dereg called for motor %d, but motor is not registered", static_cast<int>(motor));
+			return;
+		}
 
 		motorPins[motor].digitalPin.driver->write(motorPins[motor].digitalPin.port, false);
 		motorPins[motor].analogPin.driver->write(motorPins[motor].analogPin.port, false);

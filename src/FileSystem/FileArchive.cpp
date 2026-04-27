@@ -1,9 +1,9 @@
 #include "FileArchive.h"
 #include <vector>
-#include <esp_log.h>
+#include "Log/Log.h"
 #include "FileSystem/RamFile.h"
 
-static const char* TAG = "FileArchive";
+DEFINE_LOG(FileArchive)
 
 FileArchive::FileArchive(File file, const std::unordered_set<std::string>& excluded){
 	file.seek(0);
@@ -20,7 +20,7 @@ FileArchive::FileArchive(File file, const std::unordered_set<std::string>& exclu
 		name.reserve(32);
 		while(file.available()){
 			if(name.length() >= 32){
-				ESP_LOGE("FileArchive", "Too big filename; %s...", name.c_str());
+				CMF_LOG(FileArchive, LogLevel::Error, "Too big filename; %s...", name.c_str());
 				abort();
 			}
 
@@ -47,7 +47,7 @@ FileArchive::FileArchive(File file, const std::unordered_set<std::string>& exclu
 	externalData = false;
 
 	if(data == nullptr){
-		ESP_LOGW(TAG, "Failed allocating data buffer of %zu B", totalSize);
+		CMF_LOG(FileArchive, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
 		return;
 	}
 

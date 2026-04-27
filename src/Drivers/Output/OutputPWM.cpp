@@ -68,7 +68,7 @@ void OutputPWM::performWrite(int port, float value) noexcept{
 
 void OutputPWM::performRegister(const OutputPinDef& output) noexcept{
 	if(!gpios.contains(output.port)){
-		ESP_LOGE("OutputPWM", "Output port %d not found in pin map", output.port);
+		CMF_LOG(PWM, Error, "Output port %d not found in pin map", output.port);
 		return;
 	}
 

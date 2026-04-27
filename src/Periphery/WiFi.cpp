@@ -376,6 +376,9 @@ void WiFi::createNetif() const noexcept {
         cfg.base = &base;
 
         esp_netif_t* netif = esp_netif_new(&cfg);
+        if(netif == nullptr){
+            CMF_LOG(WiFi, LogLevel::Error, "esp_netif_new returned nullptr for WiFi access point");
+        }
         assert(netif);
         esp_netif_set_default_netif(netif);
 
@@ -397,6 +400,9 @@ void WiFi::createNetif() const noexcept {
         cfg.base = &base;
 
         esp_netif_t* netif = esp_netif_new(&cfg);
+        if(netif == nullptr){
+            CMF_LOG(WiFi, LogLevel::Error, "esp_netif_new returned nullptr for WiFi station");
+        }
         assert(netif);
         esp_netif_set_default_netif(netif);
 
