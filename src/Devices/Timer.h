@@ -43,7 +43,7 @@ public:
 	void setPeriod(uint32_t period);
 
 private:
-	static void interrupt(void* arg);
+	static void IRAM_ATTR interrupt(void* arg);
 	esp_timer_handle_t timer;
 
 	uint64_t period;
