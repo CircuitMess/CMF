@@ -3,12 +3,15 @@
 
 #include <map>
 #include "Entity/AsyncEntity.h"
+#include "Log/Log.h"
 #include "ModuleType.h"
 #include "Event/EventBroadcaster.h"
 #include "Drivers/Interface/InputDriver.h"
 #include "Drivers/Interface/OutputDriver.h"
 #include "ModuleDevice.h"
 #include "ModuleDefs.h"
+
+DEFINE_LOG(ModuleService)
 
 /**
 * Service for managing UMAX modules (https://www.lcsc.com/datasheet/C404108.pdf)
@@ -104,7 +107,7 @@ private:
 
 			busContexts[bus].type = Modules::Type::Unknown;
 
-			ESP_LOGI(TAG, "Module %d removed from bus %d", (int) removed, bus);
+			CMF_LOG(ModuleService, LogLevel::Info, "Module %d removed from bus %d", (int) removed, bus);
 			ModulesEvent.broadcast(bus, removed, Action::Remove);
 
 			busContexts[bus].instance = nullptr;
@@ -116,7 +119,7 @@ private:
 			busContexts[bus].type = type;
 			busContexts[bus].inserted = true;
 
-			ESP_LOGI(TAG, "Module %d inserted into bus %d", (int) type, bus);
+			CMF_LOG(ModuleService, LogLevel::Info, "Module %d inserted into bus %d", (int) type, bus);
 			ModulesEvent.broadcast(bus, type, Action::Insert);
 
 			if(type != Modules::Type::Unknown){
@@ -149,7 +152,7 @@ private:
 			}
 		}
 
-		ESP_LOGI(TAG, "primary address %d", addr);
+		CMF_LOG(ModuleService, LogLevel::Info, "primary address %d", addr);
 
 		readAddress.mainAddress = addr;
 
@@ -158,7 +161,7 @@ private:
 			if(AddressMap.contains(readAddress)){
 				return AddressMap.at(readAddress);
 			}else{
-				ESP_LOGW(TAG, "Unknown primary address");
+				CMF_LOG(ModuleService, LogLevel::Warning, "Unknown primary address");
 				return Modules::Type::Unknown;
 			}
 		}
@@ -223,14 +226,14 @@ private:
 		}
 
 		if(readSubAddress.type == Modules::SubAddress::Type::None){
-			ESP_LOGW(TAG, "Unknown main-sub address combination");
+			CMF_LOG(ModuleService, LogLevel::Warning, "Unknown main-sub address combination");
 			return Modules::Type::Unknown;
 		}
 
 		readAddress.subAddress = readSubAddress;
 
 		if(!AddressMap.contains(readAddress)){
-			ESP_LOGE(TAG, "Error in main/sub address mapping (internal error)");
+			CMF_LOG(ModuleService, LogLevel::Error, "Error in main/sub address mapping (internal error)");
 			return Modules::Type::Unknown;
 		}
 
@@ -305,8 +308,6 @@ private:
 			}
 		}
 	}
-
-	static constexpr const char* TAG = "ModuleService";
 };
 
 

@@ -4,11 +4,10 @@
 #include "Periphery/I2CMaster.h"
 
 DEFINE_LOG(Camera)
-static constexpr const char* TAG = "Camera";
 
 Camera::Camera(camera_config_t config, I2CMaster* i2c, std::function<void(sensor_t*)> sensorConfig) : config(config), i2c(i2c), sensorConfig(sensorConfig){
 	if(!i2c){
-		ESP_LOGE(TAG, "I2C interface is null");
+		CMF_LOG(Camera, LogLevel::Error, "I2C interface is null");
 		abort();
 	}
 
@@ -51,6 +50,7 @@ esp_err_t Camera::init(){
 
 	auto err = esp_camera_init(&config);
 	if(err == ESP_ERR_NOT_FOUND){
+		CMF_LOG(Camera, LogLevel::Warning, "Camera not found during init");
 		return err;
 	}else if(err != ESP_OK){
 		CMF_LOG(Camera, LogLevel::Error, "Camera init failed with error 0x%x: %s\n", err, esp_err_to_name(err));
@@ -59,6 +59,7 @@ esp_err_t Camera::init(){
 
 	sensor_t* sensor = esp_camera_sensor_get();
 	if(sensor == nullptr){
+		CMF_LOG(Camera, LogLevel::Error, "Camera sensor not detected after init");
 		return ESP_ERR_CAMERA_NOT_DETECTED;
 	}
 
@@ -103,8 +104,10 @@ camera_fb_t* Camera::getFrame(){
 
 	if(frame == nullptr){
 		failedFrames++;
+		CMF_LOG(Camera, LogLevel::Info, "esp_camera_fb_get returned null (%u/%u failed frames)", (unsigned) failedFrames, (unsigned) MaxFailedFrames);
 
 		if(failedFrames >= MaxFailedFrames){
+			CMF_LOG(Camera, LogLevel::Error, "Reached max failed frames, deinitializing camera");
 			deinit();
 		}
 	}else{

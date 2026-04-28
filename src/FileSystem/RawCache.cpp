@@ -1,7 +1,9 @@
-#include <esp_log.h>
+#include "Log/Log.h"
 #include "RawCache.h"
 #include "SPIFFS.h"
 #include "RamFile.h"
+
+DEFINE_LOG(RawCache)
 
 RawCache::RawCache(){ }
 
@@ -26,7 +28,7 @@ void RawCache::load(){
 	for(const auto& path : paths){
 		File file = SPIFFS::open(path.c_str());
 		if(!file){
-			ESP_LOGW("RawCache", "Can't open file %s", path.c_str());
+			CMF_LOG(RawCache, LogLevel::Warning, "Can't open file %s", path.c_str());
 			continue;
 		}
 

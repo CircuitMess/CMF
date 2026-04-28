@@ -6,6 +6,7 @@
 #include "Object/Class.h"
 #include "Entity/AsyncEntity.h"
 #include "Object/SubclassOf.h"
+#include "Log/Log.h"
 #include "Memory/GarbageCollector.h"
 #include "Memory/ObjectMemory.h"
 #include "Misc/Singleton.h"
@@ -90,6 +91,7 @@ public:
 		}
 
 		if(!newSingleton.isValid()){
+			CMF_LOG(CMF, LogLevel::Error, "registerSingleton: failed to construct singleton object");
 			return nullptr;
 		}
 
@@ -229,6 +231,7 @@ protected:
 	T* registerPeriphery(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
+			CMF_LOG(CMF, LogLevel::Error, "registerPeriphery: failed to construct periphery object");
 			return nullptr;
 		}
 
@@ -248,6 +251,7 @@ protected:
 	T* registerDevice(Args&&... args) noexcept requires(std::derived_from<T, Object>) {
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
+			CMF_LOG(CMF, LogLevel::Error, "registerDevice: failed to construct device object");
 			return nullptr;
 		}
 
@@ -267,6 +271,7 @@ protected:
 	T* registerDriver(Args&&... args) noexcept requires(std::derived_from<T, Object>){
 		StrongObjectPtr<T> object = newObject<T>(this, args...);
 		if(!object.isValid()){
+			CMF_LOG(CMF, LogLevel::Error, "registerDriver: failed to construct driver object");
 			return nullptr;
 		}
 
@@ -286,6 +291,7 @@ protected:
 	T* registerService(Args&&... args) noexcept requires(std::derived_from<T, Object>){
 		StrongObjectPtr<T> object = newObject<T>(this, std::forward<Args>(args)...);
 		if(!object.isValid()){
+			CMF_LOG(CMF, LogLevel::Error, "registerService: failed to construct service object");
 			return nullptr;
 		}
 

@@ -160,6 +160,7 @@ void Audio::tick(float deltaTime) noexcept{
 	Super::tick(deltaTime);
 
 	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
+		CMF_LOG(Audio, LogLevel::Warning, "tick: failed to take tickSemaphore");
 		return;
 	}
 
@@ -205,6 +206,7 @@ void Audio::internalStop(){
 	}
 
 	if(!xSemaphoreTake(tickSemaphore, portMAX_DELAY)){
+		CMF_LOG(Audio, LogLevel::Warning, "internalStop: failed to take tickSemaphore");
 		return;
 	}
 

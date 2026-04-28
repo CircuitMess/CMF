@@ -1,9 +1,9 @@
 #include <string>
 #include <cstdio>
-#include <esp_log.h>
+#include "Log/Log.h"
 #include "LVGIF.h"
 
-static const char* tag = "LVGIF";
+DEFINE_LOG(LVGIF)
 
 LVGIF::LVGIF(lv_obj_t* parent, const char* path) : LVObject(parent), path(path){
 	auto strpath = std::string(path);
@@ -17,7 +17,7 @@ LVGIF::LVGIF(lv_obj_t* parent, const char* path) : LVObject(parent), path(path){
 	auto f = fopen(descPath.c_str(), "r");
 
 	if(f == nullptr){
-		ESP_LOGE(tag, "Couldn't open GIF descriptor file at %s", descPath.c_str());
+		CMF_LOG(LVGIF, LogLevel::Error, "Couldn't open GIF descriptor file at %s", descPath.c_str());
 		return;
 	}
 

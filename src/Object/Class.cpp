@@ -1,5 +1,6 @@
 #include "Class.h"
 #include "Object.h"
+#include "Log/Log.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
 
 const Class* ClassRegistry::getClass(uint64_t ID) const noexcept{
@@ -41,6 +42,7 @@ Class::Class(uint64_t ID) noexcept : classID(ID) {
 StrongObjectPtr<Object> Class::__createObject(void* arguments) const noexcept {
 	void* temp = operator new(sizeof(Object));
 	if(temp == nullptr){
+		CMF_LOG(CMF, LogLevel::Error, "Class::__createObject: out of memory allocating Object (%zu B)", sizeof(Object));
 		return nullptr;
 	}
 

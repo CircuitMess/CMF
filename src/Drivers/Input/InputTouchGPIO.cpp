@@ -1,5 +1,8 @@
 #include "InputTouchGPIO.h"
+#include "Log/Log.h"
 #include <driver/touch_pad.h>
+
+DEFINE_LOG(InputTouchGPIO)
 
 InputTouchGPIO::InputTouchGPIO(const std::vector<TouchPinDef>& inputs) noexcept: Super(toInputPinDef(inputs)){
 	for(const auto& input : inputs){
@@ -39,7 +42,7 @@ void InputTouchGPIO::performRegister(const InputPinDef& input) noexcept{
 	touch_pad_config(touchPin);
 
 	if(!thresholds.contains(input.port)){
-		ESP_LOGE("InputTouchGPIO", "Threshold for pin %d not defined", input.port);
+		CMF_LOG(InputTouchGPIO, LogLevel::Error, "Threshold for pin %d not defined", input.port);
 		return;
 	}
 

@@ -63,13 +63,19 @@ public:
 	}
 
 	float get(Servo servo){
-		if(!currentValues.count(servo)) return 0;
+		if(!currentValues.count(servo)){
+			CMF_LOG(Servos, LogLevel::Warning, "get called for unregistered servo");
+			return 0;
+		}
 
 		return currentValues[servo];
 	}
 
 	void enable(Servo servo){
-		if(!pins.count(servo)) return;
+		if(!pins.count(servo)){
+			CMF_LOG(Servos, LogLevel::Warning, "Servo not registered");
+			return;
+		}
 
 		const auto& pin = pins[servo];
 
@@ -83,7 +89,10 @@ public:
 	}
 
 	void disable(Servo servo){
-		if(!pins.count(servo)) return;
+		if(!pins.count(servo)){
+			CMF_LOG(Servos, LogLevel::Warning, "Servo not registered");
+			return;
+		}
 
 		const auto& pin = pins[servo];
 

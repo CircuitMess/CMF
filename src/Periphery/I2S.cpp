@@ -1,6 +1,7 @@
 #include "I2S.h"
+#include "Log/Log.h"
 
-static constexpr const char* TAG = "I2S";
+DEFINE_LOG(I2S)
 
 I2S::I2S(i2s_port_t port, i2s_std_config_t config){
 	i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(port, I2S_ROLE_MASTER);
@@ -34,28 +35,34 @@ I2S::~I2S(){
 
 size_t I2S::write(uint8_t* data, size_t bytes){
 	if(!tx_chan){
-		ESP_LOGE(TAG, "No TX channel configured!");
+		CMF_LOG(I2S, LogLevel::Error, "No TX channel configured!");
 		return ESP_ERR_INVALID_STATE;
 	}
 
 	size_t bytesWritten = 0;
 	auto err = i2s_channel_write(tx_chan, data, bytes, &bytesWritten, portMAX_DELAY);
 
-	if(err != ESP_OK) return 0;
+	if(err != ESP_OK){
+		CMF_LOG(I2S, LogLevel::Warning, "i2s_channel_write failed: %s", esp_err_to_name(err));
+		return 0;
+	}
 
 	return bytesWritten;
 }
 
 size_t I2S::read(uint8_t* data, size_t bytes){
 	if(!rx_chan){
-		ESP_LOGE(TAG, "No RX channel configured!");
+		CMF_LOG(I2S, LogLevel::Error, "No RX channel configured!");
 		return 0;
 	}
 
 	size_t bytesRead = 0;
 	auto err = i2s_channel_read(rx_chan, data, bytes, &bytesRead, portMAX_DELAY);
 
-	if(err != ESP_OK) return 0;
+	if(err != ESP_OK){
+		CMF_LOG(I2S, LogLevel::Warning, "i2s_channel_read failed: %s", esp_err_to_name(err));
+		return 0;
+	}
 
 	return (int32_t) bytesRead;
 }

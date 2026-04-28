@@ -1,13 +1,13 @@
 #include "RamFile.h"
+#include "Log/Log.h"
 #include <cstring>
-#include <esp_log.h>
 #include <esp_heap_caps.h>
 
-static const char* TAG = "RamFile";
+DEFINE_LOG(RamFile)
 
 RamFile::RamFile(File file, bool use32bAligned) : filePath(file.name()){
 	if(!file){
-		ESP_LOGE(TAG, "Couldn't open file: %s", file.name());
+		CMF_LOG(RamFile, LogLevel::Error, "Couldn't open file: %s", file.name());
 		return;
 	}
 
@@ -15,7 +15,7 @@ RamFile::RamFile(File file, bool use32bAligned) : filePath(file.name()){
 	fileSize = file.size();
 
 	if(fileSize == 0){
-		ESP_LOGE(TAG, "File is empty: %s", file.name());
+		CMF_LOG(RamFile, LogLevel::Error, "File is empty: %s", file.name());
 		file.close();
 		return;
 	}
@@ -30,7 +30,7 @@ RamFile::RamFile(File file, bool use32bAligned) : filePath(file.name()){
 	data = (uint8_t*) heap_caps_malloc(allocSize, MALLOC_CAP_INTERNAL | (use32bAligned ? MALLOC_CAP_32BIT : MALLOC_CAP_8BIT));
 	if(data == nullptr){
 		fileSize = 0;
-		ESP_LOGE(TAG, "Couldn't allocate memory for %s. Need %zu B, largest block: %zu B", file.name(), allocSize,
+		CMF_LOG(RamFile, LogLevel::Error, "Couldn't allocate memory for %s. Need %zu B, largest block: %zu B", file.name(), allocSize,
 				 heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | (use32bAligned ? MALLOC_CAP_32BIT : MALLOC_CAP_8BIT)));
 		file.close();
 

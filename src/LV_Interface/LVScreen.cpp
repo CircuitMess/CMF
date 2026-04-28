@@ -1,11 +1,11 @@
 #include "LVScreen.h"
 #include "LVGL.h"
 #include "InputLVGL.h"
+#include "Log/Log.h"
 #include <cstdio>
 #include <utility>
-#include <esp_log.h>
 
-static constexpr const char* TAG = "LVScreen";
+DEFINE_LOG(LVScreen)
 
 LVScreen::LVScreen() : LVObject(nullptr){
 
@@ -21,7 +21,7 @@ LVScreen::LVScreen() : LVObject(nullptr){
 
 LVScreen::~LVScreen(){
 	if(running){
-		ESP_LOGE(TAG, "Destroying while still running! Call stop() first.");
+		CMF_LOG(LVScreen, LogLevel::Error, "Destroying while still running! Call stop() first.");
 		abort();
 	}
 	lv_group_delete(inputGroup);
@@ -29,7 +29,7 @@ LVScreen::~LVScreen(){
 
 void LVScreen::transition(std::function<std::unique_ptr<LVScreen>()> create, lv_screen_load_anim_t anim){
 	if(lvgl == nullptr){
-		ESP_LOGE(TAG, "Starting transition, but LVGL ptr isn't set");
+		CMF_LOG(LVScreen, LogLevel::Error, "Starting transition, but LVGL ptr isn't set");
 		abort();
 	}
 	lvgl->startScreen(std::move(create), anim);
@@ -38,7 +38,7 @@ void LVScreen::transition(std::function<std::unique_ptr<LVScreen>()> create, lv_
 void LVScreen::start(LVGL* lvgl){
 	this->lvgl = lvgl;
 	if(running){
-		printf("Already running\n");
+		CMF_LOG(LVScreen, LogLevel::Warning, "start() called while already running");
 		return;
 	}
 	onStarting();
