@@ -1,12 +1,13 @@
 #include "FSLVGL.h"
 #include "FileSystem/SPIFFS.h"
+#include "Log/Log.h"
 #include <dirent.h>
 #include <esp_spiffs.h>
 #include <string>
 #include <unordered_map>
 #include <cstring>
 
-const char* TAG = "FSLVGL";
+DEFINE_LOG(FSLVGL)
 
 FSLVGL* FSLVGL::instance = nullptr;
 
@@ -74,6 +75,7 @@ void* FSLVGL::lvOpen(const char* path, lv_fs_mode_t mode){
 	file = SPIFFS::open(path, Map.at(mode));
 	if(file) return mkPtr(file);
 
+	CMF_LOG(FSLVGL, LogLevel::Warning, "Failed to open '%s' from cache or SPIFFS", path);
 	return nullptr;
 }
 

@@ -3,12 +3,16 @@
 #include <Log/Log.h>
 #include <driver/i2c_master.h>
 
+DEFINE_LOG(I2CMaster)
+
 I2CMaster::I2CMaster(I2CPort port, gpio_num_t sda, gpio_num_t scl) noexcept : Super(), port(i2c_port_t(port)){
 	if(port == I2CPort::None){
+		CMF_LOG(I2CMaster, LogLevel::Error, "I2CMaster constructed with port=None, instance is unusable");
 		return;
 	}
 
 	if(sda == GPIO_NUM_NC || scl == GPIO_NUM_NC){
+		CMF_LOG(I2CMaster, LogLevel::Error, "I2CMaster constructed without SDA/SCL pins (sda=%d, scl=%d), instance is unusable", (int) sda, (int) scl);
 		return;
 	}
 
@@ -35,7 +39,10 @@ std::lock_guard<std::mutex> I2CMaster::lockBus() noexcept{
 }
 
 std::unique_ptr<I2CDevice> I2CMaster::addDevice(uint16_t addr, i2c_addr_bit_len_t addrLen, uint32_t speedHz){
-	if(probe(addr) != ESP_OK) return {};
+	if(const auto err = probe(addr); err != ESP_OK){
+		CMF_LOG(I2CMaster, LogLevel::Warning, "addDevice: probe failed for address 0x%x: %s", addr, esp_err_to_name(err));
+		return {};
+	}
 
 	const i2c_device_config_t cfg = {
 			.dev_addr_length = addrLen,
@@ -44,7 +51,8 @@ std::unique_ptr<I2CDevice> I2CMaster::addDevice(uint16_t addr, i2c_addr_bit_len_
 	};
 
 	i2c_master_dev_handle_t devHndl;
-	if(i2c_master_bus_add_device(hndl, &cfg, &devHndl) != ESP_OK) {
+	if(const auto err = i2c_master_bus_add_device(hndl, &cfg, &devHndl); err != ESP_OK){
+		CMF_LOG(I2CMaster, LogLevel::Error, "addDevice: i2c_master_bus_add_device failed for address 0x%x: %s", addr, esp_err_to_name(err));
 		return {};
 	}
 
@@ -52,15 +60,15 @@ std::unique_ptr<I2CDevice> I2CMaster::addDevice(uint16_t addr, i2c_addr_bit_len_
 }
 
 void I2CMaster::scan(TickType_t timeout) noexcept{
-	printf("I2C scan:\n");
+	CMF_LOG(I2CMaster, LogLevel::Info, "I2C scan:");
 
 	for(size_t i = 0; i < 127; ++i){
 		if(probe(i, timeout) == ESP_OK){
-			printf("Found device on address 0x%x\n", i);
+			CMF_LOG(I2CMaster, LogLevel::Info, "Found device on address 0x%x", (unsigned) i);
 		}
 	}
 
-	printf("I2C scan done.\n");
+	CMF_LOG(I2CMaster, LogLevel::Info, "I2C scan done.");
 }
 
 esp_err_t I2CMaster::probe(uint8_t address, TickType_t timeout) noexcept{

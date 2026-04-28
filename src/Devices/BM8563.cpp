@@ -1,23 +1,24 @@
 #include "BM8563.h"
+#include "Log/Log.h"
 #include "Periphery/I2CMaster.h"
 
-static const char* TAG = "BM8563";
+DEFINE_LOG(BM8563)
 
 BM8563::BM8563(I2CMaster* i2c, uint8_t Addr) : Addr(Addr){
 	if(!i2c){
-		ESP_LOGE(TAG, "No I2C peripheral provided");
+		CMF_LOG(BM8563, LogLevel::Error, "No I2C peripheral provided");
 		abort();
 	}
 
 	dev = i2c->addDevice(Addr);
 	if(!dev){
-		ESP_LOGE(TAG, "I2C device is null");
+		CMF_LOG(BM8563, LogLevel::Error, "I2C device is null");
 		abort();
 	}
 
 	// Clear status registers (0x0 and 0x1)
 	if(const auto ret = dev->write({ 0, 0, 0 }, 10); ret != ESP_OK){
-		ESP_LOGE(TAG, "Error clearing status registers: %d", ret);
+		CMF_LOG(BM8563, LogLevel::Error, "Error clearing status registers: %d", ret);
 		abort();
 	}
 }
@@ -25,7 +26,10 @@ BM8563::BM8563(I2CMaster* i2c, uint8_t Addr) : Addr(Addr){
 tm BM8563::getTime(){
 	uint8_t data[7];
 	constexpr uint8_t writeData = 0x02;
-	if(dev->write_read(&writeData, 1, data, 7) != ESP_OK) return {};
+	if(dev->write_read(&writeData, 1, data, 7) != ESP_OK){
+		CMF_LOG(BM8563, LogLevel::Warning, "Failed reading time registers, returning zero time");
+		return {};
+	}
 
 	tm time = {};
 

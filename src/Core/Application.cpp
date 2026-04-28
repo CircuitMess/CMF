@@ -19,6 +19,7 @@ Application::~Application() noexcept {
 
 	ObjectManager* manager = ObjectManager::get();
 	if(manager == nullptr){
+		CMF_LOG(CMF, LogLevel::Warning, "Application destroyed without an ObjectManager available, skipping cleanup");
 		return;
 	}
 

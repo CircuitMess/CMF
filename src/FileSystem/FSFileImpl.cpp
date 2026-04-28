@@ -1,14 +1,14 @@
 #include "FSFileImpl.h"
+#include "Log/Log.h"
 #include <cstring>
-#include <esp_log.h>
 
-static const char* TAG = "FSFile";
+DEFINE_LOG(FSFile)
 
 FSFileImpl::FSFileImpl(const char* path, const char* mode) : filePath(path){
 	file = fopen(path, mode);
 
 	if(file == nullptr){
-		ESP_LOGE(TAG, "Can't open file %s", path);
+		CMF_LOG(FSFile, LogLevel::Error, "Can't open file %s", path);
 		return;
 	}
 

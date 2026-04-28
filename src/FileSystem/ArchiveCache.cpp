@@ -1,7 +1,9 @@
 #include "ArchiveCache.h"
 #include "SPIFFS.h"
-#include <esp_log.h>
+#include "Log/Log.h"
 #include <cstring>
+
+DEFINE_LOG(ArchiveCache)
 
 ArchiveCache::ArchiveCache(const std::vector<std::string>& paths) : paths(paths){
 	archives.reserve(paths.size());
@@ -16,7 +18,7 @@ void ArchiveCache::load(){
 
 		auto file = SPIFFS::open(filename.c_str());
 		if(!file){
-			ESP_LOGW("ArchiveCache", "Can't open archive %s", path.c_str());
+			CMF_LOG(ArchiveCache, LogLevel::Warning, "Can't open archive %s", path.c_str());
 			continue;
 		}
 

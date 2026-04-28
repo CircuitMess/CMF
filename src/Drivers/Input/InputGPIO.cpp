@@ -1,6 +1,8 @@
 #include "InputGPIO.h"
 #include "Log/Log.h"
 
+DEFINE_LOG(InputGPIO)
+
 InputGPIO::InputGPIO(const std::vector<GPIOPinDef>& inputs, StrongObjectPtr<GPIOPeriph> gpio) noexcept:
 	Super(toInputPinDef(inputs)), gpio(std::move(gpio)){
 
@@ -27,7 +29,7 @@ void InputGPIO::performRegister(const InputPinDef& input) noexcept{
 	gpio->setMode((gpio_num_t) input.port, GPIOMode::Input);
 
 	if(!pullModes.contains(input.port)){
-		ESP_LOGE("InputGPIO", "No pull mode defined for pin %d", input.port);
+		CMF_LOG(InputGPIO, LogLevel::Error, "No pull mode defined for pin %d", input.port);
 	}
 
 	const auto pin = (gpio_num_t) input.port;

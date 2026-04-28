@@ -1,5 +1,6 @@
 #include "TCA9555.h"
 #include "Core/Application.h"
+#include "Log/Log.h"
 #include "Periphery/I2CMaster.h"
 #include "Periphery/I2CDevice.h"
 
@@ -11,18 +12,18 @@ static inline uint8_t TCA_BIT(uint8_t pin){ return (pin <= 7) ? pin : (pin - 8);
 
 static inline uint8_t TCA_MASK(uint8_t pin){ return 1 << TCA_BIT(pin); }
 
-static const char* TAG = "TCA9555";
+DEFINE_LOG(TCA9555)
 
 
 TCA9555::TCA9555(I2CMaster* i2c, uint8_t addr){
 	if(!i2c){
-		ESP_LOGE(TAG, "I2C master is null");
+		CMF_LOG(TCA9555, LogLevel::Error, "I2C master is null");
 		abort();
 	}
 
 	dev = i2c->addDevice(addr);
 	if(!dev){
-		ESP_LOGE(TAG, "I2C device is null");
+		CMF_LOG(TCA9555, LogLevel::Error, "I2C device is null");
 		abort();
 	}
 
