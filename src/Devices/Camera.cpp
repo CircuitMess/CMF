@@ -104,7 +104,7 @@ camera_fb_t* Camera::getFrame(){
 
 	if(frame == nullptr){
 		failedFrames++;
-		CMF_LOG(Camera, LogLevel::Warning, "esp_camera_fb_get returned null (%u/%u failed frames)", (unsigned) failedFrames, (unsigned) MaxFailedFrames);
+		CMF_LOG(Camera, LogLevel::Info, "esp_camera_fb_get returned null (%u/%u failed frames)", (unsigned) failedFrames, (unsigned) MaxFailedFrames);
 
 		if(failedFrames >= MaxFailedFrames){
 			CMF_LOG(Camera, LogLevel::Error, "Reached max failed frames, deinitializing camera");
