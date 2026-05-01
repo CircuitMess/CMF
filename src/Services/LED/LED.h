@@ -1,6 +1,7 @@
 #ifndef CMF_LED_H
 #define CMF_LED_H
 
+#include <Event/EventBroadcaster.h>
 #include "Entity/AsyncEntity.h"
 #include "Misc/Enum.h"
 #include "glm.hpp"
@@ -38,8 +39,10 @@ public:
 		}
 	}
 
-	virtual TickType_t getInterval() const{
+	virtual TickType_t getInterval(){
 		static constexpr TickType_t defaultInterval = portMAX_DELAY;
+
+		std::lock_guard guard(accessMutex);
 
 		if(currentFunctions.empty() && prevFunctions.empty()){
 			return defaultInterval;
@@ -47,18 +50,25 @@ public:
 
 		TickType_t interval = defaultInterval;
 
-		for(auto it = currentFunctions.begin(); it != currentFunctions.end();){
+		for(auto it = currentFunctions.begin(); it != currentFunctions.end(); ++it){
 			const RegisteredFunction& func = it->second;
 
 			if(!func.function.isValid() || func.function->isDone()){
 				continue;
 			}
 
-			const TickType_t funcIntervalRemainder = std::max(func.function->getInterval() - static_cast<TickType_t>(millis() - func.lastActivation), static_cast<TickType_t>(0));
+			const TickType_t funcInterval = func.function->getInterval();
+			const TickType_t sinceLastActivation = static_cast<TickType_t>(millis() - func.lastActivation);
+
+			if(funcInterval <= sinceLastActivation){
+				return 0;
+			}
+
+			const TickType_t funcIntervalRemainder = funcInterval - sinceLastActivation;
 			interval = std::min(interval, funcIntervalRemainder);
 		}
 
-		return interval;
+		return interval / portTICK_PERIOD_MS;
 	}
 
 	void reg(LED led, std::array<OutputPin, sizeof(DataT) / sizeof(float)> pins) noexcept{
@@ -129,7 +139,7 @@ public:
 		}
 
 		currentFunctions[led] = std::move(regFunc);
-		xSemaphoreTake(waitSemaphores, portMAX_DELAY);
+		xSemaphoreTake(waitSemaphores[led], portMAX_DELAY);
 	}
 
 	DataT getValue(LED led) noexcept requires (std::same_as<DataT, float>){
@@ -207,7 +217,7 @@ public:
 			}
 		}
 
-		if(!xSemaphoreTake(waitSemaphores[led], wait) != pdTRUE){
+		if(xSemaphoreTake(waitSemaphores[led], wait) != pdTRUE){
 			return false;
 		}
 
@@ -247,7 +257,7 @@ private:
 
 	struct RegisteredFunction {
 		StrongObjectPtr<LEDFunction<LED, DataT>> function;
-		bool isTemporary;
+		bool isTemporary = false;
 		uint64_t lastActivation = 0;
 	};
 
@@ -265,20 +275,23 @@ class LED : public AsyncEntity {
 	TEMPLATE_ATTRIBUTES(Monos, RGBs)
 	GENERATED_BODY(LED, AsyncEntity, void)
 
+private:
+	// This event is only used internally by the LED service to unlock the wait for events semaphore and begin ticking when needed
+	DECLARE_EVENT(LEDFunctionStartEvent, LED)
+	LEDFunctionStartEvent OnFunctionStart{this};
+
 public:
-	LED() noexcept : Super(CONFIG_CMF_LED_TICK_INTERVAL, CONFIG_CMF_LED_STACK_SIZE, CONFIG_CMF_LED_THREAD_PRIORITY, CONFIG_CMF_LED_CPU_CORE){
+	LED() noexcept : Super(CONFIG_CMF_LED_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_LED_STACK_SIZE, CONFIG_CMF_LED_THREAD_PRIORITY, CONFIG_CMF_LED_CPU_CORE){
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
+
+		OnFunctionStart.bind(this, &LED::onFunctionStart);
 	}
 
-	virtual TickType_t getEventScanningTime() const override{
-		if(!monos.isValid() || !rgbs.isValid()){
-			return Super::getEventScanningTime();
-		}
-
-		const TickType_t monosInterval = monos->getInterval();
-		const TickType_t rbgsInterval = rgbs->getInterval();
-		const TickType_t minInterval = std::min(monosInterval, rbgsInterval);
+	virtual TickType_t getEventScanningTime() const noexcept override{
+		const TickType_t monosInterval = monos.isValid() ? monos->getInterval() : Super::getEventScanningTime();
+		const TickType_t rgbsInterval = rgbs.isValid() ? rgbs->getInterval() : Super::getEventScanningTime();
+		const TickType_t minInterval = std::min(monosInterval, rgbsInterval);
 
 		if(minInterval < MinimumTickInterval){
 			return MinimumTickInterval;
@@ -325,10 +338,12 @@ public:
 
 	void set(Monos led, StrongObjectPtr<LEDFunction<Monos, float>> function, bool temp = false) noexcept{
 		monos->set(led, std::move(function), temp);
+		OnFunctionStart.broadcast();
 	}
 
 	void set(RGBs led, StrongObjectPtr<LEDFunction<RGBs, glm::vec3>> function, bool temp = false) noexcept{
 		rgbs->set(led, std::move(function), temp);
+		OnFunctionStart.broadcast();
 	}
 
 	float getValue(Monos led) noexcept{
@@ -360,6 +375,9 @@ private:
 	StrongObjectPtr<LEDBase<RGBs, glm::vec3>> rgbs;
 
 	inline static constexpr TickType_t MinimumTickInterval = CONFIG_CMF_LED_MINIMAL_TICK_INTERVAL;
+
+private:
+	void onFunctionStart() noexcept{}
 };
 
 #endif //CMF_LED_H
