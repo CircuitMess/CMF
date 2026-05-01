@@ -1,7 +1,7 @@
 #include "StateMachine.h"
 #include "Memory/ObjectMemory.h"
 
-StateMachine::StateMachine(TickType_t interval /*= CONFIG_CMF_STATEMACHINE_TICK_INTERVAL*/, size_t stackSize /*= CONFIG_CMF_STATEMACHINE_STACK_SIZE*/,
+StateMachine::StateMachine(TickType_t interval /*= CONFIG_CMF_STATEMACHINE_TICK_INTERVAL / portTICK_PERIOD_MS*/, size_t stackSize /*= CONFIG_CMF_STATEMACHINE_STACK_SIZE*/,
 	uint8_t threadPriority /*= CONFIG_CMF_STATEMACHINE_THREAD_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_STATEMACHINE_CPU_CORE*/) noexcept :
 		Super(interval, stackSize, threadPriority, cpuCore) {}
 

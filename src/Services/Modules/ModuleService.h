@@ -37,7 +37,7 @@ public:
 	 * @param busPins array of UMAX bus pin structures
 	 */
 	ModuleService(std::array<Modules::BusPins, NumBus> busPins = {}) :
-			Super(CONFIG_CMF_MODULESERVICE_TICK_INTERVAL, CONFIG_CMF_MODULESERVICE_STACK_SIZE, CONFIG_CMF_MODULESERVICE_THREAD_PRIORITY, CONFIG_CMF_MODULESERVICE_CPU_CORE), busPins(std::move(busPins)){
+			Super(CONFIG_CMF_MODULESERVICE_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_MODULESERVICE_STACK_SIZE, CONFIG_CMF_MODULESERVICE_THREAD_PRIORITY, CONFIG_CMF_MODULESERVICE_CPU_CORE), busPins(std::move(busPins)){
 		populateInputDrivers();
 
 		for(uint8_t i = 0; i < NumBus; i++){

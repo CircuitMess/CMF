@@ -3,7 +3,7 @@
 #include "Log/Log.h"
 #include "Memory/ObjectMemory.h"
 
-Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL*/,
+Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
 	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/) noexcept :
 						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore) {
 	stopSemaphore = xSemaphoreCreateBinary();
@@ -11,7 +11,7 @@ Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG
 	pauseSemaphore = xSemaphoreCreateBinary();
 }
 
-Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL*/,
+Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
 	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/) noexcept :
 						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), lambdaLoop(fn) {
 	stopSemaphore = xSemaphoreCreateBinary();

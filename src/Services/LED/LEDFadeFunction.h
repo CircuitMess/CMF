@@ -6,17 +6,15 @@
 template<typename LED, typename DataT>
 class LEDFadeFunction : public LEDFunction<LED, DataT> {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDFadeFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), void)
+	GENERATED_BODY(LEDFadeFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), CONSTRUCTOR_PACK(DataT, DataT, float, uint32_t, float))
 public:
-	LEDFadeFunction() = default;
-
-	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount, float startDelay = 0) :
+	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount, float startDelay = 0.0f) :
 			start(start), end(end), period(period), count(loopsCount), startDelay(startDelay){}
 
 	DataT getValue() const noexcept override{
-		if(!delayCleared && startDelay) return DataT{};
+		if(!delayCleared && startDelay > 0.0f) return DataT{};
 
-		float t = -0.5 * cos(2 * M_PI * timeCounter / period) + 0.5;
+		const float t = -0.5 * cos(2 * M_PI * timeCounter / period) + 0.5;
 
 		return start * (1 - t) + end * t;
 	}
@@ -29,12 +27,12 @@ public:
 		return false;
 	}
 
-	void tick(float deltaTime) noexcept override{
-		SyncEntity::tick(deltaTime);
+	virtual void tick(float deltaTime) noexcept override{
+		Super::tick(deltaTime);
 
 		timeCounter += deltaTime;
 
-		if(!delayCleared && startDelay){
+		if(!delayCleared && startDelay > 0.0f){
 			if(timeCounter < startDelay){
 				return;
 			}
@@ -48,17 +46,22 @@ public:
 		}
 	}
 
-private:
+	virtual TickType_t getInterval() const noexcept override{
+		if(!delayCleared && startDelay > 0.0f){
+			return static_cast<TickType_t>(startDelay * 1000 / portTICK_PERIOD_MS);
+		}
 
+		return 0;
+	}
+
+private:
 	DataT start;
 	DataT end;
 	float period;
 	uint32_t count;
 	uint32_t elapsedCount = 0;
 	float startDelay = 0;
-
 	bool delayCleared = false;
-
 	float timeCounter;
 };
 

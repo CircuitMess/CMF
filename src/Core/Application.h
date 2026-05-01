@@ -28,7 +28,7 @@ public:
 	/**
 	 * @brief The default constructor. Sets the static instance pointer to the first constructed instance of the Application class that is still alive.
 	 */
-	Application(TickType_t interval = CONFIG_CMF_APPLICATION_TICK_INTERVAL, size_t stackSize = CONFIG_CMF_APPLICATION_STACK_SIZE,
+	Application(TickType_t interval = CONFIG_CMF_APPLICATION_TICK_INTERVAL / portTICK_PERIOD_MS, size_t stackSize = CONFIG_CMF_APPLICATION_STACK_SIZE,
 		uint8_t threadPriority = CONFIG_CMF_APPLICATION_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_APPLICATION_CPU_CORE) noexcept;
 
 	/**
