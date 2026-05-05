@@ -10,6 +10,7 @@
 #include "Drivers/Interface/OutputDriver.h"
 #include "ModuleDevice.h"
 #include "ModuleDefs.h"
+#include "Event/EventDelegate.h"
 
 DEFINE_LOG(ModuleService)
 
@@ -18,38 +19,26 @@ DEFINE_LOG(ModuleService)
 * that follow this pinout specification: https://docs.google.com/spreadsheets/d/1MGPnOqgmIhoZG_LD7VQy7eJBQMKvngh-zGssaOBs1kE/edit?usp=sharing
  *
  * Its job is to detect and manage instances of plugged-in modules.
- *
- * @tparam NumBus Number of independent UMAX ports (defaults to 1)
+ * Number of buses is set via CONFIG_CMF_MODULESERVICE_NUM_BUSES (KConfig, range 1–16, default 1).
 */
 
 
-template<uint8_t NumBus = 1>
 class ModuleService : public AsyncEntity {
-	GENERATED_BODY(ModuleService, AsyncEntity, CONSTRUCTOR_PACK(std::array<Modules::BusPins, NumBus>));
+	GENERATED_BODY(ModuleService, AsyncEntity, CONSTRUCTOR_PACK(std::array<Modules::BusPins, CONFIG_CMF_MODULESERVICE_NUM_BUSES>));
 public:
 
 	enum class Action : uint8_t {
 		Insert, Remove
 	};
 
-	/**
-	 * Generic constructor
-	 * @param busPins array of UMAX bus pin structures
-	 */
-	ModuleService(std::array<Modules::BusPins, NumBus> busPins = {}) :
+	ModuleService(std::array<Modules::BusPins, CONFIG_CMF_MODULESERVICE_NUM_BUSES> busPins) :
 			Super(CONFIG_CMF_MODULESERVICE_TICK_INTERVAL, CONFIG_CMF_MODULESERVICE_STACK_SIZE, CONFIG_CMF_MODULESERVICE_THREAD_PRIORITY, CONFIG_CMF_MODULESERVICE_CPU_CORE), busPins(std::move(busPins)){
 		populateInputDrivers();
 
-		for(uint8_t i = 0; i < NumBus; i++){
+		for(uint8_t i = 0; i < CONFIG_CMF_MODULESERVICE_NUM_BUSES; i++){
 			registerSubAddressPinsInput(i);
 		}
 	}
-
-	/**
-	 * Specialized constructor for a single bus
-	 * @param busPinsSingle UMAX bus pins
-	 */
-	ModuleService(const Modules::BusPins& busPinsSingle, std::enable_if_t<NumBus == 1, int> = 0) : ModuleService(std::array<Modules::BusPins, 1>{ busPinsSingle }){}
 
 	/**
 	 * uint8_t - busID
@@ -60,13 +49,13 @@ public:
 	ModulesEvent ModulesEvent{ this };
 
 	StrongObjectPtr<ModuleDevice> getDevice(uint8_t bus = 0){
-		if(bus >= NumBus) return nullptr;
+		if(bus >= CONFIG_CMF_MODULESERVICE_NUM_BUSES) return nullptr;
 
 		return busContexts[bus].instance;
 	}
 
 	Modules::Type getInserted(uint8_t bus = 0){
-		if(bus >= NumBus) return Modules::Type::Unknown;
+		if(bus >= CONFIG_CMF_MODULESERVICE_NUM_BUSES) return Modules::Type::Unknown;
 
 		if(!busContexts[bus].inserted){
 			return Modules::Type::Unknown;
@@ -76,17 +65,22 @@ public:
 	}
 
 
-private:
-	const std::array<Modules::BusPins, NumBus> busPins;
-
+#ifdef CONFIG_RM_Motion
 	/**
-	 * Model of the current bus state
+	 * bool state - true = motion started, false = motion stopped
 	 */
+	DECLARE_DELEGATE(RM_MotionEvent, bool);
+	RM_MotionEvent OnRM_Motion;
+#endif
+
+private:
+	const std::array<Modules::BusPins, CONFIG_CMF_MODULESERVICE_NUM_BUSES> busPins;
+
 	struct BusContext {
 		bool inserted;
 		Modules::Type type;
 		StrongObjectPtr<ModuleDevice> instance;
-	} busContexts[NumBus];
+	} busContexts[CONFIG_CMF_MODULESERVICE_NUM_BUSES];
 
 
 	void tick(float deltaTime) noexcept override{
@@ -94,7 +88,7 @@ private:
 
 		scanAllInputs();
 
-		for(uint8_t i = 0; i < NumBus; i++){
+		for(uint8_t i = 0; i < CONFIG_CMF_MODULESERVICE_NUM_BUSES; i++){
 			loopCheck(i);
 		}
 	}
@@ -259,7 +253,7 @@ private:
 	 * Populates the inputDriverSets with their respective inputDrivers
 	 */
 	void populateInputDrivers(){
-		for(uint8_t bus = 0; bus < NumBus; ++bus){
+		for(uint8_t bus = 0; bus < CONFIG_CMF_MODULESERVICE_NUM_BUSES; ++bus){
 			auto& pins = busPins[bus];
 
 			// Address pins

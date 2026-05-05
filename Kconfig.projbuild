@@ -226,6 +226,10 @@ menu "Thread properties"
             default -1
             help
                 Pin the thread to a CPU core, if -1, it is not pinned but assigned automatically to a free CPU core.
+        config CMF_MODULESERVICE_NUM_BUSES
+            int "Number of buses"
+            range 1 16
+            default 1
 
     endmenu
 
