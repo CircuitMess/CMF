@@ -1,6 +1,7 @@
 #ifndef CMF_STATE_H
 #define CMF_STATE_H
 
+#include "Event/EventBroadcaster.h"
 #include "Object/Class.h"
 #include "Entity/SyncEntity.h"
 
@@ -12,13 +13,6 @@ class State : public SyncEntity {
 	GENERATED_BODY(State, SyncEntity, void)
 
 public:
-	/**
-	 * @brief Triggers the owning StateMachine to transition to the returned class.
-	 * If nullptr or a class that doesn't extend the State class is returned,
-	 * this state remains the active one in the state machine.
-	 * @return The class type of the state the state machine needs to transition to at the current time.
-	 */
-	virtual const Class* transitionTo() const noexcept;
 
 	/**
 	 * @brief Function that is called when the owning StateMachine transitions to this state.
@@ -33,14 +27,21 @@ public:
 	virtual void onTransitionTo(const Class* next) noexcept;
 
 	/**
+	 *
+	 * @return True if next state tick should be instant instead of following the StateMachine tick interval
+	 */
+	virtual bool skipStateMachineTickInterval() const noexcept;
+
+	/**
 	 * @return The owning StateMachine or nullptr if the State is still inactive.
 	 */
 	class StateMachine* getStateMachine() const noexcept;
 
-	void setNextState(const Class* state) noexcept;
-
-private:
-	const Class* next = nullptr;
+	/**
+	 *
+	 * @param state
+	 */
+	void transitionTo(const Class* state) const;
 };
 
 #endif //CMF_STATE_H

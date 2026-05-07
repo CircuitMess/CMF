@@ -1,9 +1,8 @@
 #include "State.h"
 #include "StateMachine.h"
+#include "Log/Log.h"
 
-const Class* State::transitionTo() const noexcept{
-	return next;
-}
+DEFINE_LOG(State);
 
 void State::onTransitionFrom(const Class* previous) noexcept{
 
@@ -13,14 +12,20 @@ void State::onTransitionTo(const Class* next) noexcept{
 
 }
 
+bool State::skipStateMachineTickInterval() const noexcept{
+	return false;
+}
+
 StateMachine* State::getStateMachine() const noexcept{
 	return cast<StateMachine>(getOwner());
 }
 
-void State::setNextState(const Class* state) noexcept {
-	if(!state->isA(staticClass())){
+void State::transitionTo(const Class* state) const {
+	StateMachine* stateMachine = getStateMachine();
+	if(stateMachine == nullptr){
+		CMF_LOG(State, LogLevel::Warning, "Transition but StateMachine is nullptr");
 		return;
 	}
 
-	next = state;
+	stateMachine->transitionTo(state);
 }
