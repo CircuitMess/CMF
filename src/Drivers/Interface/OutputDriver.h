@@ -49,8 +49,10 @@ public:
 	}
 
 	void registerOutput(const OutputPinDef& pinDef) noexcept{
-		outputs.emplace_back(pinDef);
-		inversions[pinDef.port] = pinDef.inverted;
+		if(!inversions.contains(pinDef.port)){
+			outputs.emplace_back(pinDef);
+			inversions[pinDef.port] = pinDef.inverted;
+		}
 		performRegister(pinDef);
 	}
 
