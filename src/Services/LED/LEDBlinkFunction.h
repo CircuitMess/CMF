@@ -7,11 +7,9 @@
 template<typename LED, typename DataT>
 class LEDBlinkFunction : public LEDFunction<LED, DataT> {
 	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDBlinkFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), void)
+	GENERATED_BODY(LEDBlinkFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), CONSTRUCTOR_PACK(DataT, float, float, uint32_t))
 
 public:
-	LEDBlinkFunction() = default;
-
 	/**
 	 * @param value - ON value for blinking
 	 * @param period - blink period in seconds
@@ -39,16 +37,21 @@ public:
 		return false;
 	}
 
+	virtual TickType_t getInterval() const noexcept override{
+		if(state){
+			return static_cast<TickType_t>((period - onTime) * 1000 / portTICK_PERIOD_MS);
+		}
+
+		return static_cast<TickType_t>(onTime * 1000 / portTICK_PERIOD_MS);
+	}
+
 private:
-	void tick(float deltaTime) noexcept override{
+	virtual void tick(float deltaTime) noexcept override{
 		if(invalidConfig) return;
 
 		timer += deltaTime;
 
-		state = false;
-		if(fmodf(timer, period) <= onTime){
-			state = true;
-		}
+		state = !state;
 
 		elapsedCount = timer / period;
 	}

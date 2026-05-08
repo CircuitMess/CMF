@@ -5,7 +5,7 @@
 #include "Log/Log.h"
 #include "Core/Application.h"
 
-AsyncEntity::AsyncEntity(TickType_t interval /*= CONFIG_CMF_ASYNCENTITY_TICK_INTERVAL*/, size_t threadStackSize /*= CONFIG_CMF_ASYNCENTITY_STACK_SIZE*/,
+AsyncEntity::AsyncEntity(TickType_t interval /*= CONFIG_CMF_ASYNCENTITY_TICK_INTERVAL / portTICK_PERIOD_MS*/, size_t threadStackSize /*= CONFIG_CMF_ASYNCENTITY_STACK_SIZE*/,
 	uint8_t threadPriority /*= CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_ASYNCENTITY_CPU_CORE*/) noexcept :
 						Super(),
 						threadStackSize(threadStackSize),
@@ -76,8 +76,9 @@ void AsyncEntity::tickHandle() noexcept{
 
 	const uint64_t currentTickTime = micros();
 	const float deltaTime = (currentTickTime - lastTickTime) / 1000000.0f;
+	const TickType_t eventScanningTime = getEventScanningTime();
 
-	scanEvents(getEventScanningTime() + (getEventScanningTime() < portMAX_DELAY ? 1 : 0));
+	scanEvents(eventScanningTime + (eventScanningTime < portMAX_DELAY ? 1 : 0));
 	tick(deltaTime);
 	__tick(deltaTime);
 

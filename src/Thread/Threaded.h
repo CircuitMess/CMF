@@ -28,7 +28,7 @@ protected:
 	 * @param threadPriority How high of a priority the thread is, comes into effect when context switching between threads happens.
 	 * @param cpuCore Which CPU code the thread should run on. If -1, it will run on any available without preference.
 	 */
-	explicit Threaded(const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
+	explicit Threaded(const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
 		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE) noexcept;
 
 public:
@@ -41,7 +41,7 @@ public:
 	 * @param threadPriority How high of a priority the thread is, comes into effect when context switching between threads happens.
 	 * @param cpuCore Which CPU core the thread should run on. If -1, it will run on any available without preference.
 	 */
-	Threaded(const std::function<void(void)>& fn, const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
+	Threaded(const std::function<void(void)>& fn, const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
 		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE) noexcept;
 
 	/**

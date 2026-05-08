@@ -21,7 +21,7 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 	}, "RM_MotionSensor", 0, 2*1024);
 
 
-	const auto pin = static_cast<gpio_num_t>(busPins.subAddressPins[0].port);
+	const auto pin = static_cast<gpio_num_t>(busPins.subAddressPins[0].inputPort);
 	const gpio_config_t io_conf = {
 			.pin_bit_mask = 1ULL << pin,
 			.mode = GPIO_MODE_INPUT,
@@ -31,8 +31,8 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 	};
 
 	gpio_intr_enable(pin);
-	gpio_config(&io_conf);
 	gpio_isr_handler_add(pin, isr, this);
+	gpio_config(&io_conf);
 
 	setLEDs(false);
 }
@@ -51,7 +51,7 @@ RM_MotionSensor::~RM_MotionSensor() noexcept{
 
 void RM_MotionSensor::setLEDs(bool state){
 	if(pins.subAddressPins[1].outputDriver){
-		pins.subAddressPins[1].outputDriver->write(pins.subAddressPins[1].port, state);
+		pins.subAddressPins[1].outputDriver->write(pins.subAddressPins[1].outputPort, state);
 	}
 }
 
