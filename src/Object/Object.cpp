@@ -156,7 +156,7 @@ void Object::registerEventHandle(EventHandleBase* handle) const noexcept{
 		return;
 	}
 
-	if(handle->getOwningObject() == nullptr) {
+	if(handle->getOwningObject() == nullptr){
 		return;
 	}
 

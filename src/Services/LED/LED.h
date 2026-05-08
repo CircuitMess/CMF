@@ -53,7 +53,9 @@ public:
 		for(auto it = currentFunctions.begin(); it != currentFunctions.end(); ++it){
 			const RegisteredFunction& func = it->second;
 
-			if(!func.function.isValid() || func.function->isDone()){
+			// Should not check if the function is done and disregard it. If it does, and it is the only function,
+			// it will block the service tick for portMAX_DELAY and the wairFor function will remain blocked forever in certain cases
+			if(!func.function.isValid()){
 				continue;
 			}
 
