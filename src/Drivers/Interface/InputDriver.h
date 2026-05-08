@@ -41,8 +41,10 @@ public:
 	}
 
 	void registerInput(const InputPinDef& pinDef) noexcept{
-		inputs.emplace_back(std::cref(pinDef));
-		inversions[pinDef.port] = pinDef.inverted;
+		if(!inversions.contains(pinDef.port)){
+			inputs.emplace_back(std::cref(pinDef));
+			inversions[pinDef.port] = pinDef.inverted;
+		}
 		performRegister(pinDef);
 	}
 
