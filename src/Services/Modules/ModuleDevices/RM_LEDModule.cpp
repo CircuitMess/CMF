@@ -14,7 +14,7 @@ void RM_LEDModule::set(bool state){
 void RM_LEDModule::setLevel(float level){
 	CMF_LOG(RM_LEDModule, LogLevel::Info, "Setting LED level to %.2f", level);
 	if(pins.subAddressPins[0].outputDriver){
-		pins.subAddressPins[0].outputDriver->write(pins.subAddressPins[0].port, level);
+		pins.subAddressPins[0].outputDriver->write(pins.subAddressPins[0].outputPort, level);
 	}else{
 		CMF_LOG(RM_LEDModule, LogLevel::Warning, "No output driver assigned for LED module pin");
 	}

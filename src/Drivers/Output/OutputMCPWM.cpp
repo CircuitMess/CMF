@@ -23,8 +23,10 @@ void OutputMCPWM::performRegister(const OutputPinDef& output) noexcept{
 		return;
 	}
 
-	gpio_reset_pin(config.pin);
-	gpio_set_direction(config.pin, GPIO_MODE_OUTPUT);
+	gpio_config_t gpioConfig{
+		1ULL << config.pin, GPIO_MODE_OUTPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE
+	};
+	gpio_config(&gpioConfig);
 
 	auto& state = states[output.port];
 

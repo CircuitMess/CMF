@@ -72,11 +72,12 @@ void OutputPWM::performRegister(const OutputPinDef& output) noexcept{
 		return;
 	}
 
-
 	const auto& pin = gpios[output.port];
 
-	gpio_reset_pin(pin);
-	gpio_set_direction(pin, GPIO_MODE_OUTPUT);
+	gpio_config_t config{
+		1ULL << pin, GPIO_MODE_OUTPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE
+	};
+	gpio_config(&config);
 
 	const ledc_timer_config_t ledc_timer = {
 			.speed_mode       = getSpeedMode(output.port),

@@ -37,7 +37,8 @@ enum class Type : uint8_t {
 struct IOPin {
 	InputDriver* inputDriver;
 	OutputDriver* outputDriver;
-	int port;
+	int inputPort;
+	int outputPort;
 };
 struct BusPins {
 	InputPin addr[6], detPins[2];

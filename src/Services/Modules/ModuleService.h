@@ -187,7 +187,7 @@ private:
 					for(uint8_t i = 0; i < 3; i++){
 						const Modules::IOPin pin = busPins[bus].subAddressPins[i + 3];
 
-						if(pin.inputDriver->read(pin.port) > 0.0f){
+						if(pin.inputDriver->read(pin.inputPort) > 0.0f){
 							RMAddr |= 1 << i;
 						}
 					}
@@ -211,7 +211,7 @@ private:
 					for(uint8_t i = 0; i < 6; i++){
 						const Modules::IOPin pin = busPins[bus].subAddressPins[i];
 
-						if(pin.inputDriver->read(pin.port) > 0.0f){
+						if(pin.inputDriver->read(pin.inputPort) > 0.0f){
 							tokenAddr |= 1 << i;
 						}
 					}
@@ -293,7 +293,7 @@ private:
 	 */
 	void registerSubAddressPinsInput(uint8_t bus){
 		for(const auto& pin : busPins[bus].subAddressPins){
-			if(pin.inputDriver) pin.inputDriver->registerInput({ pin.port });
+			pin.inputDriver->registerInput({ pin.inputPort });
 		}
 	}
 
@@ -301,10 +301,10 @@ private:
 		const auto& pinModes = Modules::GetPinModeMap().at(type);
 		for(uint8_t i = 0; i < pinModes.size(); i++){
 			const auto& pin = busPins[bus].subAddressPins[i];
-			if(pinModes[i] == Modules::PinMode::Input && pin.inputDriver){
-				pin.inputDriver->registerInput({ pin.port });
-			}else if(pinModes[i] == Modules::PinMode::Output && pin.outputDriver){
-				pin.outputDriver->registerOutput({ pin.port });
+			if(pinModes[i] == Modules::PinMode::Input){
+				pin.inputDriver->registerInput({ pin.inputPort });
+			}else if(pinModes[i] == Modules::PinMode::Output){
+				pin.outputDriver->registerOutput({ pin.outputPort });
 			}
 		}
 	}
