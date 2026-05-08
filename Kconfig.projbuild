@@ -256,6 +256,29 @@ menu "Thread properties"
 
     endmenu
 
+    menu "Timer worker"
+
+        config CMF_TIMER_QUEUE_LENGTH
+            int "Worker queue length"
+            range 1 4096
+            default 16
+            help
+                Capacity of the queue that buffers callbacks signalled from the timer ISR before
+                the worker task picks them up. If the queue fills up, additional firings are dropped.
+        config CMF_TIMER_STACK_SIZE
+            int "Stack size"
+            range 2048 4294967295
+            default 4096
+        config CMF_TIMER_THREAD_PRIORITY
+            int "Priority"
+            range 0 25
+            default 20
+            help
+                Priority of the shared task that executes Timer callbacks after they are signalled
+                from the ISR. Set high so that the wake-up delay between ISR and callback stays small.
+
+    endmenu
+
 endmenu
 
 endmenu
