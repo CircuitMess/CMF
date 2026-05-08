@@ -12,7 +12,7 @@ Timer::Timer(uint32_t period, std::function<void()> ISR, const char* name) : per
 	esp_timer_create_args_t args = {
 			.callback = interrupt,
 			.arg = this,
-			.dispatch_method = ESP_TIMER_ISR,
+			.dispatch_method = ESP_TIMER_TASK,
 			.name = timerName,
 			.skip_unhandled_events = true
 	};
@@ -24,11 +24,11 @@ Timer::~Timer(){
 	esp_timer_delete(timer);
 }
 
-void IRAM_ATTR Timer::start(){
+void Timer::start(){
 	esp_timer_start_once(timer, period);
 }
 
-void IRAM_ATTR Timer::stop(){
+void Timer::stop(){
 	esp_timer_stop(timer);
 }
 
@@ -38,7 +38,7 @@ void Timer::reset(){
 
 }
 
-void IRAM_ATTR Timer::interrupt(void* arg){
+void Timer::interrupt(void* arg){
 	auto timer = (Timer*) arg;
 	timer->ISR();
 }
@@ -57,7 +57,7 @@ void Timer::single(uint32_t delay, std::function<void()> ISR){
 				delete func;
 			},
 			.arg = func,
-			.dispatch_method = ESP_TIMER_ISR,
+			.dispatch_method = ESP_TIMER_TASK,
 			.name = name,
 			.skip_unhandled_events = true
 	};
@@ -68,7 +68,7 @@ void Timer::single(uint32_t delay, std::function<void()> ISR){
 	esp_timer_start_once(timer, delay * 1000);
 }
 
-void IRAM_ATTR Timer::setPeriod(uint32_t period){
+void Timer::setPeriod(uint32_t period){
 	if(esp_timer_is_active(timer)){
 		CMF_LOG(Timer, LogLevel::Error, "setPeriod called while timer is running");
 		return;
