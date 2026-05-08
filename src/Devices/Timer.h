@@ -8,57 +8,53 @@
 /**
  * Abstraction for ESP's hardware timers (esp_timer with ISR dispatch).
  *
- * Note:
- * ESP Timer HAL takes care of HW allocation when Timers are created. (No need to specify timerID and timerGroup).
- * For more control, use GPTimer instead.
+ * The underlying esp_timer is created with dispatch_method = ESP_TIMER_ISR, so the user
+ * callback runs directly in ISR context. For this to work the application must enable
+ * CONFIG_ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD in its sdkconfig.
  *
- * Dispatch path: the underlying esp_timer fires the trampoline in ISR context (ESP_TIMER_ISR),
- * preserving the low alarm-to-wake-up latency. The trampoline lives in IRAM and only signals a
- * shared high-priority worker task via an ISR-safe queue; the user's std::function callback runs
- * on that task. This keeps every flash-resident dispatch step (std::function invoker, captured
- * lambda body) outside the cache-disabled ISR window, so a timer firing during a flash write no
- * longer triggers a cache-disabled crash.
+ * Because the callback runs in ISR context with the SPI flash cache potentially disabled:
+ *   - The callback function must be marked IRAM_ATTR.
+ *   - Any constants the callback reads must live in DRAM (DRAM_ATTR / static const).
+ *   - The callback must not call into flash-resident code or perform blocking work.
+ *   - Only ISR-safe FreeRTOS primitives (the *FromISR variants) may be used.
  *
- * Implication: callbacks may run shortly after Timer::stop() / ~Timer() returns if an item was
- * already queued from the ISR. Callers must not rely on synchronous shutdown.
+ * ESP Timer HAL takes care of HW allocation when Timers are created (no need to specify
+ * timerID and timerGroup). For more control, use GPTimer instead.
  */
 
 
 class Timer : public Object {
-	GENERATED_BODY(Timer, Object, CONSTRUCTOR_PACK(uint32_t, std::function<void()>, const char*))
+	GENERATED_BODY(Timer, Object, CONSTRUCTOR_PACK(uint32_t, void(*)(void*), void*, const char*))
 
 public:
+	using Callback = void (*)(void* arg);
+
 	/**
 	 * @param period Time between periodic callback invocations [ms]
-	 * @param ISR Callback to be invoked when the period elapses. Runs in the Timer worker task; should be non-blocking.
+	 * @param callback Callback to be invoked when the period elapses. Runs in ISR context — must be IRAM_ATTR.
+	 * @param arg Opaque pointer forwarded to callback on every invocation.
 	 * @param name Name for internal ESP timer HAL (optional, for debugging purposes)
 	 */
-
-	Timer(uint32_t period, std::function<void()> ISR, const char* name = "");
+	Timer(uint32_t period, Callback callback, void* arg, const char* name = "");
 	virtual ~Timer();
 
 	void start();
 	void stop();
 	void reset();
 
-
 	/**
 	 * Creates a one-time timer, instead of a periodically called one.
 	 * @param delay Delay before the callback is invoked [ms]
-	 * @param ISR Callback to be invoked when the delay elapses. Runs in the Timer worker task; should be non-blocking.
+	 * @param callback Callback to be invoked when the delay elapses. Runs in ISR context — must be IRAM_ATTR.
+	 * @param arg Opaque pointer forwarded to callback when it fires.
 	 */
-
-	static void single(uint32_t delay, std::function<void()> ISR);
+	static void single(uint32_t delay, Callback callback, void* arg);
 
 	void setPeriod(uint32_t period);
 
 private:
-	static void IRAM_ATTR interrupt(void* arg);
 	esp_timer_handle_t timer;
-
 	uint64_t period;
-	std::function<void()> ISR = nullptr;
-
 };
 
 
