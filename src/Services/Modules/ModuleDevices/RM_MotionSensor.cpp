@@ -1,5 +1,4 @@
 #include "RM_MotionSensor.h"
-
 #include "Memory/ObjectMemory.h"
 #include "Services/Modules/ModuleService.h"
 
@@ -54,7 +53,6 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 }
 
 RM_MotionSensor::~RM_MotionSensor() noexcept{
-	const auto pin = static_cast<gpio_num_t>(pins.subAddressPins[0].inputPort);
 	gpio_isr_handler_remove(pin);
 
 	thread->stop(0);

@@ -31,6 +31,9 @@ public:
 		Insert, Remove
 	};
 
+
+	ModuleService(const Modules::BusPins& busPins) requires (CONFIG_CMF_MODULESERVICE_NUM_BUSES == 1) : ModuleService(std::array{ busPins }){}
+
 	ModuleService(std::array<Modules::BusPins, CONFIG_CMF_MODULESERVICE_NUM_BUSES> busPins) :
 			Super(CONFIG_CMF_MODULESERVICE_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_MODULESERVICE_STACK_SIZE, CONFIG_CMF_MODULESERVICE_THREAD_PRIORITY, CONFIG_CMF_MODULESERVICE_CPU_CORE), busPins(std::move(busPins)){
 		populateInputDrivers();
