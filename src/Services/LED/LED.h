@@ -53,7 +53,9 @@ public:
 		for(auto it = currentFunctions.begin(); it != currentFunctions.end(); ++it){
 			const RegisteredFunction& func = it->second;
 
-			if(!func.function.isValid() || func.function->isDone()){
+			// Should not check if the function is done and disregard it. If it does, and it is the only function,
+			// it will block the service tick for portMAX_DELAY and the wairFor function will remain blocked forever in certain cases
+			if(!func.function.isValid()){
 				continue;
 			}
 
@@ -132,14 +134,28 @@ public:
 
 		RegisteredFunction regFunc = { std::move(function), temp };
 
+		bool alreadyLocked = false;
 		if(currentFunctions.contains(led)){
+			alreadyLocked = true;
 			if(!currentFunctions[led].isTemporary){
 				prevFunctions[led] = std::move(currentFunctions[led]);
 			}
 		}
 
 		currentFunctions[led] = std::move(regFunc);
-		xSemaphoreTake(waitSemaphores[led], portMAX_DELAY);
+
+		/**
+		 * When setting a function while an existing continuous function is already playing,
+		 * the waitSemaphore is already locked and will never be given, since tick is also blocked by the accessMutex.
+		 * Furthermore, if the previous function is continuous the waitSemaphore will never be given.
+		 *
+		 * Since accessMutex is locked here, there isn't any rug-pulling on the tick() thread.
+		 */
+		if(alreadyLocked){
+			xSemaphoreTake(waitSemaphores[led], 0);
+		} else{
+			xSemaphoreTake(waitSemaphores[led], portMAX_DELAY);
+		}
 	}
 
 	DataT getValue(LED led) noexcept requires (std::same_as<DataT, float>){

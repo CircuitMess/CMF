@@ -17,15 +17,13 @@ template<typename ...Args>
 class Event {
 public:
 	/**
-	 * @brief Deletes all contained bound handles and decallocates memory.
+	 * @brief Deletes all contained bound handles and deallocates memory.
 	 */
-	inline virtual ~Event() noexcept {
+	inline virtual ~Event() noexcept{
 		std::lock_guard guard(accessMutex);
 
 		for(const HandleContainer& container : handles){
-			if(container.owned){
-				delete container.handle;
-			}
+			delete container.handle;
 		}
 	}
 
@@ -33,7 +31,7 @@ public:
 	 * @brief Function for binding of handles via reference.
 	 * @param handle The handle for a callback function being bound.
 	 */
-	inline void bind(EventHandle<Args...>&& handle) noexcept {
+	inline void bind(EventHandle<Args...>&& handle) noexcept{
 		if(handle.getOwningObject() == nullptr){
 			return;
 		}
@@ -46,7 +44,7 @@ public:
 	 * @brief Function for binding of handles via pointer.
 	 * @param handle Pointer to the handle for a callback function being bound.
 	 */
-	inline void bind(EventHandle<Args...>* handle) noexcept {
+	inline void bind(EventHandle<Args...>* handle) noexcept{
 		if(handle == nullptr){
 			return;
 		}
@@ -110,12 +108,10 @@ public:
 	 * @brief Function for removing bound function via object instance.
 	 * @param object The object instance whose functions are to be removed.
 	 */
-	inline void unbind(Object* object) noexcept {
-		std::erase_if(handles, [object](const HandleContainer& container) {
+	inline void unbind(Object* object) noexcept{
+		std::erase_if(handles, [object](const HandleContainer& container){
 			if(container.owningObject == object){
-				if(container.owned){
-					delete container.handle;
-				}
+				delete container.handle;
 
 				return true;
 			}
@@ -130,7 +126,7 @@ protected:
 	 * @param args Arguments passed to the bound function callbacks.
 	 * @return True if all callback calls were successful, false otherwise.
 	 */
-	virtual inline bool _broadcast(const Args&... args) noexcept {
+	virtual inline bool _broadcast(const Args&... args) noexcept{
 		std::lock_guard guard(accessMutex);
 
 		bool succeeded = true;
@@ -162,7 +158,6 @@ private:
 	struct HandleContainer {
 		EventHandle<Args...>* handle = nullptr;
 		WeakObjectPtr<Object> owningObject = nullptr;
-		bool owned = true;
 
 		// This is only needed for std::set to work
 		/**
@@ -170,7 +165,7 @@ private:
 		 * @param other The HandleContainer being compared to.
 		 * @return True if handle pointer is less than the other containers handle pointer.
 		 */
-		bool operator < (const HandleContainer& other) const noexcept {
+		bool operator < (const HandleContainer& other) const noexcept{
 			return (uint32_t) handle < (uint32_t) other.handle;
 		}
 	};
