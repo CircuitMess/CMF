@@ -51,7 +51,10 @@ private:
 
 		timer += deltaTime;
 
-		state = !state;
+		state = false;
+		if(fmodf(timer, period) <= onTime){
+			state = true;
+		}
 
 		elapsedCount = timer / period;
 	}
