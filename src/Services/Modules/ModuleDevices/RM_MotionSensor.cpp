@@ -17,7 +17,7 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 		}
 
 		if(xSemaphoreTake(sem, pdMS_TO_TICKS(DebounceMs)) == pdTRUE){
-			CMF_LOG(RM_MotionSensor, Info, "ignored debounce");
+			CMF_LOG(RM_MotionSensor, Debug, "ignored bounce");
 			return;
 		}
 
@@ -81,4 +81,5 @@ void IRAM_ATTR RM_MotionSensor::isr(void* arg){
 	RM_MotionSensor* motion = static_cast<RM_MotionSensor*>(arg);
 	BaseType_t higherPrioTask = pdFALSE;
 	xSemaphoreGiveFromISR(motion->sem, &higherPrioTask);
+	portYIELD_FROM_ISR(higherPrioTask);
 }
