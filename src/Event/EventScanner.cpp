@@ -1,7 +1,7 @@
 #include "EventScanner.h"
 #include "EventHandle.h"
 
-EventScanner::EventScanner() : Super(0, 4 * 1024, 20) {
+EventScanner::EventScanner() : Super(CONFIG_CMF_EVENTSCANNER_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_EVENTSCANNER_STACK_SIZE, CONFIG_CMF_EVENTSCANNER_THREAD_PRIORITY, CONFIG_CMF_EVENTSCANNER_CPU_CORE) {
     semaphore = xSemaphoreCreateBinary();
 }
 
