@@ -28,9 +28,9 @@ public:
 
 	/**
 	 *
-	 * @return True if next state tick should be instant instead of following the StateMachine tick interval
+	 * @return If less than 0, StateMachine will tick its default interval, otherwise will use this, capped at portMAX_DELAY
 	 */
-	virtual bool skipStateMachineTickInterval() const noexcept;
+	virtual int64_t getDynamicTickInterval() const noexcept;
 
 	/**
 	 * @return The owning StateMachine or nullptr if the State is still inactive.

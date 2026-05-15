@@ -22,11 +22,17 @@ TickType_t StateMachine::getEventScanningTime() const noexcept{
 		return Super::getEventScanningTime();
 	}
 
-	if(current->skipStateMachineTickInterval()){
-		return 0;
+	const int64_t dynamicTickInterval = current->getDynamicTickInterval();
+
+	if(dynamicTickInterval < 0){
+		return Super::getEventScanningTime();
 	}
 
-	return Super::getEventScanningTime();
+	if(dynamicTickInterval >= portMAX_DELAY){
+		return portMAX_DELAY;
+	}
+
+	return dynamicTickInterval;
 }
 
 void StateMachine::transitionTo(const SubclassOf<State>& state){

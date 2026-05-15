@@ -12,8 +12,8 @@ void State::onTransitionTo(const Class* next) noexcept{
 
 }
 
-bool State::skipStateMachineTickInterval() const noexcept{
-	return false;
+int64_t State::getDynamicTickInterval() const noexcept{
+	return -1;
 }
 
 StateMachine* State::getStateMachine() const noexcept{
