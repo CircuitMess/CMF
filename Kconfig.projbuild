@@ -253,6 +253,33 @@ menu "Thread properties"
             default -1
             help
                 Pin the thread to a CPU core, if -1, it is not pinned but assigned automatically to a free CPU core.
+        config CMF_MODULESERVICE_NUM_BUSES
+            int "Number of buses"
+            range 1 16
+            default 1
+
+    endmenu
+
+    menu "EventScanner"
+
+        config CMF_EVENTSCANNER_TICK_INTERVAL
+            int "Tick interval"
+            range 0 4294967295
+            default 0
+        config CMF_EVENTSCANNER_STACK_SIZE
+            int "Stack size"
+            range 2048 4294967295
+            default 4096
+        config CMF_EVENTSCANNER_THREAD_PRIORITY
+            int "Priority"
+            range 0 25
+            default 20
+        config CMF_EVENTSCANNER_CPU_CORE
+            int "CPU core"
+            range -1 1
+            default -1
+            help
+                Pin the thread to a CPU core, if -1, it is not pinned but assigned automatically to a free CPU core.
 
     endmenu
 
