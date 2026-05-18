@@ -28,6 +28,7 @@ void AsyncEntity::__postInitProperties() noexcept {
 	Super::__postInitProperties();
 
 	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
+	thread->start();
 }
 
 void AsyncEntity::setOwner(Object* object) noexcept{

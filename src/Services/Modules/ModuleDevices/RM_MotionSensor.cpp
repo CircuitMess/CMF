@@ -50,6 +50,8 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 	gpio_config(&io_conf);
 
 	setLEDs(false);
+
+	thread->start();
 }
 
 RM_MotionSensor::~RM_MotionSensor() noexcept{
