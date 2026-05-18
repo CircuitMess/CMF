@@ -49,7 +49,7 @@ public:
 	 * @return The static class of the object.
 	 */
 	inline static const Class* staticClass() noexcept{
-		return objectStaticClass;
+		return &objectStaticClass;
 	}
 
 	/**
@@ -218,7 +218,7 @@ protected:
 
 private:
 	using ClassType = Class;
-	static const ClassType* objectStaticClass;
+	static const ClassType objectStaticClass;
 	inline static uint32_t ObjectIndex = 0;
 
 	const uint32_t id;
@@ -229,11 +229,7 @@ private:
 
 	Queue<EventHandleBase*> readyEventHandles;
 
-	// Thread safety
-	std::mutex ownershipMutex;
-	std::mutex instigatorMutex;
-	std::mutex destroyMutex;
-	std::mutex eventScanningMutex;
+	std::mutex accessMutex;
 
 private:
 	/**
@@ -357,11 +353,11 @@ private:																													                                				\
 																															                                				\
 	using Super = SuperObject;																								                                				\
 	using ClassType = __##ObjectName##_Class<Super, ##__VA_ARGS__>;															                                				\
-	inline static const ClassType* objectStaticClass = new ClassType(((uint64_t) STRING_HASH(#ObjectName) << 32) | __getTemplateHash());									\
+	inline static const ClassType objectStaticClass = ClassType(((uint64_t) STRING_HASH(#ObjectName) << 32) | __getTemplateHash());											\
 																															                                				\
 public:																														                                				\
 	inline static const Class* staticClass() noexcept {																		                                				\
-		return objectStaticClass;																							                                				\
+		return &objectStaticClass;																							                                				\
 	}																														                                				\
 																															                                				\
 	inline virtual const Class* getStaticClass() const noexcept override {													                                				\
@@ -379,7 +375,7 @@ public:																														                                				\
 																															                                				\
 	template<typename __T>																									                                				\
 	inline static constexpr bool implements() noexcept {																	                                				\
-		return objectStaticClass->template implements<__T>() || Super::template implements<__T>();							                                				\
+		return staticClass()->template implements<__T>() || Super::template implements<__T>();							                                					\
 	}                                                      																	                                				\
 private:																																									\
 

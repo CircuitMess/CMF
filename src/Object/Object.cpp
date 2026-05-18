@@ -7,7 +7,7 @@
 #include "Core/Application.h"
 #include "Class.h"
 
-const Object::ClassType* Object::objectStaticClass = new Object::ClassType(static_cast<uint64_t>(STRING_HASH("Object")) << 32);
+const Object::ClassType Object::objectStaticClass = Object::ClassType(static_cast<uint64_t>(STRING_HASH("Object")) << 32);
 
 Object::Object() noexcept : id(ObjectIndex++){}
 
@@ -69,7 +69,7 @@ void Object::setOwner(Object* object) noexcept{
 	Object* oldOwner = nullptr;
 
 	{
-		std::lock_guard lock(ownershipMutex);
+		std::lock_guard lock(accessMutex);
 
 		oldOwner = owner.get();
 
@@ -94,7 +94,7 @@ void Object::onChildAdded(Object* child) noexcept{}
 void Object::onChildRemoved(Object* child) noexcept{}
 
 void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept{
-	std::lock_guard lock(ownershipMutex);
+	std::lock_guard lock(accessMutex);
 
 	for(const WeakObjectPtr<Object>& child : childrenObjects){
 		if(!child.isValid()){
@@ -111,7 +111,7 @@ void Object::setInstigator(Object* object) noexcept{
 	Object* oldInstigator = nullptr;
 
 	{
-		std::lock_guard lock(instigatorMutex);
+		std::lock_guard lock(accessMutex);
 		oldInstigator = instigator.get();
 		instigator = object;
 	}
@@ -121,11 +121,7 @@ void Object::setInstigator(Object* object) noexcept{
 void Object::onInstigatorChanged(Object* oldInstigator) noexcept{}
 
 void Object::scanEvents(TickType_t wait) noexcept{
-	if(!eventScanningMutex.try_lock()){
-		CMF_LOG(CMF, Warning, "Circular object ownership detected. Object: %s, Owner: %s", getName().c_str(), getOwner()->getName().c_str());
-		eventScanningMutex.unlock();
-		return;
-	}
+	std::lock_guard guard(accessMutex);
 
 	const uint64_t begin = millis();
 
@@ -147,8 +143,6 @@ void Object::scanEvents(TickType_t wait) noexcept{
 
 		child->scanEvents(0);
 	}
-
-	eventScanningMutex.unlock();
 }
 
 void Object::registerEventHandle(EventHandleBase* handle) const noexcept{
@@ -232,7 +226,7 @@ Object* Object::getOutermostInstigator() const noexcept{
 }
 
 inline void Object::registerChild(Object* child) noexcept{
-	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
+	// NOTE: accessMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	WeakObjectPtr<Object> newChild = child;
 	if(!newChild.isValid()){
 		return;
@@ -243,7 +237,7 @@ inline void Object::registerChild(Object* child) noexcept{
 }
 
 inline void Object::removeChild(Object* child) noexcept{
-	// NOTE: ownershipMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
+	// NOTE: accessMutex must be locked before calling this function to avoid multithreading issues. If it is not locked, bugs can occur.
 	if(child == nullptr){
 		return;
 	}
