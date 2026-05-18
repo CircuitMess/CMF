@@ -27,7 +27,8 @@ uint8_t RM_TempHumModule::getHumidity() const{
 //TODO - separate this out to its own Device class for AHT20
 std::array<uint8_t, 6> RM_TempHumModule::readData(){
 	std::array<uint8_t, 6> data{};
-	i2c->write({ 0xAC, 0x33, 0x00 });
+	constexpr std::array<uint8_t, 3> trigger{ 0xAC, 0x33, 0x00 };
+	i2c->write(trigger);
 	delayMillis(80);
 	i2c->read(data);
 

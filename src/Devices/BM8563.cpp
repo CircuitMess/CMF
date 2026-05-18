@@ -1,6 +1,7 @@
 #include "BM8563.h"
 #include "Log/Log.h"
 #include "Periphery/I2CMaster.h"
+#include <array>
 
 DEFINE_LOG(BM8563)
 
@@ -17,7 +18,8 @@ BM8563::BM8563(I2CMaster* i2c, uint8_t Addr) : Addr(Addr){
 	}
 
 	// Clear status registers (0x0 and 0x1)
-	if(const auto ret = dev->write({ 0, 0, 0 }, 10); ret != ESP_OK){
+	constexpr std::array<uint8_t, 3> clear{ 0, 0, 0 };
+	if(const auto ret = dev->write(clear, 10); ret != ESP_OK){
 		CMF_LOG(BM8563, LogLevel::Error, "Error clearing status registers: %d", ret);
 		abort();
 	}

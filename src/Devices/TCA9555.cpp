@@ -3,6 +3,7 @@
 #include "Log/Log.h"
 #include "Periphery/I2CMaster.h"
 #include "Periphery/I2CDevice.h"
+#include <array>
 
 static inline uint8_t TCA_IT(uint8_t pin){ return (pin <= 7) ? 0 : 1; }
 
@@ -31,8 +32,10 @@ TCA9555::TCA9555(I2CMaster* i2c, uint8_t addr){
 }
 
 void TCA9555::reset(){
-	dev->write({ REG_DIR, 0xff, 0xff }); // All pins to input
-	dev->write({ REG_POLARITY, 0x00, 0x00 }); // Turn off polarity inversion for all pins
+	constexpr std::array<uint8_t, 3> dirReset{ REG_DIR, 0xff, 0xff };
+	constexpr std::array<uint8_t, 3> polarityReset{ REG_POLARITY, 0x00, 0x00 };
+	dev->write(dirReset); // All pins to input
+	dev->write(polarityReset); // Turn off polarity inversion for all pins
 	regs = Regs();
 }
 
@@ -65,7 +68,7 @@ bool TCA9555::read(uint8_t pin){
 }
 
 uint16_t TCA9555::readAll(){
-	std::vector<uint8_t> val(2);
+	std::array<uint8_t, 2> val{};
 	ESP_ERROR_CHECK(dev->write_read(REG_INPUT, val));
 	return (val[1] << 8) | val[0];
 }
