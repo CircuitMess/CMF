@@ -3,8 +3,9 @@
 
 DEFINE_LOG(LIS2DW12)
 
-LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Config config, uint8_t addr) : i2c(std::move(i2cDevice)), Addr(addr), config(config), pins(pinConfig),
-																				 dispatcherThread([this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8){
+LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Config config, uint8_t addr) : i2c(std::move(i2cDevice)), Addr(addr), config(config), pins(pinConfig){
+	dispatcherThread = newObject<Threaded>(this, [this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8);
+
 	if(!i2c){
 		CMF_LOG(LIS2DW12, LogLevel::Error, "No I2C peripheral provided");
 		abort();
@@ -13,6 +14,8 @@ LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Co
 	dispatcherSem = xSemaphoreCreateBinary();
 
 	init(config, pins);
+
+	dispatcherThread->start();
 }
 
 LIS2DW12::Sample LIS2DW12::getSample(){

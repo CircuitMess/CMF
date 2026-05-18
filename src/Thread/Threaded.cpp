@@ -32,12 +32,6 @@ Threaded::~Threaded() noexcept{
 	vSemaphoreDelete(pauseSemaphore);
 }
 
-void Threaded::__postInitProperties() noexcept{
-	Super::__postInitProperties();
-
-	start();
-}
-
 void Threaded::start() noexcept{
 	if(state != State::Stopped){
 		return;
@@ -56,13 +50,13 @@ void Threaded::start() noexcept{
 			return;
 		}
 
-		if(!isValid(static_cast<Threaded *>(arg))){
+		if(!isValid(static_cast<Threaded*>(arg))){
 			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
 			vTaskDelete(nullptr);
 			return;
 		}
 
-		static_cast<Threaded *>(arg)->threadFunction();
+		static_cast<Threaded*>(arg)->threadFunction();
 	};
 
 	if(core == -1){

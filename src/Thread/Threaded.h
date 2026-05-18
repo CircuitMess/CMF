@@ -14,7 +14,7 @@
 /**
  * @brief Thread object that runs continuously with control of its properties like stack size,
  * priority, core and interval, and an optional callback function that is called once per loop.
- * The thread starts running immediately as constructed.
+ * The thread DOES NOT start running immediately as constructed, instead needs to be started manually.
  */
 class Threaded : public Object {
 	GENERATED_BODY(Threaded, Object, CONSTRUCTOR_PACK(const std::function<void(void)>&, const std::string&, TickType_t, size_t, uint8_t, int8_t))
@@ -50,10 +50,6 @@ public:
 	virtual ~Threaded() noexcept override;
 
 public:
-	/**
-	 * @brief Starts the thread after all initial properties have been set.
-	 */
-	virtual void __postInitProperties() noexcept override;
 
 	/**
 	 * @brief Creates a native FreeRTOS thread.

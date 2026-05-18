@@ -147,7 +147,7 @@ private:
 
 	SemaphoreHandle_t dispatcherSem = nullptr;
 
-	Threaded dispatcherThread;
+	StrongObjectPtr<Threaded> dispatcherThread;
 	void dispatcherFunc();
 	void fetchEvents();
 };
