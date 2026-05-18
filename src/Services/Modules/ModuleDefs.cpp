@@ -112,7 +112,7 @@ const std::map<Type, std::array<PinMode, 6>>& GetPinModeMap(){
 			{ Type::RM_Motion, { PinMode::Input, PinMode::Output }},
 #endif
 #ifdef CONFIG_RM_CO2
-			{ Type::RM_CO2, { PinMode::Input }},
+			{ Type::RM_CO2, { PinMode::None, PinMode::None, PinMode::None, PinMode::None, PinMode::None, PinMode::Input }},
 #endif
 #ifdef CONFIG_RM_IR
 			{ Type::RM_IR, { PinMode::Input, PinMode::Output }},
