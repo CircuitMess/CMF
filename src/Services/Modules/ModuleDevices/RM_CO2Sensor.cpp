@@ -7,7 +7,7 @@ RM_CO2Sensor::RM_CO2Sensor(const Modules::BusPins& pins) : Super(Modules::Type::
 			.bitwidth = ADC_BITWIDTH_12
 	};
 
-	adc_pin = newObject<ADCReader>(this, static_cast<gpio_num_t>(pins.subAddressPins[0].inputPort), cfg, true);
+	adc_pin = newObject<ADCReader>(this, static_cast<gpio_num_t>(pins.subAddressPins[5].inputPort), cfg, true);
 }
 
 uint32_t RM_CO2Sensor::getReading(){
@@ -15,5 +15,5 @@ uint32_t RM_CO2Sensor::getReading(){
 }
 
 bool RM_CO2Sensor::isOK(){
-	return getReading() < OKThreshold;
+	return getReading() > OKThreshold;
 }

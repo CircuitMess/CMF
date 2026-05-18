@@ -135,6 +135,8 @@ private:
 
 		const bool det1 = pin1.driver->read(pin1.port);
 		const bool det2 = pin2.driver->read(pin2.port);
+
+		CMF_LOG(ModuleService, Debug, "det1: %d, det2: %d", det1, det2);
 		return det1 == 0 && det2 == 1;
 	}
 

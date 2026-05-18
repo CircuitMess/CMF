@@ -15,7 +15,7 @@ public:
 
 	bool isOK();
 private:
-	static constexpr uint32_t OKThreshold = 2100;
+	static constexpr uint32_t OKThreshold = 1100;
 	StrongObjectPtr<ADCReader> adc_pin;
 };
 
