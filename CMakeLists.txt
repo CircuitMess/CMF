@@ -50,6 +50,10 @@ set(EXCLUDED_ITEMS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_Perfboard.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Services/Modules/ModuleDevices/RM_TempHumModule.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Input/InputTouchGPIO.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Input/InputTouchGPIO.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Output/OutputMCPWM.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Output/OutputMCPWM.h"
         CACHE INTERNAL "" FORCE)
 
 foreach(SRC IN LISTS SRC_DIRS)
@@ -139,6 +143,16 @@ endif()
 # WiFi specific
 if(CONFIG_CMF_WIFI)
     list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Periphery/WiFi.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Periphery/WiFi.h")
+endif()
+
+# Touch specific
+if(CONFIG_CMF_TOUCH)
+    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Input/InputTouchGPIO.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Input/InputTouchGPIO.h")
+endif()
+
+# MCPWM specific
+if(CONFIG_CMF_MCPWM)
+list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Output/OutputMCPWM.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/Output/OutputMCPWM.h")
 endif()
 
 set(REQUIRED_COMPONENTS "esp_timer" "driver" "spiffs" "esp_adc" "esp_wifi" CACHE INTERNAL "" FORCE)
