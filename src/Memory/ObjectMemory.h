@@ -2,6 +2,7 @@
 #define CMF_OBJECTMEMORY_H
 
 #include <concepts>
+#include <span>
 #include "Cast.h"
 #include "Object/Object.h"
 #include "Memory/SmartPtr/StrongObjectPtr.h"
@@ -134,8 +135,8 @@ inline StrongObjectPtr<T> newObject(Object* owner = nullptr, Args&&... args) noe
  * @return The newly created object.
  */
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, Object* owner = nullptr) noexcept {
-	OutArchive archive = data;
+inline StrongObjectPtr<T> objectFromByteArray(std::span<const uint8_t> data, Object* owner = nullptr) noexcept {
+	OutArchive archive(data);
 	uint64_t classID = 0;
 	archive << classID;
 
@@ -157,12 +158,12 @@ inline StrongObjectPtr<T> objectFromByteArray(const std::vector<uint8_t>& data, 
  * @return True if successful, false if given object is invalid or of wrong type
  */
 template<typename T, typename = std::enable_if<std::derived_from<T, Object>, T>::type>
-inline bool objectFromByteArray(T* object, const std::vector<uint8_t>& data) noexcept {
+inline bool objectFromByteArray(T* object, std::span<const uint8_t> data) noexcept {
 	if(!isValid(object)) {
 		return false;
 	}
 
-	OutArchive archive = data;
+	OutArchive archive(data);
 	uint64_t classID = 0;
 	archive << classID;
 

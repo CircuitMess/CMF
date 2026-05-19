@@ -4,7 +4,7 @@
 #include <concepts>
 #include <cstdio>
 #include <numeric>
-#include <vector>
+#include <span>
 
 template<typename T = int, typename = std::enable_if<std::integral<T>, T>::type>
 class Enum {
@@ -14,7 +14,7 @@ public:
 	template<typename E>
 	inline constexpr Enum(E val) noexcept : value(static_cast<T>(val)) {}
 
-	inline virtual constexpr std::vector<T> getValues() const noexcept{
+	inline virtual constexpr std::span<const T> getValues() const noexcept{
 		return {};
 	}
 
@@ -38,7 +38,10 @@ private:
 			__VA_ARGS__																												\
 		};                                        																					\
 																																	\
-		inline virtual constexpr std::vector<Type> getValues() const noexcept override { return {__VA_ARGS__}; } 					\
+		inline std::span<const Type> getValues() const noexcept override {                                                          \
+			static constexpr Type __cmfEnumValues[] = { __VA_ARGS__ };                                                              \
+			return std::span<const Type>(__cmfEnumValues);                                                                          \
+		}                                                                                                                           \
 	}
 
 #define DECLARE_CLASS_ENUM_STARTING_WITH(Name, Type, First, ...) 																	\
@@ -54,7 +57,10 @@ private:
 			__VA_ARGS__																												\
 		};                                        																					\
 																																	\
-		inline virtual constexpr std::vector<Type> getValues() const noexcept override { return {__VA_ARGS__}; } 					\
+		inline std::span<const Type> getValues() const noexcept override {                                                          \
+			static constexpr Type __cmfEnumValues[] = { __VA_ARGS__ };                                                              \
+			return std::span<const Type>(__cmfEnumValues);                                                                          \
+		}                                                                                                                           \
 	}
 
 #define DECLARE_ENUM(Name, ...) DECLARE_CLASS_ENUM(Name, int, __VA_ARGS__)

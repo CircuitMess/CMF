@@ -1,9 +1,11 @@
 #ifndef CMF_ARCHIVE_H
 #define CMF_ARCHIVE_H
 
+#include <cstdint>
 #include <queue>
-#include <queue>
+#include <span>
 #include <string>
+#include <vector>
 
 /**
  * @brief The base archive class, functioning as the backbone and implementation of internal works for the in-only and out-only archives.
@@ -17,9 +19,9 @@ public:
 
 	/**
 	 * @brief Constructor from a given byte array.
-	 * @param queue Vector containing the archive data.
+	 * @param queue Span of bytes containing the archive data.
 	 */
-	Archive(const std::vector<uint8_t>& queue) noexcept;
+	Archive(std::span<const uint8_t> queue) noexcept;
 
 	/**
 	 * @brief Constructor from a give byte queue.
@@ -343,10 +345,10 @@ public:
 	InArchive() noexcept = default;
 
 	/**
-	 * @brief Constructor from a vector of byte data treated as a queue.
-	 * @param queue The vector of byte data.
+	 * @brief Constructor from a span of byte data treated as a queue.
+	 * @param queue The span of byte data.
 	 */
-	InArchive(const std::vector<uint8_t>& queue) noexcept;
+	InArchive(std::span<const uint8_t> queue) noexcept;
 
 	/**
 	 * @brief Constructor from a queue of byte data.
@@ -793,10 +795,10 @@ public:
 	OutArchive() noexcept = default;
 
 	/**
-	 * @brief The constructor from a vector of byte date treated as a queue.
-	 * @param queue The vector of byte data.
+	 * @brief The constructor from a span of byte data treated as a queue.
+	 * @param queue The span of byte data.
 	 */
-	OutArchive(const std::vector<uint8_t>& queue) noexcept;
+	OutArchive(std::span<const uint8_t> queue) noexcept;
 
 	/**
 	 * @brief The constructor from a queue of byte data.

@@ -1,6 +1,6 @@
 #include "Archive.h"
 
-Archive::Archive(const std::vector<uint8_t>& queue) noexcept {
+Archive::Archive(std::span<const uint8_t> queue) noexcept {
 	for(uint8_t value : queue) {
 		pushDataPoint(value);
 	}
@@ -41,7 +41,7 @@ bool Archive::popDataPoint(uint8_t& data) noexcept {
 	return true;
 }
 
-InArchive::InArchive(const std::vector<uint8_t>& queue) noexcept : Archive(queue) {}
+InArchive::InArchive(std::span<const uint8_t> queue) noexcept : Archive(queue) {}
 
 InArchive::InArchive(const std::queue<uint8_t>& queue) noexcept : Archive(queue) {}
 
@@ -516,7 +516,7 @@ Archive& InArchive::operator << (const std::vector<std::wstring>& data) noexcept
 	return *this;
 }
 
-OutArchive::OutArchive(const std::vector<uint8_t>& queue) noexcept : Archive(queue) {}
+OutArchive::OutArchive(std::span<const uint8_t> queue) noexcept : Archive(queue) {}
 
 OutArchive::OutArchive(const std::queue<uint8_t>& queue) noexcept : Archive(queue) {}
 
