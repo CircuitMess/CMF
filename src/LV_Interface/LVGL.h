@@ -7,10 +7,9 @@
 #include "Entity/AsyncEntity.h"
 
 class LVGL : public AsyncEntity {
-	GENERATED_BODY(LVGL, AsyncEntity, void)
+	GENERATED_BODY(LVGL, AsyncEntity, CONSTRUCTOR_PACK(Display*, std::function<lv_theme_t*(lv_disp_t*)>))
 
 public:
-	LVGL() = default;
 	LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit = {});
 
 	void startScreen(std::function<std::unique_ptr<LVScreen>()> create, lv_screen_load_anim_t anim = LV_SCR_LOAD_ANIM_NONE);
@@ -29,7 +28,7 @@ public:
 	void startThread() noexcept;
 
 protected:
-	void __postInitProperties() noexcept override;
+	void begin() noexcept override;
 
 private:
 	Display* display;
@@ -42,7 +41,7 @@ private:
 
 	std::unique_ptr<LVScreen> currentScreen;
 
-	bool threadStarted = false;
+	SemaphoreHandle_t initSem;
 };
 
 #endif //CMF_LVGL_H

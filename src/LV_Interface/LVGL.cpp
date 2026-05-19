@@ -10,16 +10,6 @@
 
 DEFINE_LOG(LVGL)
 
-void LVGL::__postInitProperties() noexcept {
-	// Thread is not started automatically; call startThread() after startScreen().
-}
-
-void LVGL::startThread() noexcept {
-	if(threadStarted) return;
-	threadStarted = true;
-	AsyncEntity::__postInitProperties();
-}
-
 LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : AsyncEntity(0, 8192, 5, 1), display(display){
 	lv_init();
 
@@ -36,6 +26,8 @@ LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) :
 	if(themeInit){
 		lv_display_set_theme(lvDisplay, themeInit(lvDisplay));
 	}
+
+	initSem = xSemaphoreCreateBinary();
 }
 
 void LVGL::tick(float deltaTime) noexcept{
@@ -148,4 +140,12 @@ void LVGL::drawImage(const char* src){
 void LVGL::resetDisplayRefreshTimer(){
 	auto timer = lv_display_get_refr_timer(lvDisplay);
 	lv_timer_reset(timer);
+}
+
+void LVGL::startThread() noexcept{
+	xSemaphoreGive(initSem);
+}
+
+void LVGL::begin() noexcept{
+	xSemaphoreTake(initSem, portMAX_DELAY);
 }
