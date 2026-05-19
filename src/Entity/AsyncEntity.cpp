@@ -24,13 +24,6 @@ AsyncEntity::~AsyncEntity() noexcept {
 	// Thread will automatically get deleted as a child of this object, no need to explicitely delete it
 }
 
-void AsyncEntity::__postInitProperties() noexcept {
-	Super::__postInitProperties();
-
-	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
-	thread->start();
-}
-
 void AsyncEntity::setOwner(Object* object) noexcept{
 	// This is on purpose, async entities should not have an owner to try to prevent accidental circular ownership and issues with event scanning
 	Super::setOwner(nullptr);
@@ -46,6 +39,21 @@ TickType_t AsyncEntity::getEventScanningTime() const noexcept {
 
 void AsyncEntity::setEventScanningTime(TickType_t value) noexcept {
 	eventScanningTime = value;
+}
+
+void AsyncEntity::__postInitProperties() noexcept {
+	Super::__postInitProperties();
+
+	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
+	thread->start();
+}
+
+void AsyncEntity::__begin() noexcept{
+	Super::__begin();
+}
+
+void AsyncEntity::__tick(float deltaTime) noexcept{
+	Super::__tick(deltaTime);
 }
 
 void AsyncEntity::tickHandle() noexcept{

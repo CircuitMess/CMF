@@ -34,11 +34,6 @@ public:
 
 protected:
 	/**
-	 * @brief Creates the thread of the entity and starts its execution.
-	 */
-	virtual void __postInitProperties() noexcept override;
-
-	/**
 	 * @brief Ensures that the owner set is always nullptr since async entities cannot have an owner.
 	 * @param object The owner object, always ignored and set to nullptr.
 	 */
@@ -55,6 +50,15 @@ protected:
 	void setEventScanningTime(TickType_t value) noexcept;
 
 private:
+	/**
+	 * @brief Creates the thread of the entity and starts its execution.
+	 */
+	virtual void __postInitProperties() noexcept override final;
+
+	virtual void __begin() noexcept override final;
+
+	virtual void __tick(float deltaTime) noexcept override final;
+
 	/**
 	 * @brief The internal tick handle which is running within the native thread.
 	 * This function calls the tick and event scanning of this object,

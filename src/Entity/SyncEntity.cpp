@@ -70,3 +70,7 @@ void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{
 		setOwner(ApplicationStatics::getApplication());
 	}
 }
+
+void SyncEntity::__postInitProperties() noexcept{
+	Super::__postInitProperties();
+}

@@ -28,14 +28,14 @@ public:
 	 * @brief Controls the lifetime functionality of all synch entity children of this entity.
 	 * @param deltaTime Time since the last tick call.
 	 */
-	virtual void __tick(float deltaTime) noexcept override;
+	virtual void __tick(float deltaTime) noexcept override final;
 
 	virtual void tick(float deltaTime) noexcept override;
 
 	/**
 	 * @brief Also calls the begin of all children entities.
 	 */
-	virtual void __begin() noexcept override;
+	virtual void __begin() noexcept override final;
 
 	virtual void begin() noexcept override;
 
@@ -45,6 +45,9 @@ protected:
 	 * @param oldOwner 
 	 */
 	virtual void onOwnerChanged(Object* oldOwner) noexcept override;
+
+private:
+	virtual void __postInitProperties() noexcept override final;
 
 private:
 	// TODO remove or change to Object
