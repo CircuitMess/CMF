@@ -107,6 +107,11 @@ void Object::forEachChild(const std::function<bool(Object*)>& function) noexcept
 	}
 }
 
+size_t Object::getChildCount() noexcept{
+	std::lock_guard guard(accessMutex);
+	return childrenObjects.size();
+}
+
 void Object::setInstigator(Object* object) noexcept{
 	Object* oldInstigator = nullptr;
 

@@ -127,6 +127,12 @@ public:
 	void forEachChild(const std::function<bool(Object*)>& function) noexcept;
 
 	/**
+	 *
+	 * @return Number of children of the Object
+	 */
+	size_t getChildCount() noexcept;
+
+	/**
 	 * @return The owner of the object.
 	 */
 	inline constexpr Object* getOwner() const noexcept{
