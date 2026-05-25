@@ -16,7 +16,7 @@ public:
 	 * @param onTime - blink duration in seconds, will be repeated every period, must be less than period!
 	 * @param count - number of blink cycles to be repeated, or 0 for infinite blinks
 	 */
-	LEDBlinkFunction(DataT value, float period, float onTime, uint32_t count = 0) : value(value), count(count), period(period), onTime(onTime){
+	LEDBlinkFunction(DataT value, float period, float onTime, uint32_t count = 0) : value(value), count(count), period(period), onTime(onTime), nextTickTime(millis()){
 		if(onTime >= period){
 			CMF_LOG(CMF, LogLevel::Error, "Blink on-time must be less than period!");
 			invalidConfig = true;
@@ -38,11 +38,15 @@ public:
 	}
 
 	virtual TickType_t getInterval() const noexcept override{
-		if(state){
-			return static_cast<TickType_t>((period - onTime) * 1000 / portTICK_PERIOD_MS);
+		if(!Super::hasBegun()){
+			return 0;
 		}
 
-		return static_cast<TickType_t>(onTime * 1000 / portTICK_PERIOD_MS);
+		if(millis() >= nextTickTime){
+			return 0;
+		}
+
+		return nextTickTime - millis();
 	}
 
 private:
@@ -51,9 +55,20 @@ private:
 
 		timer += deltaTime;
 
+		const bool lastState = state;
+
 		state = false;
 		if(fmodf(timer, period) <= onTime){
 			state = true;
+		}
+
+		if(lastState != state){
+			if(state){
+				nextTickTime += onTime * 1000 / portTICK_PERIOD_MS;
+			}else{
+				const uint64_t offTime = period - onTime;
+				nextTickTime += offTime * 1000 / portTICK_PERIOD_MS;
+			}
 		}
 
 		elapsedCount = timer / period;
@@ -63,6 +78,7 @@ private:
 	uint32_t count;
 	float period;
 	float onTime;
+	uint64_t nextTickTime;
 
 	float timer = 0;
 	uint32_t elapsedCount = 0;

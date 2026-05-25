@@ -19,10 +19,23 @@ class LEDFunction : public SyncEntity {
 	GENERATED_BODY(LEDFunction, SyncEntity, void)
 
 public:
+	/**
+	 *
+	 * @return True when the LEDFunction is finished, false otherwise.
+	 */
 	virtual bool isDone() const noexcept{ return true; }
 
+	/**
+	 *
+	 * @return The value to set the LED to at the time of the function call.
+	 */
 	virtual DataT getValue() const noexcept{ return {}; }
 
+	/**
+	 *
+	 * @return The time until next needed change to the LED state. This directly affects the ticking period of LEDFunction as well as LED service.
+	 * The smallest interval of all functions is the one taken for the LED service ticking interval.
+	 */
 	virtual TickType_t getInterval() const noexcept{ return portMAX_DELAY; }
 };
 
@@ -39,6 +52,10 @@ public:
 		}
 	}
 
+	/**
+	 *
+	 * @return The time to wait until the next tick for the LED service and all children functions. Returns the minimum interval of all current functions.
+	 */
 	virtual TickType_t getInterval(){
 		static constexpr TickType_t defaultInterval = portMAX_DELAY;
 
@@ -73,6 +90,11 @@ public:
 		return interval / portTICK_PERIOD_MS;
 	}
 
+	/**
+	 * @brief Registers an LED and its output pins.
+	 * @param led LED being registered
+	 * @param pins The output pin(s) for that LED
+	 */
 	void reg(LED led, std::array<OutputPin, sizeof(DataT) / sizeof(float)> pins) noexcept{
 		accessMutex.lock();
 		outputs[led] = pins;
@@ -81,6 +103,10 @@ public:
 		off(led);
 	}
 
+	/**
+	 * @brief Turns the LED off (sets its value to DataT()).
+	 * @param led The LED to turn off.
+	 */
 	void off(LED led) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
@@ -102,6 +128,11 @@ public:
 		xSemaphoreGive(waitSemaphores[led]);
 	}
 
+	/**
+	 * @brief Turn the LED on.
+	 * @param led LED to turn on.
+	 * @param level The level to set to the LED output.
+	 */
 	void on(LED led, DataT level) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
@@ -123,6 +154,12 @@ public:
 		xSemaphoreGive(waitSemaphores[led]);
 	}
 
+	/**
+	 * @brief Set a function to the LED. If temporary, when the function ends, the old one will be reactivated.
+	 * @param led LED to set a function to.
+	 * @param function LED function for the LED
+	 * @param temp If the function is temporary or not
+	 */
 	void set(LED led, StrongObjectPtr<LEDFunction<LED, DataT>> function, bool temp = false) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
@@ -158,6 +195,11 @@ public:
 		}
 	}
 
+	/**
+	 *
+	 * @param led The LED to of the value.
+	 * @return The value set to the output of the LED.
+	 */
 	DataT getValue(LED led) noexcept requires (std::same_as<DataT, float>){
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
@@ -169,6 +211,11 @@ public:
 		return pin.driver->getState(pin.port);
 	}
 
+	/**
+	 *
+	 * @param led The LED to of the value.
+	 * @return The value set to the output of the LED.
+	 */
 	DataT getValue(LED led) noexcept requires (std::same_as<DataT, glm::vec3>){
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
@@ -224,6 +271,12 @@ public:
 		}
 	}
 
+	/**
+	 * @brief Block the active thread for {wait} milliseconds maximum until the function on the given LED finishes.
+	 * @param led LED to wait on.
+	 * @param wait Wait time.
+	 * @return True if successful.
+	 */
 	bool waitFor(LED led, TickType_t wait){
 		{
 			std::lock_guard guard(accessMutex);
