@@ -26,10 +26,16 @@ public:
 	explicit StateMachine(const SubclassOf<State>& startingState = nullptr, TickType_t interval = CONFIG_CMF_STATEMACHINE_TICK_INTERVAL / portTICK_PERIOD_MS, size_t stackSize = CONFIG_CMF_STATEMACHINE_STACK_SIZE, uint8_t threadPriority = CONFIG_CMF_STATEMACHINE_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_STATEMACHINE_CPU_CORE) noexcept;
 
 	/**
-	 * @brief
-	 * @return
+	 *
+	 * @return The current state.
 	 */
 	State* getActiveState() const noexcept;
+
+	/**
+	 *
+	 * @return The next state waiting to transition into.
+	 */
+	const Class* getNextState() const noexcept;
 
 	/**
 	 * @brief This is used to avoid large pauses between states when transitioning

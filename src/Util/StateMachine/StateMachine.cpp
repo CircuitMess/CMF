@@ -13,6 +13,10 @@ State* StateMachine::getActiveState() const noexcept{
 	return current.get();
 }
 
+const Class* StateMachine::getNextState() const noexcept{
+	return *next;
+}
+
 TickType_t StateMachine::getEventScanningTime() const noexcept{
 	if(next != nullptr){
 		return 0;
