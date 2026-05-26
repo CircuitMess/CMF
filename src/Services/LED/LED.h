@@ -119,9 +119,11 @@ public:
 		prevStates[led] = DataT(); //zero-value
 
 		if(currentFunctions.contains(led)){
+			destroyFunction(currentFunctions[led].function);
 			currentFunctions.erase(led);
 		}
 		if(prevFunctions.contains(led)){
+			destroyFunction(prevFunctions[led].function);
 			prevFunctions.erase(led);
 		}
 
@@ -145,9 +147,11 @@ public:
 		prevStates[led] = level;
 
 		if(currentFunctions.contains(led)){
+			destroyFunction(currentFunctions[led].function);
 			currentFunctions.erase(led);
 		}
 		if(prevFunctions.contains(led)){
+			destroyFunction(prevFunctions[led].function);
 			prevFunctions.erase(led);
 		}
 
@@ -175,7 +179,12 @@ public:
 		if(currentFunctions.contains(led)){
 			alreadyLocked = true;
 			if(!currentFunctions[led].isTemporary){
+				if(prevFunctions.contains(led)){
+					destroyFunction(prevFunctions[led].function);
+				}
 				prevFunctions[led] = std::move(currentFunctions[led]);
+			}else{
+				destroyFunction(currentFunctions[led].function);
 			}
 		}
 
@@ -252,6 +261,8 @@ public:
 
 			xSemaphoreGive(waitSemaphores[led]);
 
+			destroyFunction(func.function);
+
 			if(prevFunctions.contains(led)){
 				currentFunctions[led].function = std::move(prevFunctions[led].function);
 				currentFunctions[led].isTemporary = prevFunctions[led].isTemporary;
@@ -321,6 +332,12 @@ private:
 			if(!pin.driver) continue;
 
 			pin.driver->write(pin.port, false);
+		}
+	}
+
+	void destroyFunction(StrongObjectPtr<LEDFunction<LED, DataT>>& function) noexcept{
+		if(function.isValid()){
+			delete *function;
 		}
 	}
 
