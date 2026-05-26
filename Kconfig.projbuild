@@ -52,24 +52,59 @@ config CMF_MODULES
     menu "Supported modules"
         depends on CMF_MODULES
 
-    config RM_TempHum
-        bool "RM_TempHum module"
+    menuconfig CMF_MODULES_RM
+        bool "Rick and Morty modules"
         default "n"
-    config RM_LED
-        bool "RM_LED module"
+        help
+            Enable detection and support for the Rick and Morty module set.
+            When enabled, the ModuleService will read the sub-address pins
+            and probe I2C addresses required to detect Rick and Morty modules.
+
+    if CMF_MODULES_RM
+        config RM_TempHum
+            bool "RM_TempHum module"
+            default "n"
+        config RM_LED
+            bool "RM_LED module"
+            default "n"
+        config RM_Motion
+            bool "RM_Motion module"
+            default "n"
+        config RM_CO2
+            bool "RM_CO2 module"
+            default "n"
+        config RM_IR
+            bool "RM_IR module"
+            default "n"
+        config RM_PerfBoard
+            bool "RM_PerfBoard module"
+            default "n"
+    endif
+
+    menuconfig CMF_MODULES_ROVER_I2C
+        bool "Rover I2C modules"
         default "n"
-    config RM_Motion
-        bool "RM_Motion module"
+        help
+            Enable detection and support for the Rover I2C module set.
+            When enabled, the ModuleService will probe the I2C bus for
+            Rover I2C modules during detection.
+
+    if CMF_MODULES_ROVER_I2C
+        # No individual Rover I2C modules are defined yet.
+    endif
+
+    menuconfig CMF_MODULES_TOKEN
+        bool "Wacky robot tokens"
         default "n"
-    config RM_CO2
-        bool "RM_CO2 module"
-        default "n"
-    config RM_IR
-        bool "RM_IR module"
-        default "n"
-    config RM_PerfBoard
-        bool "RM_PerfBoard module"
-        default "n"
+        help
+            Enable detection and support for the Wacky robot tokens
+            (Bit / STEM adventure tokens) module set. When enabled, the
+            ModuleService will read all six sub-address pins to determine
+            the token address during detection.
+
+    if CMF_MODULES_TOKEN
+        # No individual Wacky robot token modules are defined yet.
+    endif
 
     endmenu
 

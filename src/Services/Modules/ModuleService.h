@@ -175,12 +175,19 @@ private:
 		 * I2C values don't make sense to cache here, since every possible I2C address needs to be probed individually
 		 * (instead of being read once and then compared multiple times)
 		 */
+#ifdef CONFIG_CMF_MODULES_RM
 		std::optional<uint8_t> ReadRMAddress;
+#endif
+#ifdef CONFIG_CMF_MODULES_TOKEN
 		std::optional<uint8_t> ReadTokenAddress;
+#endif
 
 		//Check every possible subAddress for this mainAddress, stop when match is found
+		//Each branch is compiled in only if the corresponding Module set is enabled,
+		//so sub-address pins / I2C probes for un-selected sets are never touched.
 		for(const Modules::SubAddress& subAddress : subAddressSet){
 			if(subAddress.type == Modules::SubAddress::Type::RM){
+#ifdef CONFIG_CMF_MODULES_RM
 				/* RM non-I2C modules are sub-addressed using subAddr pins 4 - 6 (3 bits)  */
 				if(!ReadRMAddress){
 					uint8_t RMAddr = 0;
@@ -198,13 +205,25 @@ private:
 					readSubAddress = subAddress;
 					break;
 				}
-			}else if(subAddress.type == Modules::SubAddress::Type::RM_I2C || subAddress.type == Modules::SubAddress::Type::Rover_I2C){
-				/* RM I2C and Rover I2C addresses determined by probing */
+#endif
+			}else if(subAddress.type == Modules::SubAddress::Type::RM_I2C){
+#ifdef CONFIG_CMF_MODULES_RM
+				/* RM I2C addresses determined by probing */
 				if(busPins[bus].i2c->probe(subAddress.I2CAddress) == ESP_OK){
 					readSubAddress = subAddress;
 					break;
 				}
+#endif
+			}else if(subAddress.type == Modules::SubAddress::Type::Rover_I2C){
+#ifdef CONFIG_CMF_MODULES_ROVER_I2C
+				/* Rover I2C addresses determined by probing */
+				if(busPins[bus].i2c->probe(subAddress.I2CAddress) == ESP_OK){
+					readSubAddress = subAddress;
+					break;
+				}
+#endif
 			}else if(subAddress.type == Modules::SubAddress::Type::Token){
+#ifdef CONFIG_CMF_MODULES_TOKEN
 				/* Bit/Wacky robots are sub-addressed using all 6 SubAddress pins */
 				if(!ReadTokenAddress){
 					uint8_t tokenAddr = 0;
@@ -222,6 +241,7 @@ private:
 					readSubAddress = subAddress;
 					break;
 				}
+#endif
 			}
 		}
 
@@ -287,14 +307,37 @@ private:
 	}
 
 	/**
-	 * Registers all subAddress pins to their InputDrivers.
-	 * This enables using them for address scanning.
+	 * Registers the subAddress pins needed to detect modules of the selected
+	 * Module sets to their InputDrivers, so they can be sampled during detection.
+	 *
+	 * Pins which no enabled Module set relies on are deliberately left unregistered
+	 * so they aren't touched during detection; the corresponding InputDriver entry
+	 * is added later by registerSubAddressPinsModule() if (and only if) a detected
+	 * Module requires that pin as an input.
+	 *
+	 * Pin layout per set (see checkAddr):
+	 *  - Wacky robot tokens (CMF_MODULES_TOKEN): all 6 sub-address pins
+	 *  - Rick and Morty non-I2C (CMF_MODULES_RM): sub-address pins 3..5
+	 *  - I2C-only sets (RM_I2C, Rover_I2C): no sub-address pins used at all
+	 *
 	 * @param bus
 	 */
 	void registerSubAddressPinsInput(uint8_t bus){
+#if defined(CONFIG_CMF_MODULES_TOKEN)
+		// Tokens use all 6 sub-address pins; this is a strict superset of the RM pin set.
 		for(const auto& pin : busPins[bus].subAddressPins){
-			pin.inputDriver->registerInput({ pin.inputPort });
+			if(pin.inputDriver) pin.inputDriver->registerInput({ pin.inputPort });
 		}
+#elif defined(CONFIG_CMF_MODULES_RM)
+		// RM non-I2C modules only use sub-address pins 3..5.
+		for(uint8_t i = 3; i < 6; i++){
+			const auto& pin = busPins[bus].subAddressPins[i];
+			if(pin.inputDriver) pin.inputDriver->registerInput({ pin.inputPort });
+		}
+#else
+		// No selected Module set needs sub-address pins for detection.
+		(void) bus;
+#endif
 	}
 
 	void registerSubAddressPinsModule(uint8_t bus, Modules::Type type){
