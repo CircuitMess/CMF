@@ -18,7 +18,8 @@ dependencies:
       - if: "$CONFIG{CMF_CAMERA} == True"
 
   LIS2DW12:
-    git: https://github.com/CircuitMess/lis2dw12-pid
+    git: https://github.com/CircuitMess/lis2dw12-pid.git
+    version: master
 
   idf:
     version: '>=5.5.3' # ESP-IDF v5.5.3 fixed a bug with conditional dependencies, so this is necessary to work
