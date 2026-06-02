@@ -1,44 +1,80 @@
 #include "ArchiveCache.h"
-#include "SPIFFS.h"
+#include <vector>
 #include "Log/Log.h"
-#include <cstring>
+#include "FileSystem/RamFile.h"
 
 DEFINE_LOG(ArchiveCache)
 
-ArchiveCache::ArchiveCache(const std::vector<std::string>& paths) : paths(paths){
-	archives.reserve(paths.size());
-}
+ArchiveCache::ArchiveCache(File file){
+	file.seek(0);
+	uint32_t count = 0;
+	file.read((uint8_t*) &count, 4);
 
-void ArchiveCache::load(){
-	if(loaded) return;
-	loaded = true;
+	std::vector<Entry> tmp;
+	tmp.reserve(count);
 
-	for(const auto& path : paths){
-		const auto filename = path + ".sz";
+	size_t totalSize = 0;
 
-		auto file = SPIFFS::open(filename.c_str());
-		if(!file){
-			CMF_LOG(ArchiveCache, LogLevel::Warning, "Can't open archive %s", path.c_str());
-			continue;
+	while(file.available()){
+		std::string name;
+		name.reserve(32);
+		while(file.available()){
+			if(name.length() >= 32){
+				CMF_LOG(ArchiveCache, LogLevel::Error, "Too big filename; %s...", name.c_str());
+				abort();
+			}
+
+			char c = 0;
+			file.read((uint8_t*) &c, 1);
+			if(c == 0) break;
+
+			name.append(1, c);
 		}
 
-		archives.emplace(path, FileArchive(file));
+		if(name.empty()) break;
+
+		size_t size = 0;
+		file.read((uint8_t*) &size, 4);
+
+		tmp.emplace_back(Entry { name, size, 0 });
+	}
+
+	data = (uint8_t*) malloc(totalSize);
+	externalData = false;
+
+	if(data == nullptr){
+		CMF_LOG(ArchiveCache, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
+		return;
+	}
+
+	size_t offset = 0;
+
+	for(auto& entry : tmp){
+		file.read(data + offset, entry.size);
+		entry.offset = offset;
+
+		offset += entry.size;
+
+		entries.insert(std::make_pair(entry.name, std::move(entry)));
 	}
 }
 
-void ArchiveCache::unload(){
-	if(!loaded) return;
-	loaded = false;
+ArchiveCache::~ArchiveCache(){
+	if(!externalData){
+		free(data);
+	}
+}
 
-	archives.clear();
+void ArchiveCache::load(){
+}
+
+void ArchiveCache::unload(){
 }
 
 File ArchiveCache::open(const char* path){
-	const char* slash = strchr(path+1, '/');
-	if(slash == nullptr) return { };
+	const auto entry = entries.find(path);
+	if(entry == entries.end()) return File();
 
-	const auto archive = archives.find(std::string(path, slash));
-	if(archive == archives.end()) return { };
-
-	return archive->second.get(slash+1, path);
+	auto f = std::make_shared<RamFile>(data + entry->second.offset, entry->second.size, path);
+	return File(f);
 }
