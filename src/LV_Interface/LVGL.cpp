@@ -31,6 +31,12 @@ LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) :
 }
 
 void LVGL::tick(float deltaTime) noexcept{
+	// Apply any queued transition before running the current screen's loop or
+	// the LVGL timer handler. AsyncEntity guarantees scanEvents() has returned
+	// before tick() runs, so destroying currentScreen here can no longer
+	// invalidate an EventHandle still being iterated by its scan loop.
+	applyPendingScreen();
+
 	if(currentScreen && currentScreen->loaded){
 		currentScreen->loop();
 	}
@@ -64,9 +70,23 @@ void LVGL::resume(){
 }
 
 void LVGL::startScreen(std::function<std::unique_ptr<LVScreen>()> create, lv_screen_load_anim_t anim){
+	// Queue the transition; tick() applies it on the next iteration, after
+	// scanEvents() has returned. Last queued transition wins if startScreen is
+	// called multiple times before the next tick.
+	nextScreenCreate = std::move(create);
+	nextScreenAnim = anim;
+}
+
+void LVGL::applyPendingScreen(){
+	if(!nextScreenCreate) return;
+
+	auto create = std::move(nextScreenCreate);
+	const auto anim = nextScreenAnim;
+	nextScreenCreate = nullptr;
+
 	if(anim == LV_SCR_LOAD_ANIM_NONE){
 		stopScreen();
-	}else{
+	}else if(currentScreen){
 		currentScreen->stop();
 		currentScreen.release(); // Will get auto deleted by LVGL
 	}
