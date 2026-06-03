@@ -1,23 +1,23 @@
-#include "Log/Log.h"
 #include "RawCache.h"
+#include "Log/Log.h"
 #include "SPIFFS.h"
 #include "RamFile.h"
 
 DEFINE_LOG(RawCache)
 
-RawCache::RawCache(){ }
+RawCache::RawCache(FileCache* archiveCache) : archiveCache(archiveCache){ }
 
 RawCache::RawCache(const std::vector<std::string>& paths) : paths(paths){
 	files.reserve(paths.size());
 }
 
-void RawCache::setPaths(const std::vector<std::string>& paths){
+void RawCache::setPaths(const std::vector<std::string>& filePaths){
 	if(loaded) return;
 
-	this->paths = paths;
+	paths = filePaths;
 
-	if(files.bucket_count() < paths.size()){
-		files.reserve(paths.size());
+	if(files.bucket_count() < filePaths.size()){
+		files.reserve(filePaths.size());
 	}
 }
 
@@ -26,7 +26,8 @@ void RawCache::load(){
 	loaded = true;
 
 	for(const auto& path : paths){
-		File file = SPIFFS::open(path.c_str());
+		// If using ArchiveCache, find file in it instead of spiffs
+		File file = archiveCache ? archiveCache->open(path.c_str()) : SPIFFS::open(path.c_str());
 		if(!file){
 			CMF_LOG(RawCache, LogLevel::Warning, "Can't open file %s", path.c_str());
 			continue;
