@@ -21,6 +21,10 @@ dependencies:
     git: https://github.com/CircuitMess/lis2dw12-pid.git
     version: master
 
+  heatshrink:
+    git: https://github.com/laride/heatshrink.git
+    version: "esp/master"
+
   idf:
     version: '>=5.5.3' # ESP-IDF v5.5.3 fixed a bug with conditional dependencies, so this is necessary to work
     

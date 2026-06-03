@@ -9,7 +9,7 @@
 class CompressedFile : public FileImpl {
 public:
 	CompressedFile(File file, bool use32bAligned = false);
-	CompressedFile(uint8_t* data, size_t size, const char* name);
+	CompressedFile(const uint8_t* compressedData, size_t compressedSize, const char* name, bool use32bAligned = false);
 	~CompressedFile() override;
 
 	operator bool() override;
@@ -28,11 +28,12 @@ public:
 	size_t pos() const override;
 
 private:
+	static uint8_t* decompress(const uint8_t* compressedData, size_t compressedSize, size_t& outSize, bool use32bAligned);
+
 	uint8_t* data = nullptr;
 	size_t cursor = 0;
 	std::string filePath;
 	size_t fileSize = 0;
-	bool borrowed = false;
 };
 
 #endif //BUTTERBOTCTRL_FIRMWARE_COMPRESSEDFILE_H

@@ -3,6 +3,10 @@
 #include "Log/Log.h"
 #include "FileSystem/RamFile.h"
 
+extern "C" {
+#include <heatshrink_decoder.h>
+}
+
 DEFINE_LOG(ArchiveCache)
 
 ArchiveCache::ArchiveCache(const File& file) : archiveFile(file){
@@ -22,7 +26,7 @@ void ArchiveCache::load(){
 
 	archiveFile.seek(0);
 	uint32_t count = 0;
-	archiveFile.read((uint8_t*) &count, 4);
+	archiveFile.read((uint8_t*)&count, 4);
 
 	std::vector<Entry> tmp;
 	tmp.reserve(count);
@@ -39,7 +43,7 @@ void ArchiveCache::load(){
 			}
 
 			char c = 0;
-			archiveFile.read((uint8_t*) &c, 1);
+			archiveFile.read((uint8_t*)&c, 1);
 			if(c == 0) break;
 
 			name.append(1, c);
@@ -48,13 +52,13 @@ void ArchiveCache::load(){
 		if(name.empty()) break;
 
 		size_t size = 0;
-		archiveFile.read((uint8_t*) &size, 4);
+		archiveFile.read((uint8_t*)&size, 4);
 		totalSize += size;
 
-		tmp.emplace_back(Entry { name, size, 0 });
+		tmp.emplace_back(Entry{ name, size, 0 });
 	}
 
-	data = (uint8_t*) malloc(totalSize);
+	data = (uint8_t*)malloc(totalSize);
 
 	if(data == nullptr){
 		CMF_LOG(ArchiveCache, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
