@@ -5,27 +5,41 @@
 
 DEFINE_LOG(ArchiveCache)
 
-ArchiveCache::ArchiveCache(File file){
-	file.seek(0);
+ArchiveCache::ArchiveCache(const File& file) : archiveFile(file){
+	if(!file){
+		CMF_LOG(ArchiveCache, LogLevel::Error, "File not opened: %s", file.name());
+	}
+	ArchiveCache::load();
+}
+
+ArchiveCache::~ArchiveCache(){
+	free(data);
+}
+
+void ArchiveCache::load(){
+	if(loaded) return;
+	loaded = true;
+
+	archiveFile.seek(0);
 	uint32_t count = 0;
-	file.read((uint8_t*) &count, 4);
+	archiveFile.read((uint8_t*) &count, 4);
 
 	std::vector<Entry> tmp;
 	tmp.reserve(count);
 
 	size_t totalSize = 0;
 
-	while(file.available()){
+	while(archiveFile.available()){
 		std::string name;
 		name.reserve(32);
-		while(file.available()){
+		while(archiveFile.available()){
 			if(name.length() >= 32){
 				CMF_LOG(ArchiveCache, LogLevel::Error, "Too big filename; %s...", name.c_str());
 				abort();
 			}
 
 			char c = 0;
-			file.read((uint8_t*) &c, 1);
+			archiveFile.read((uint8_t*) &c, 1);
 			if(c == 0) break;
 
 			name.append(1, c);
@@ -34,13 +48,13 @@ ArchiveCache::ArchiveCache(File file){
 		if(name.empty()) break;
 
 		size_t size = 0;
-		file.read((uint8_t*) &size, 4);
+		archiveFile.read((uint8_t*) &size, 4);
+		totalSize += size;
 
 		tmp.emplace_back(Entry { name, size, 0 });
 	}
 
 	data = (uint8_t*) malloc(totalSize);
-	externalData = false;
 
 	if(data == nullptr){
 		CMF_LOG(ArchiveCache, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
@@ -50,7 +64,7 @@ ArchiveCache::ArchiveCache(File file){
 	size_t offset = 0;
 
 	for(auto& entry : tmp){
-		file.read(data + offset, entry.size);
+		archiveFile.read(data + offset, entry.size);
 		entry.offset = offset;
 
 		offset += entry.size;
@@ -59,22 +73,17 @@ ArchiveCache::ArchiveCache(File file){
 	}
 }
 
-ArchiveCache::~ArchiveCache(){
-	if(!externalData){
-		free(data);
-	}
-}
-
-void ArchiveCache::load(){
-}
-
 void ArchiveCache::unload(){
+	if(!loaded) return;
+	loaded = false;
+
+	entries.clear();
 }
 
 File ArchiveCache::open(const char* path){
 	const auto entry = entries.find(path);
 	if(entry == entries.end()) return File();
 
-	auto f = std::make_shared<RamFile>(data + entry->second.offset, entry->second.size, path);
-	return File(f);
+	const auto ramFile = std::make_shared<RamFile>(data + entry->second.offset, entry->second.size, path);
+	return File(ramFile);
 }

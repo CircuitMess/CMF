@@ -8,7 +8,7 @@
 
 class ArchiveCache : public FileCache {
 public:
-	ArchiveCache(File file);
+	ArchiveCache(const File& file);
 	~ArchiveCache() override;
 
 	void load() override;
@@ -25,8 +25,9 @@ private:
 
 	std::unordered_map<std::string, const Entry> entries;
 
-	bool externalData = false;
+	bool loaded = false;
 	uint8_t* data = nullptr;
+	File archiveFile;
 };
 
 #endif //CMF_ARCHIVECACHE_H
