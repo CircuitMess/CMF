@@ -16,6 +16,8 @@ public:
 
 	File open(const char* path) override;
 
+	void setArchiveFile(const File& file);
+
 private:
 	struct Entry {
 		const std::string name;

@@ -20,6 +20,13 @@ ArchiveCache::~ArchiveCache(){
 	free(data);
 }
 
+void ArchiveCache::setArchiveFile(const File& file){
+	if(!file){
+		CMF_LOG(ArchiveCache, LogLevel::Error, "New file not opened: %s", file.name());
+	}
+	archiveFile = file;
+}
+
 void ArchiveCache::load(){
 	if(loaded) return;
 	loaded = true;
