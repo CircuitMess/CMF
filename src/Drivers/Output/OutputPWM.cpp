@@ -38,7 +38,7 @@ void OutputPWM::attach(int port){
 			.timer_sel      = getTimer(port),
 			.duty           = 0,
 			.hpoint         = 0,
-			.flags = { .output_invert = false } //this is accounted for in parent abstraction
+			.flags = { .output_invert = getInversions()[port] }
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
@@ -58,6 +58,14 @@ void OutputPWM::detach(int port){
 }
 
 void OutputPWM::performWrite(int port, float value) noexcept{
+	/**
+	 * LEDC's (hardware-based) inversion needs to be used, otherwise pin will experience an initial glitch.
+	 * Since parent interface OutputDriver already handles inversion, we need to reverse it here.
+	 */
+	if(getInversions()[port]){
+		value = 1.0f - value;
+	}
+
 	const uint32_t duty = (uint32_t) (FullDuty * value);
 	const auto group = getSpeedMode(port);
 	const auto chan = getChannel(port);
@@ -73,11 +81,6 @@ void OutputPWM::performRegister(const OutputPinDef& output) noexcept{
 	}
 
 	const auto& pin = gpios[output.port];
-
-	gpio_config_t config{
-		1ULL << pin, GPIO_MODE_OUTPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE
-	};
-	gpio_config(&config);
 
 	const ledc_timer_config_t ledc_timer = {
 			.speed_mode       = getSpeedMode(output.port),
