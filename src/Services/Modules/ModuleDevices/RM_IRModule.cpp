@@ -61,8 +61,10 @@ IRSignal RM_IRModule::captureSignal(uint32_t timeoutMs){
 		return result;
 	}
 
-	rmt_symbol_word_t* rawBuf = new rmt_symbol_word_t[IRMaxSymbols];
-	QueueHandle_t queue = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
+	rmt_symbol_word_t rawBuf[IRMaxSymbols];
+	StaticQueue_t queueControl;
+	uint8_t queueStorage[sizeof(rmt_rx_done_event_data_t)];
+	QueueHandle_t queue = xQueueCreateStatic(1, sizeof(rmt_rx_done_event_data_t), queueStorage, &queueControl);
 
 	rmt_rx_event_callbacks_t cbs{};
 	cbs.on_recv_done = [](rmt_channel_handle_t, const rmt_rx_done_event_data_t* data, void* ctx) -> bool {
@@ -94,7 +96,6 @@ IRSignal RM_IRModule::captureSignal(uint32_t timeoutMs){
 	rmt_disable(rxChannel);
 	rmt_del_channel(rxChannel);
 	vQueueDelete(queue);
-	delete[] rawBuf;
 
 	// Reset the pin fully before reconnecting LEDC so it sees a clean state.
 	gpio_reset_pin(rxPin);
