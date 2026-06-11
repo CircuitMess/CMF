@@ -20,6 +20,20 @@ config CMF_WIFI
     bool "Include WiFi extension"
     default "n"
 
+    menu "WiFi features"
+        depends on CMF_WIFI
+
+    config CMF_WIFI_STA_SUPPORT
+        bool "WiFi station support"
+        default "n"
+
+    config CMF_WIFI_AP_SUPPORT
+        depends on ESP_WIFI_SOFTAP_SUPPORT
+        bool "WiFi access point support"
+        default "n"
+
+    endmenu
+
 config CMF_TOUCH
     bool "Include touch input extension"
     default "n"
