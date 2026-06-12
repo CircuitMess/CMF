@@ -2,7 +2,6 @@
 
 #include "Log/Log.h"
 #include <cstring>
-#include <vector>
 #include <esp_heap_caps.h>
 
 extern "C" {
@@ -16,15 +15,13 @@ static constexpr uint8_t HEATSHRINK_LOOKAHEAD_SZ2 = 7;
 static constexpr uint16_t HEATSHRINK_INPUT_BUF_SIZE = 256;
 static constexpr size_t HEATSHRINK_POLL_BUF_SIZE = 1024;
 
-uint8_t* CompressedFile::decompress(const uint8_t* compressedData, size_t compressedSize, size_t& outSize, bool use32bAligned){
+void CompressedFile::decompress(const uint8_t* compressedData, size_t compressedSize, bool use32bAligned){
 	heatshrink_decoder* hsd = heatshrink_decoder_alloc(HEATSHRINK_INPUT_BUF_SIZE, HEATSHRINK_WINDOW_SZ2, HEATSHRINK_LOOKAHEAD_SZ2);
 	if(!hsd){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Failed to allocate heatshrink decoder");
-		outSize = 0;
-		return nullptr;
+		return;
 	}
 
-	std::vector<uint8_t> result;
 	uint8_t pollBuf[HEATSHRINK_POLL_BUF_SIZE];
 
 	auto pollAll = [&]() {
@@ -51,35 +48,14 @@ uint8_t* CompressedFile::decompress(const uint8_t* compressedData, size_t compre
 	}
 
 	heatshrink_decoder_free(hsd);
-
-	outSize = result.size();
-	if(outSize == 0){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression produced no output");
-		return nullptr;
-	}
-
-	size_t allocSize = outSize;
-	if(use32bAligned){
-		const auto rest = outSize % 4;
-		if(rest != 0) allocSize += (4 - rest);
-	}
-
-	auto* buf = static_cast<uint8_t*>(heap_caps_malloc(allocSize,MALLOC_CAP_SPIRAM | (use32bAligned ? MALLOC_CAP_32BIT : MALLOC_CAP_8BIT)));
-	if(!buf){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't allocate %zu B for decompressed data", allocSize);
-		outSize = 0;
-		return nullptr;
-	}
-
-	memcpy(buf, result.data(), outSize);
-	return buf;
 }
 
-CompressedFile::CompressedFile(File file, bool use32bAligned) : filePath(file.name()){
+CompressedFile::CompressedFile(File file, size_t reserveSize, bool use32bAligned) : filePath(file.name()){
 	if(!file){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't open file: %s", file.name());
 		return;
 	}
+	result.reserve(reserveSize * 1024);
 
 	file.seek(0);
 	const size_t compressedSize = file.size();
@@ -98,44 +74,41 @@ CompressedFile::CompressedFile(File file, bool use32bAligned) : filePath(file.na
 	}
 
 	file.read(compressedData, compressedSize);
-	data = decompress(compressedData, compressedSize, fileSize, use32bAligned);
+	decompress(compressedData, compressedSize, use32bAligned);
 	free(compressedData);
 
-	if(!data){
+	if(result.empty()){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression failed for: %s", file.name());
 	}
 }
 
-CompressedFile::CompressedFile(const uint8_t* compressedData, size_t compressedSize, const char* name, bool use32bAligned) : filePath(name){
-	data = decompress(compressedData, compressedSize, fileSize, use32bAligned);
-	if(!data){
+CompressedFile::CompressedFile(const uint8_t* compressedData, size_t compressedSize, const char* name, size_t reserveSize, bool use32bAligned) : filePath(name){
+	result.reserve(reserveSize * 1024);
+	decompress(compressedData, compressedSize, use32bAligned);
+	if(result.empty()){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression failed for: %s", name);
 	}
 }
 
 CompressedFile::~CompressedFile(){
-	free(data);
 }
 
 CompressedFile::operator bool(){
-	return data != nullptr;
+	return !result.empty();
 }
 
-File CompressedFile::open(const File& file, bool use32bAligned){
-	auto f = std::make_shared<CompressedFile>(file, use32bAligned);
+File CompressedFile::open(const File& file, size_t reserveSize, bool use32bAligned){
+	std::shared_ptr<CompressedFile> f = std::make_shared<CompressedFile>(file, reserveSize, use32bAligned);
 	return { f };
 }
 
 void CompressedFile::close(){
-	free(data);
-
-	data = nullptr;
-	fileSize = 0;
+	result.clear();
 	filePath = "";
 }
 
 size_t CompressedFile::size() const{
-	return fileSize;
+	return result.size();
 }
 
 const char* CompressedFile::name() const{
@@ -143,11 +116,11 @@ const char* CompressedFile::name() const{
 }
 
 size_t IRAM_ATTR CompressedFile::read(uint8_t* dest, size_t len){
-	if(cursor >= fileSize) return 0;
-	len = std::min(len, fileSize - cursor);
+	if(cursor >= result.size()) return 0;
+	len = std::min(len, result.size() - cursor);
 	if(len <= 0) return 0;
 
-	memcpy(dest, data + cursor, len);
+	memcpy(dest, result.data() + cursor, len);
 	cursor += len;
 
 	return len;
@@ -166,7 +139,7 @@ bool CompressedFile::seek(int pos, int whence){
 	} else if(whence == SEEK_CUR){
 		cursor += pos;
 	} else if(whence == SEEK_END){
-		cursor = fileSize - pos;
+		cursor = result.size() - pos;
 	}
 	return true;
 }
