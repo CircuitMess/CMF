@@ -5,7 +5,7 @@
 
 DEFINE_LOG(RamFile)
 
-RamFile::RamFile(File file, bool use32bAligned) : filePath(file.name()){
+RamFile::RamFile(File file, bool useExternalRam, bool use32bAligned) : filePath(file.name()){
 	if(!file){
 		CMF_LOG(RamFile, LogLevel::Error, "Couldn't open file: %s", file.name());
 		return;
@@ -27,7 +27,7 @@ RamFile::RamFile(File file, bool use32bAligned) : filePath(file.name()){
 		}
 	}
 
-	data = (uint8_t*) heap_caps_malloc(allocSize, MALLOC_CAP_INTERNAL | (use32bAligned ? MALLOC_CAP_32BIT : MALLOC_CAP_8BIT));
+	data = (uint8_t*) heap_caps_malloc(allocSize, (useExternalRam ? MALLOC_CAP_SPIRAM : MALLOC_CAP_INTERNAL) | (use32bAligned ? MALLOC_CAP_32BIT : MALLOC_CAP_8BIT));
 	if(data == nullptr){
 		fileSize = 0;
 		CMF_LOG(RamFile, LogLevel::Error, "Couldn't allocate memory for %s. Need %zu B, largest block: %zu B", file.name(), allocSize,
@@ -54,8 +54,8 @@ RamFile::operator bool(){
 	return data != nullptr;
 }
 
-File RamFile::open(const File& file, bool use32bAligned){
-	auto f = std::make_shared<RamFile>(file, use32bAligned);
+File RamFile::open(const File& file, bool useExternalRam, bool use32bAligned){
+	auto f = std::make_shared<RamFile>(file, useExternalRam, use32bAligned);
 	return { f };
 }
 

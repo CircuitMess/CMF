@@ -7,10 +7,10 @@
 
 class RawCache : public FileCache {
 public:
-	explicit RawCache();
+	explicit RawCache(FileCache* archiveCache = nullptr);
 	explicit RawCache(const std::vector<std::string>& paths);
 
-	void setPaths(const std::vector<std::string>& paths);
+	void setPaths(const std::vector<std::string>& filePaths);
 
 	void load() override;
 	void unload() override;
@@ -22,6 +22,8 @@ private:
 
 	bool loaded = false;
 	std::unordered_map<std::string, File> files;
+
+	FileCache* archiveCache = nullptr;
 };
 
 #endif //CMF_RAWCACHE_H

@@ -7,8 +7,7 @@
 #include <unordered_map>
 #include <memory>
 #include <Object/Class.h>
-#include "FileSystem/RawCache.h"
-#include "FileSystem/FileArchive.h"
+#include "FileSystem/FileCache.h"
 #include "Object/Object.h"
 
 class FSLVGL : public Object {

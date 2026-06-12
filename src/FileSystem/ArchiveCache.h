@@ -1,24 +1,35 @@
 #ifndef CMF_ARCHIVECACHE_H
 #define CMF_ARCHIVECACHE_H
 
-#include <vector>
 #include "FileCache.h"
-#include "FileArchive.h"
+#include <unordered_map>
+#include <string>
+#include "FileSystem/File.h"
 
 class ArchiveCache : public FileCache {
 public:
-	explicit ArchiveCache(const std::vector<std::string>& paths);
+	ArchiveCache(const File& file);
+	~ArchiveCache() override;
 
 	void load() override;
 	void unload() override;
 
 	File open(const char* path) override;
 
+	void setArchiveFile(const File& file);
+
 private:
-	const std::vector<std::string> paths;
+	struct Entry {
+		const std::string name;
+		size_t size;
+		size_t offset;
+	};
+
+	std::unordered_map<std::string, const Entry> entries;
 
 	bool loaded = false;
-	std::unordered_map<std::string, FileArchive> archives;
+	uint8_t* data = nullptr;
+	File archiveFile;
 };
 
 #endif //CMF_ARCHIVECACHE_H

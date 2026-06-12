@@ -9,13 +9,13 @@
 
 class RamFile : public FileImpl {
 public:
-	RamFile(File file, bool use32bAligned = false);
+	RamFile(File file, bool useExternalRam = false, bool use32bAligned = false);
 	RamFile(uint8_t* data, size_t size, const char* name);
 	~RamFile() override;
 
 	operator bool() override;
 
-	static File open(const File& file, bool use32bAligned = false);
+	static File open(const File& file, bool useExternalRam = false, bool use32bAligned = false);
 	void close() override;
 
 	size_t size() const override;
