@@ -18,6 +18,7 @@ ArchiveCache::ArchiveCache(const File& file) : archiveFile(file){
 
 ArchiveCache::~ArchiveCache(){
 	free(data);
+	data = nullptr;
 }
 
 void ArchiveCache::setArchiveFile(const File& file){
@@ -89,6 +90,8 @@ void ArchiveCache::unload(){
 	loaded = false;
 
 	entries.clear();
+	free(data);
+	data = nullptr;
 }
 
 File ArchiveCache::open(const char* path){

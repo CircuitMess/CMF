@@ -47,7 +47,7 @@ void RawCache::unload(){
 }
 
 File RawCache::open(const char* path){
-	auto entry = files.find(path);
+	const auto entry = files.find(path);
 	if(entry == files.end()) return { };
 	return entry->second;
 }
