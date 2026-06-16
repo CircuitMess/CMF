@@ -11,7 +11,7 @@ class CompressedFile : public FileImpl {
 public:
 	/**
 	 * @param file input compressed File object
-	 * @param reserveSize size to reserve for internal buffer
+	 * @param reserveSize size to reserve for internal buffer, in bytes
 	 * @param use32bAligned if memory is organized in 32bit alignment
 	 */
 	CompressedFile(File file, size_t reserveSize = 0, bool use32bAligned = false);

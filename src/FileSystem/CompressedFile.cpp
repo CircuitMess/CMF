@@ -55,7 +55,7 @@ CompressedFile::CompressedFile(File file, size_t reserveSize, bool use32bAligned
 		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't open file: %s", file.name());
 		return;
 	}
-	result.reserve(reserveSize * 1024);
+	result.reserve(reserveSize);
 
 	file.seek(0);
 	const size_t compressedSize = file.size();
@@ -83,7 +83,7 @@ CompressedFile::CompressedFile(File file, size_t reserveSize, bool use32bAligned
 }
 
 CompressedFile::CompressedFile(const uint8_t* compressedData, size_t compressedSize, const char* name, size_t reserveSize, bool use32bAligned) : filePath(name){
-	result.reserve(reserveSize * 1024);
+	result.reserve(reserveSize);
 	decompress(compressedData, compressedSize, use32bAligned);
 	if(result.empty()){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression failed for: %s", name);
