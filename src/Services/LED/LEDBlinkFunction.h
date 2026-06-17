@@ -16,7 +16,7 @@ public:
 	 * @param onTime - blink duration in seconds, will be repeated every period, must be less than period!
 	 * @param count - number of blink cycles to be repeated, or 0 for infinite blinks
 	 */
-	LEDBlinkFunction(DataT value, float period, float onTime, uint32_t count = 0) : value(value), count(count), period(period), onTime(onTime), nextTickTime(millis()){
+	LEDBlinkFunction(DataT value, float period, float onTime, uint32_t count = 0) : value(value), count(count), period(period), onTime(onTime){
 		if(onTime >= period){
 			CMF_LOG(CMF, LogLevel::Error, "Blink on-time must be less than period!");
 			invalidConfig = true;
@@ -38,37 +38,32 @@ public:
 	}
 
 	virtual TickType_t getInterval() const noexcept override{
-		if(!Super::hasBegun()){
+		if(!Super::hasBegun() || !started){
 			return 0;
 		}
 
-		if(millis() >= nextTickTime){
-			return 0;
-		}
+		const float phase = fmodf(timer, period);
+		const float untilNext = (phase <= onTime) ? (onTime - phase) : (period - phase);
 
-		return nextTickTime - millis();
+		return std::max<TickType_t>(1, static_cast<TickType_t>(untilNext * 1000.0f)) / portTICK_PERIOD_MS;
 	}
 
 private:
 	virtual void tick(float deltaTime) noexcept override{
 		if(invalidConfig) return;
 
-		timer += deltaTime;
+		// Track elapsed time via an absolute timestamp, instead of accumulated deltaTime
+		// Reason: the service sleeps while idle, so the first deltaTime after waking would jump past intended count
+		if(!started){
+			started = true;
+			startTime = millis();
+		}
 
-		const bool lastState = state;
+		timer = (millis() - startTime) / 1000.0f;
 
 		state = false;
 		if(fmodf(timer, period) <= onTime){
 			state = true;
-		}
-
-		if(lastState != state){
-			if(state){
-				nextTickTime += onTime * 1000 / portTICK_PERIOD_MS;
-			}else{
-				const uint64_t offTime = period - onTime;
-				nextTickTime += offTime * 1000 / portTICK_PERIOD_MS;
-			}
 		}
 
 		elapsedCount = timer / period;
@@ -78,7 +73,9 @@ private:
 	uint32_t count;
 	float period;
 	float onTime;
-	uint64_t nextTickTime;
+
+	uint64_t startTime = 0;
+	bool started = false;
 
 	float timer = 0;
 	uint32_t elapsedCount = 0;
