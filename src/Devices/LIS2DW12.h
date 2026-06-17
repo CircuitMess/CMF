@@ -86,6 +86,8 @@ public:
 public:
 	explicit LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice = {}, PinConfig pinConfig = {}, Config config = {}, uint8_t addr = (LIS2DW12_I2C_ADD_L >> 1));
 
+	virtual ~LIS2DW12() override;
+
 	Sample getSample();
 
 	/**
@@ -147,7 +149,7 @@ private:
 
 	SemaphoreHandle_t dispatcherSem = nullptr;
 
-	StrongObjectPtr<Threaded> dispatcherThread;
+	std::unique_ptr<Threaded> dispatcherThread;
 	void dispatcherFunc();
 	void fetchEvents();
 };

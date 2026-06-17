@@ -40,6 +40,8 @@ void EventScanner::tick(float deltaTime) noexcept {
         return;
     }
 
+    std::lock_guard lock(registerMutex);
+
     for(EventHandleBase *handle : eventHandles){
         if(handle == nullptr){
             continue;

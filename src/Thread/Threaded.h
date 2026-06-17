@@ -1,9 +1,6 @@
 #ifndef CMF_THREADED_H
 #define CMF_THREADED_H
 
-#include "Object/Object.h"
-#include "Object/Class.h"
-#include <cstddef>
 #include <string>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -16,9 +13,7 @@
  * priority, core and interval, and an optional callback function that is called once per loop.
  * The thread DOES NOT start running immediately as constructed, instead needs to be started manually.
  */
-class Threaded : public Object {
-	GENERATED_BODY(Threaded, Object, CONSTRUCTOR_PACK(const std::function<void(void)>&, const std::string&, TickType_t, size_t, uint8_t, int8_t))
-
+class Threaded {
 protected:
 	/**
 	 * @brief Constructs a thread without a callback.
@@ -47,7 +42,7 @@ public:
 	/**
 	 * @brief Destructor checks if the thread is stopped and deletes all semaphores that the thread uses.
 	 */
-	virtual ~Threaded() noexcept override;
+	virtual ~Threaded() noexcept;
 
 public:
 
@@ -127,11 +122,11 @@ private:
 	const int8_t core;
 
 	State state = State::Stopped;
-	bool paused;
-	TickType_t lastLoop;
+	bool paused = false;
+	TickType_t lastLoop = 0;
 	std::function<void(void)> lambdaLoop;
 
-	TaskHandle_t task;
+	TaskHandle_t task = nullptr;
 	SemaphoreHandle_t stopSemaphore;
 	SemaphoreHandle_t stopMutex;
 	SemaphoreHandle_t pauseSemaphore;

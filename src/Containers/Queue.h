@@ -360,7 +360,7 @@ public:
 	}
 
 private:
-	static constexpr size_t DefaultSize = 16;
+	static constexpr size_t DefaultSize = CONFIG_CMF_EVENT_DEFAULT_QUEUE_SIZE;
 	T* buffer = nullptr;
 	Allocator allocator = Allocator();
 	size_t bufferSize;

@@ -1,7 +1,6 @@
 #include "Threaded.h"
 #include "Util/stdafx.h"
 #include "Log/Log.h"
-#include "Memory/ObjectMemory.h"
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
 	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/) noexcept :
@@ -45,12 +44,6 @@ void Threaded::start() noexcept{
 
 	auto function = [](void* arg) -> void {
 		if(arg == nullptr){
-			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
-			vTaskDelete(nullptr);
-			return;
-		}
-
-		if(!isValid(static_cast<Threaded*>(arg))){
 			CMF_LOG(CMF, Error, "Thread native callback started with invalid thread pointer.");
 			vTaskDelete(nullptr);
 			return;

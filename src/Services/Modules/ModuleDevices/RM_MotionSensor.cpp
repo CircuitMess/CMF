@@ -9,7 +9,7 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 	active = gpio_get_level(pin);
 
 	sem = xSemaphoreCreateBinary();
-	thread = newObject<Threaded>(this, [this]() {
+	thread = std::make_unique<Threaded>([this]() {
 		if(!debouncing){
 			xSemaphoreTake(sem, portMAX_DELAY);
 			debouncing = true;
@@ -60,8 +60,6 @@ RM_MotionSensor::~RM_MotionSensor() noexcept{
 	thread->stop(0);
 	xSemaphoreGive(sem);
 	thread->stop();
-	delete thread.get();
-
 	vSemaphoreDelete(sem);
 }
 
