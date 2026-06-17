@@ -67,7 +67,7 @@ private:
 	void tickHandle() noexcept;
 
 private:
-	StrongObjectPtr<Threaded> thread;
+	std::unique_ptr<Threaded> thread;
 	size_t threadStackSize;
 	uint8_t threadPriority;
 	int8_t cpuCore;
