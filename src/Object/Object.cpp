@@ -183,13 +183,13 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 		return;
 	}
 
-	readyEventHandles.remove(handle);
-
 	if(const Application* app = getApp()){
 		if(EventScanner* scanner = app->getEventScanner()){
 			scanner->unregisterHandle(handle);
 		}
 	}
+
+	readyEventHandles.remove(handle);
 }
 
 void Object::readyEventHandle(EventHandleBase *handle) noexcept{
