@@ -22,6 +22,8 @@ WiFi::WiFi() noexcept : Super() {
     }, this, &nativeEventHandler);
 }
 
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
+
 void WiFi::startAccessPoint(const std::string& name, const std::string& password, uint8_t channel /*= 1*/, uint8_t maxConnections /*= 1*/) noexcept {
     if(type != WiFiType::None) {
         CMF_LOG(WiFi, LogLevel::Warning, "WiFi access point attempted to start when WiFi is already running.");
@@ -49,25 +51,6 @@ void WiFi::startAccessPoint(const std::string& name, const std::string& password
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &cfg_ap));
-    ESP_ERROR_CHECK(esp_wifi_start());
-
-    initSemaphore.acquire();
-}
-
-void WiFi::startStation() noexcept {
-    if(type != WiFiType::None) {
-        CMF_LOG(WiFi, LogLevel::Warning, "WiFi station attempted to start when WiFi is already running.");
-        return;
-    }
-
-    type = WiFiType::Station;
-
-    createNetif();
-
-    const wifi_init_config_t cfg_wifi = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg_wifi);
-
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
 
     initSemaphore.acquire();
@@ -107,6 +90,29 @@ void WiFi::setNetworkParameters(const std::string& name, const std::string& pass
     strcpy((char*) config.ap.password, password.c_str());
 
     esp_wifi_set_config(WIFI_IF_AP, &config);
+}
+
+#endif
+
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
+
+void WiFi::startStation() noexcept {
+	if(type != WiFiType::None) {
+		CMF_LOG(WiFi, LogLevel::Warning, "WiFi station attempted to start when WiFi is already running.");
+		return;
+	}
+
+	type = WiFiType::Station;
+
+	createNetif();
+
+	const wifi_init_config_t cfg_wifi = WIFI_INIT_CONFIG_DEFAULT();
+	esp_wifi_init(&cfg_wifi);
+
+	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+	ESP_ERROR_CHECK(esp_wifi_start());
+
+	initSemaphore.acquire();
 }
 
 void WiFi::resetIPInfo() const noexcept {
@@ -199,6 +205,7 @@ std::vector<wifi_ap_record_t> WiFi::getAPRecords(size_t maxScanSize) const noexc
 
     return result;
 }
+#endif
 
 void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
     CMF_LOG(WiFi, LogLevel::Info, "WiFi native event received: %ld", id);
@@ -213,26 +220,30 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             break;
         }
         case WIFI_EVENT_SCAN_DONE: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             const wifi_event_sta_scan_done_t* scan_done = static_cast<wifi_event_sta_scan_done_t*>(data);
             if(scan_done == nullptr) {
                 break;
             }
 
             OnScanDone.broadcast(scan_done->status, scan_done->number, scan_done->scan_id);
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_START: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             OnStationStart.broadcast();
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_STOP: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             OnStationStop.broadcast();
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_CONNECTED: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             const wifi_event_sta_connected_t* connected = static_cast<wifi_event_sta_connected_t*>(data);
             if(connected == nullptr) {
                 break;
@@ -242,10 +253,11 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             //const std::string bssid(reinterpret_cast<const char*>(connected->bssid), 6);
 
             OnStationConnected.broadcast(/*ssid, bssid,*/ connected->channel, connected->authmode, connected->aid);
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_DISCONNECTED: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             const wifi_event_sta_disconnected_t* disconnected = static_cast<wifi_event_sta_disconnected_t*>(data);
             if(disconnected == nullptr) {
                 break;
@@ -255,17 +267,18 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             //const std::string bssid(reinterpret_cast<const char*>(disconnected->bssid), 6);
 
             OnStationDisconnected.broadcast(/*ssid, bssid,*/ disconnected->reason, disconnected->rssi);
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_AUTHMODE_CHANGE: {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
             const wifi_event_sta_authmode_change_t* auth = static_cast<wifi_event_sta_authmode_change_t*>(data);
             if(auth == nullptr) {
                 break;
             }
 
             OnStationAuthModeChanged.broadcast(auth->old_mode, auth->new_mode);
-
+#endif
             break;
         }
         case WIFI_EVENT_STA_WPS_ER_SUCCESS: {
@@ -285,17 +298,20 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             break;
         }
         case WIFI_EVENT_AP_START: {
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
             OnAccessPointStart.broadcast();
-
+#endif
             break;
         }
         case WIFI_EVENT_AP_STOP: {
-            OnAccessPointStop.broadcast();
-
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
+        	OnAccessPointStop.broadcast();
+#endif
             break;
         }
         case WIFI_EVENT_AP_STACONNECTED: {
-            const wifi_event_ap_staconnected_t* connected = static_cast<wifi_event_ap_staconnected_t*>(data);
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
+        	const wifi_event_ap_staconnected_t* connected = static_cast<wifi_event_ap_staconnected_t*>(data);
             if(connected == nullptr) {
                 break;
             }
@@ -303,10 +319,11 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             //const std::string mac(reinterpret_cast<const char *>(connected->mac), 6);
 
             OnAccessPointConnection.broadcast(/*mac,*/ connected->aid, connected->is_mesh_child);
-
+#endif
             break;
         }
         case WIFI_EVENT_AP_STADISCONNECTED: {
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
             const wifi_event_ap_stadisconnected_t* disconnected = static_cast<wifi_event_ap_stadisconnected_t*>(data);
             if(disconnected == nullptr) {
                 break;
@@ -315,7 +332,7 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
             //const std::string mac(reinterpret_cast<const char *>(disconnected->mac), 6);
 
             OnAccessPointDisconnection.broadcast(/*mac,*/ disconnected->aid, disconnected->is_mesh_child, disconnected->reason);
-
+#endif
             break;
         }
         case WIFI_EVENT_AP_PROBEREQRECVED: {
@@ -360,7 +377,9 @@ void WiFi::createNetif() const noexcept {
 
     ESP_ERROR_CHECK(esp_netif_init());
 
+	// ReSharper disable once CppDFAConstantConditions
     if(type == WiFiType::AccessPoint) {
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
         esp_netif_inherent_config_t base{};
         memcpy(&base, ESP_NETIF_BASE_DEFAULT_WIFI_AP, sizeof(esp_netif_inherent_config_t));
         base.flags = (esp_netif_flags_t) ((base.flags & ~(ESP_NETIF_DHCP_SERVER | ESP_NETIF_DHCP_CLIENT | ESP_NETIF_FLAG_EVENT_IP_MODIFIED)) | ESP_NETIF_FLAG_GARP);
@@ -384,7 +403,10 @@ void WiFi::createNetif() const noexcept {
 
         esp_netif_attach_wifi_ap(netif);
         esp_wifi_set_default_wifi_ap_handlers();
+#endif
+	// ReSharper disable once CppDFAConstantConditions
     }else if(type == WiFiType::Station) {
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
         esp_netif_inherent_config_t base{};
         memcpy(&base, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(esp_netif_inherent_config_t));
         base.flags = (esp_netif_flags_t) ((base.flags & ~(ESP_NETIF_DHCP_SERVER | ESP_NETIF_DHCP_CLIENT | ESP_NETIF_FLAG_EVENT_IP_MODIFIED)) | ESP_NETIF_FLAG_GARP);
@@ -408,5 +430,6 @@ void WiFi::createNetif() const noexcept {
 
         esp_netif_attach_wifi_station(netif);
         esp_wifi_set_default_wifi_sta_handlers();
+#endif
     }
 }
