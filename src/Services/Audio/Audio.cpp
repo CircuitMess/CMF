@@ -185,6 +185,10 @@ void Audio::tick(float deltaTime) noexcept{
 		auto pair = std::move(sourceQueue.front());
 		sourceQueue.pop();
 
+		if(currentGenerator != pair.first){
+			currentGenerator->close();
+		}
+
 		this->currentGenerator = pair.first;
 		currentGenerator->open(std::move(pair.second));
 	}
