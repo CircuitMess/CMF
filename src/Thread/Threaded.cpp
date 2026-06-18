@@ -1,18 +1,20 @@
 #include "Threaded.h"
 #include "Util/stdafx.h"
 #include "Log/Log.h"
+#include <esp_heap_caps.h>
+#include <freertos/idf_additions.h>
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
-	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/) noexcept :
-						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore) {
+	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= false*/) noexcept :
+						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), internalStack(internalStack) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();
 	pauseSemaphore = xSemaphoreCreateBinary();
 }
 
 Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
-	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/) noexcept :
-						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), lambdaLoop(fn) {
+	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= false*/) noexcept :
+						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), internalStack(internalStack), lambdaLoop(fn) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();
 	pauseSemaphore = xSemaphoreCreateBinary();
@@ -52,16 +54,18 @@ void Threaded::start() noexcept{
 		static_cast<Threaded*>(arg)->threadFunction();
 	};
 
+	const uint32_t stackCaps = internalStack ? (MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) : MALLOC_CAP_SPIRAM;
+
 	if(core == -1){
-		const auto ret = xTaskCreate(function, name.c_str(), stackSize, this, priority, &task);
+		const auto ret = xTaskCreateWithCaps(function, name.c_str(), stackSize, this, priority, &task, stackCaps);
 		if(ret != pdPASS){
-			CMF_LOG(CMF, LogLevel::Error, "xTaskCreate failed for thread '%s' (ret=%d)", name.c_str(), (int) ret);
+			CMF_LOG(CMF, LogLevel::Error, "xTaskCreateWithCaps failed for thread '%s' (ret=%d)", name.c_str(), (int) ret);
 			assert(ret == pdPASS);
 		}
 	}else{
-		const auto ret = xTaskCreatePinnedToCore(function, name.c_str(), stackSize, this, priority, &task, core);
+		const auto ret = xTaskCreatePinnedToCoreWithCaps(function, name.c_str(), stackSize, this, priority, &task, core, stackCaps);
 		if(ret != pdPASS){
-			CMF_LOG(CMF, LogLevel::Error, "xTaskCreatePinnedToCore failed for thread '%s' on core %d (ret=%d)", name.c_str(), (int) core, (int) ret);
+			CMF_LOG(CMF, LogLevel::Error, "xTaskCreatePinnedToCoreWithCaps failed for thread '%s' on core %d (ret=%d)", name.c_str(), (int) core, (int) ret);
 			assert(ret == pdPASS);
 		}
 	}
@@ -84,7 +88,7 @@ void Threaded::stop(TickType_t wait/* = portMAX_DELAY*/) noexcept{
 }
 
 void Threaded::pause() noexcept{
-	if(paused) {
+	if(paused){
 		return;
 	}
 

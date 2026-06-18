@@ -22,9 +22,12 @@ protected:
 	 * @param threadStackSize Size of the thread stack.
 	 * @param threadPriority How high of a priority the thread is, comes into effect when context switching between threads happens.
 	 * @param cpuCore Which CPU code the thread should run on. If -1, it will run on any available without preference.
+	 * @param internalStack If true the task stack is allocated in internal SRAM; otherwise (default) it is allocated in
+	 * external PSRAM to conserve internal SRAM. Tasks that run code disabling the flash cache (NVS / SPI-flash writes)
+	 * MUST set this to true, since a PSRAM stack is unreachable while the cache is disabled.
 	 */
 	explicit Threaded(const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
-		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE) noexcept;
+		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = false) noexcept;
 
 public:
 	/**
@@ -35,9 +38,12 @@ public:
 	 * @param threadStackSize Size of the thread stack.
 	 * @param threadPriority How high of a priority the thread is, comes into effect when context switching between threads happens.
 	 * @param cpuCore Which CPU core the thread should run on. If -1, it will run on any available without preference.
+	 * @param internalStack If true the task stack is allocated in internal SRAM; otherwise (default) it is allocated in
+	 * external PSRAM to conserve internal SRAM. Tasks that run code disabling the flash cache (NVS / SPI-flash writes)
+	 * MUST set this to true, since a PSRAM stack is unreachable while the cache is disabled.
 	 */
 	Threaded(const std::function<void(void)>& fn, const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
-		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE) noexcept;
+		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = false) noexcept;
 
 	/**
 	 * @brief Destructor checks if the thread is stopped and deletes all semaphores that the thread uses.
@@ -120,6 +126,7 @@ private:
 	size_t stackSize;
 	const uint8_t priority;
 	const int8_t core;
+	const bool internalStack;
 
 	State state = State::Stopped;
 	bool paused = false;

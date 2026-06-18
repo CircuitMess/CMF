@@ -6,11 +6,12 @@
 #include "Core/Application.h"
 
 AsyncEntity::AsyncEntity(TickType_t interval /*= CONFIG_CMF_ASYNCENTITY_TICK_INTERVAL / portTICK_PERIOD_MS*/, size_t threadStackSize /*= CONFIG_CMF_ASYNCENTITY_STACK_SIZE*/,
-	uint8_t threadPriority /*= CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_ASYNCENTITY_CPU_CORE*/) noexcept :
+	uint8_t threadPriority /*= CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_ASYNCENTITY_CPU_CORE*/, bool internalStack /*= false*/) noexcept :
 						Super(),
 						threadStackSize(threadStackSize),
 						threadPriority(threadPriority),
 						cpuCore(cpuCore),
+						internalStack(internalStack),
 						lastTickTime(micros()) {
 	setEventScanningTime(interval);
 }
@@ -39,7 +40,7 @@ void AsyncEntity::setEventScanningTime(TickType_t value) noexcept {
 void AsyncEntity::__postInitProperties() noexcept {
 	Super::__postInitProperties();
 
-	thread = std::make_unique<Threaded>([this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
+	thread = std::make_unique<Threaded>([this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore, internalStack);
 	thread->start();
 }
 
