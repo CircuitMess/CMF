@@ -10,6 +10,7 @@ class RM_CO2Sensor : public ModuleDevice{
 
 public:
 	RM_CO2Sensor(const Modules::BusPins& pins = {});
+	~RM_CO2Sensor() noexcept override;
 
 	uint32_t getReading();
 
