@@ -35,22 +35,39 @@ void Timer::reset(){
 	esp_timer_start_once(timer, period);
 }
 
-void Timer::single(uint32_t delay, Callback callback, void* arg){
-	char name[32];
-	sprintf(name, "Single-%d", rand() % 64);
+namespace {
+	struct SingleShotCtx {
+		Timer::Callback cb;
+		void* arg;
+		esp_timer_handle_t handle;
+	};
 
-	esp_timer_create_args_t args = {
-			.callback = callback,
-			.arg = arg,
-			.dispatch_method = ESP_TIMER_ISR,
-			.name = name,
+	void singleShotTrampoline(void* arg){
+		auto* ctx = static_cast<SingleShotCtx*>(arg);
+		if(ctx == nullptr) return;
+		if(ctx->cb) ctx->cb(ctx->arg);
+		esp_timer_delete(ctx->handle);
+		delete ctx;
+	}
+}
+
+void Timer::single(uint32_t delay, Callback callback, void* arg){
+	auto* ctx = new SingleShotCtx{ callback, arg, nullptr };
+
+	const esp_timer_create_args_t args = {
+			.callback = singleShotTrampoline,
+			.arg = ctx,
+			.dispatch_method = ESP_TIMER_TASK, // task dispatch so the trampoline can self-delete
+			.name = "Single",
 			.skip_unhandled_events = true
 	};
 
-	esp_timer_handle_t timer;
-	ESP_ERROR_CHECK(esp_timer_create(&args, &timer));
+	if(esp_timer_create(&args, &ctx->handle) != ESP_OK){
+		delete ctx;
+		return;
+	}
 
-	esp_timer_start_once(timer, delay * 1000);
+	esp_timer_start_once(ctx->handle, (uint64_t) delay * 1000);
 }
 
 void Timer::setPeriod(uint32_t period){
