@@ -27,7 +27,7 @@ public:
 	 * Set this for entities whose tick/event handlers perform NVS / SPI-flash writes (which disable the flash cache).
 	 */
 	explicit AsyncEntity(TickType_t interval = CONFIG_CMF_ASYNCENTITY_TICK_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_ASYNCENTITY_STACK_SIZE,
-		uint8_t threadPriority = CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_ASYNCENTITY_CPU_CORE, bool internalStack = false) noexcept;
+		uint8_t threadPriority = CONFIG_CMF_ASYNCENTITY_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_ASYNCENTITY_CPU_CORE, bool internalStack = true) noexcept;
 
 	/**
 	 * @brief Stops the thread if still running, then destroys the entity.
