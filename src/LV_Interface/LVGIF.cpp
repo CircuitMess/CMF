@@ -79,7 +79,7 @@ LVGIF::~LVGIF(){
 	if(timer != nullptr){
 		lv_timer_del(timer);
 	}
-	delete imgPath;
+	delete[] imgPath;
 }
 
 void LVGIF::start(){
