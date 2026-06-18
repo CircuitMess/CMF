@@ -57,6 +57,7 @@ public:
 
 public:
     WiFi() noexcept;
+	virtual ~WiFi() override;
 
     // ACCESS POINT FUNCTIONS
 #ifdef CONFIG_CMF_WIFI_AP_SUPPORT

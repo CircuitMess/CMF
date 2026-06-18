@@ -22,6 +22,10 @@ WiFi::WiFi() noexcept : Super() {
     }, this, &nativeEventHandler);
 }
 
+WiFi::~WiFi(){
+	esp_event_loop_delete_default();
+}
+
 #ifdef CONFIG_CMF_WIFI_AP_SUPPORT
 
 void WiFi::startAccessPoint(const std::string& name, const std::string& password, uint8_t channel /*= 1*/, uint8_t maxConnections /*= 1*/) noexcept {
