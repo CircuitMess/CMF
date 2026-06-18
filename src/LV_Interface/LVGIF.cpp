@@ -6,40 +6,39 @@
 DEFINE_LOG(LVGIF)
 
 LVGIF::LVGIF(lv_obj_t* parent, const char* path) : LVObject(parent), path(path){
-	auto strpath = std::string(path);
-	if(strpath.find("S:") == 0){
-		strpath = strpath.substr(2);
-	}
-	auto descPath = "/spiffs" + strpath + "/desc.bin";
+	const std::string descPath = std::string(path) + "/desc.bin";
 
-	pathLen = descPath.length() + 10;
+	pathLen = descPath.length() + 12;
 	imgPath = new char[pathLen];
-	auto f = fopen(descPath.c_str(), "r");
 
-	if(f == nullptr){
+	lv_fs_file_t f;
+	if(lv_fs_open(&f, descPath.c_str(), LV_FS_MODE_RD) != LV_FS_RES_OK){
 		CMF_LOG(LVGIF, LogLevel::Error, "Couldn't open GIF descriptor file at %s", descPath.c_str());
 		return;
 	}
 
-	//read w and h as uint16_t variables, most significant byte is read first
-	fread(((uint8_t*) &w) + 1, 1, 1, f);
-	fread(((uint8_t*) &w), 1, 1, f);
-	fread(((uint8_t*) &h) + 1, 1, 1, f);
-	fread(((uint8_t*) &h), 1, 1, f);
-	uint32_t length;
-	fread(((uint8_t*) &length) + 3, 1, 1, f);
-	fread(((uint8_t*) &length) + 2, 1, 1, f);
-	fread(((uint8_t*) &length) + 1, 1, 1, f);
-	fread(((uint8_t*) &length), 1, 1, f);
-	durations.reserve(length);
-	for(int i = 0; i < length; i++){
-		uint16_t duration;
-		fread(((uint8_t*) &duration) + 1, 1, 1, f);
-		fread(((uint8_t*) &duration), 1, 1, f);
-		durations.push_back(duration * 10);
+	// Header: width(2) + height(2) + frame count(4), all big-endian (most significant byte first)
+	uint8_t header[8];
+	uint32_t br = 0;
+	lv_fs_read(&f, header, sizeof(header), &br);
+	if(br < sizeof(header)){
+		CMF_LOG(LVGIF, LogLevel::Error, "GIF descriptor too short at %s", descPath.c_str());
+		lv_fs_close(&f);
+		return;
 	}
 
-	fclose(f);
+	w = (header[0] << 8) | header[1];
+	h = (header[2] << 8) | header[3];
+	const uint32_t length = ((uint32_t) header[4] << 24) | ((uint32_t) header[5] << 16) | ((uint32_t) header[6] << 8) | header[7];
+
+	durations.reserve(length);
+	for(uint32_t i = 0; i < length; i++){
+		uint8_t duration[2]; // big-endian, in 10ms units
+		lv_fs_read(&f, duration, sizeof(duration), &br);
+		durations.push_back(((duration[0] << 8) | duration[1]) * 10);
+	}
+
+	lv_fs_close(&f);
 
 	lv_obj_set_size(obj, w, h);
 	lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, 0);
@@ -77,7 +76,9 @@ LVGIF::LVGIF(lv_obj_t* parent, const char* path) : LVObject(parent), path(path){
 }
 
 LVGIF::~LVGIF(){
-	lv_timer_del(timer);
+	if(timer != nullptr){
+		lv_timer_del(timer);
+	}
 	delete imgPath;
 }
 
