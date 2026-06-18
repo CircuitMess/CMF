@@ -32,6 +32,8 @@ TCA9555::TCA9555(I2CMaster* i2c, uint8_t addr){
 }
 
 void TCA9555::reset(){
+	std::lock_guard lock(mutex);
+
 	constexpr std::array<uint8_t, 3> dirReset{ REG_DIR, 0xff, 0xff };
 	constexpr std::array<uint8_t, 3> polarityReset{ REG_POLARITY, 0x00, 0x00 };
 	dev->write(dirReset); // All pins to input
@@ -41,6 +43,8 @@ void TCA9555::reset(){
 
 void TCA9555::pinMode(uint8_t pin, TCA9555::PinMode mode){
 	if(pin >= 16) return;
+
+	std::lock_guard lock(mutex);
 
 	const uint8_t it = TCA_IT(pin);
 	const uint8_t mask = TCA_MASK(pin);
@@ -59,6 +63,8 @@ void TCA9555::pinMode(uint8_t pin, TCA9555::PinMode mode){
 bool TCA9555::read(uint8_t pin){
 	if(pin >= 16) return false;
 
+	std::lock_guard lock(mutex);
+
 	const uint8_t reg = TCA_REG(REG_INPUT, pin);
 
 	uint8_t regVal;
@@ -68,6 +74,8 @@ bool TCA9555::read(uint8_t pin){
 }
 
 uint16_t TCA9555::readAll(){
+	std::lock_guard lock(mutex);
+
 	std::array<uint8_t, 2> val{};
 	ESP_ERROR_CHECK(dev->write_read(REG_INPUT, val));
 	return (val[1] << 8) | val[0];
@@ -75,6 +83,8 @@ uint16_t TCA9555::readAll(){
 
 void TCA9555::write(uint8_t pin, bool state){
 	if(pin >= 16) return;
+
+	std::lock_guard lock(mutex);
 
 	const uint8_t reg = TCA_REG(REG_OUTPUT, pin);
 	const uint8_t mask = TCA_MASK(pin);

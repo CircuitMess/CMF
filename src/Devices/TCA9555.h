@@ -4,6 +4,7 @@
 #include "Object/Class.h"
 #include "Object/Object.h"
 #include "Periphery/I2CMaster.h"
+#include <mutex>
 
 /**
  * GPIO expander, 16-bit.
@@ -56,6 +57,7 @@ public:
 
 private:
 	std::unique_ptr<class I2CDevice> dev;
+	std::mutex mutex;
 
 	struct Regs {
 		uint8_t dir[2] = { 0xff, 0xff };
