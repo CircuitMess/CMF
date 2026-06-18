@@ -1,11 +1,8 @@
 #include "ArchiveCache.h"
 #include <vector>
+#include <esp_heap_caps.h>
 #include "Log/Log.h"
 #include "FileSystem/RamFile.h"
-
-extern "C" {
-#include <heatshrink_decoder.h>
-}
 
 DEFINE_LOG(ArchiveCache)
 
@@ -16,8 +13,12 @@ ArchiveCache::ArchiveCache(const File& file) : archiveFile(file){
 	ArchiveCache::load();
 }
 
+ArchiveCache::ArchiveCache(const bool useExternalRam) : useExternalRam(useExternalRam){}
+
 ArchiveCache::~ArchiveCache(){
-	free(data);
+	if(ownsData){
+		free(data);
+	}
 	data = nullptr;
 }
 
@@ -28,61 +29,95 @@ void ArchiveCache::setArchiveFile(const File& file){
 	archiveFile = file;
 }
 
+void ArchiveCache::setBuffer(uint8_t* buffer, const size_t bufferCapacity){
+	data = buffer;
+	capacity = bufferCapacity;
+	ownsData = false;
+}
+
 void ArchiveCache::load(){
 	if(loaded) return;
+
+	if(!archiveFile){
+		CMF_LOG(ArchiveCache, LogLevel::Error, "No archive file to load");
+		return;
+	}
+
 	loaded = true;
+
+	// Reads exactly n bytes or reports failure (short read / closed source -> (size_t)-1).
+	auto readExact = [&](void* dst, const size_t n) {
+		return archiveFile.read((uint8_t*)dst, n) == n;
+	};
+
+	// A corrupt/truncated archive is a build- or flash-time fault, not a recoverable runtime
+	// condition: fail loudly rather than silently serving stale shared-buffer bytes.
+	auto fail = [&](const char* why) {
+		CMF_LOG(ArchiveCache, LogLevel::Error, "Corrupt archive: %s", why);
+		abort();
+	};
 
 	archiveFile.seek(0);
 	uint32_t count = 0;
-	archiveFile.read((uint8_t*)&count, 4);
+	if(!readExact(&count, 4)) return fail("truncated header");
 
 	std::vector<Entry> tmp;
 	tmp.reserve(count);
 
 	size_t totalSize = 0;
 
-	while(archiveFile.available()){
+	for(uint32_t i = 0; i < count; i++){
 		std::string name;
 		name.reserve(32);
-		while(archiveFile.available()){
-			if(name.length() >= 32){
-				CMF_LOG(ArchiveCache, LogLevel::Error, "Too big filename; %s...", name.c_str());
-				abort();
-			}
-
-			char c = 0;
-			archiveFile.read((uint8_t*)&c, 1);
-			if(c == 0) break;
-
+		char c = 0;
+		while(archiveFile.read((uint8_t*)&c, 1) == 1 && c != 0){
+			if(name.length() >= 32) return fail("filename too long");
 			name.append(1, c);
 		}
 
-		if(name.empty()) break;
-
 		size_t size = 0;
-		archiveFile.read((uint8_t*)&size, 4);
+		if(!readExact(&size, 4)) return fail("truncated directory");
 		totalSize += size;
 
 		tmp.emplace_back(Entry{ name, size, 0 });
 	}
 
-	data = (uint8_t*)malloc(totalSize);
+	char terminator = 0;
+	if(!readExact(&terminator, 1)) return fail("missing directory terminator");
 
-	if(data == nullptr){
-		CMF_LOG(ArchiveCache, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
+	if(ownsData){
+		// No shared buffer was provided: allocate one sized exactly to this archive.
+		data = (uint8_t*)(useExternalRam ? heap_caps_malloc(totalSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) : malloc(totalSize));
+		if(data == nullptr){
+			CMF_LOG(ArchiveCache, LogLevel::Warning, "Failed allocating data buffer of %zu B", totalSize);
+			loaded = false;
+			return;
+		}
+		capacity = totalSize;
+	}else if(data == nullptr){
+		CMF_LOG(ArchiveCache, LogLevel::Error, "No buffer set for archive load");
+		loaded = false;
+		return;
+	}else if(totalSize > capacity){
+		CMF_LOG(ArchiveCache, LogLevel::Error, "Archive (%zu B) exceeds shared buffer (%zu B)", totalSize, capacity);
+		loaded = false;
 		return;
 	}
 
 	size_t offset = 0;
 
 	for(auto& entry : tmp){
-		archiveFile.read(data + offset, entry.size);
+		if(archiveFile.read(data + offset, entry.size) != entry.size){
+			return fail("truncated payload");
+		}
 		entry.offset = offset;
 
 		offset += entry.size;
 
 		entries.insert(std::make_pair(entry.name, std::move(entry)));
 	}
+
+	archiveFile = File();
 }
 
 void ArchiveCache::unload(){
@@ -90,8 +125,12 @@ void ArchiveCache::unload(){
 	loaded = false;
 
 	entries.clear();
-	free(data);
-	data = nullptr;
+	if(ownsData){
+		// Shared buffers are kept for reuse; only free a buffer we allocated ourselves.
+		free(data);
+		data = nullptr;
+	}
+	archiveFile = File();
 }
 
 File ArchiveCache::open(const char* path){

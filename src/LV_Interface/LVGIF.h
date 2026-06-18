@@ -27,8 +27,8 @@ public:
 	[[nodiscard]] size_t getNumFrames() const;
 
 private:
-	lv_obj_t* img;
-	lv_timer_t* timer;
+	lv_obj_t* img = nullptr;
+	lv_timer_t* timer = nullptr;
 
 	uint16_t w = 0, h = 0;
 	std::vector<uint16_t> durations; //in ms

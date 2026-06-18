@@ -2,128 +2,181 @@
 
 #include "Log/Log.h"
 #include <cstring>
-#include <esp_heap_caps.h>
-
-extern "C" {
-#include <heatshrink_decoder.h>
-}
+#include <algorithm>
 
 DEFINE_LOG(CompressedFile)
 
 static constexpr uint8_t HEATSHRINK_WINDOW_SZ2 = 14;
 static constexpr uint8_t HEATSHRINK_LOOKAHEAD_SZ2 = 7;
-static constexpr uint16_t HEATSHRINK_INPUT_BUF_SIZE = 256;
-static constexpr size_t HEATSHRINK_POLL_BUF_SIZE = 1024;
 
-void CompressedFile::decompress(const uint8_t* compressedData, size_t compressedSize, bool use32bAligned){
-	heatshrink_decoder* hsd = heatshrink_decoder_alloc(HEATSHRINK_INPUT_BUF_SIZE, HEATSHRINK_WINDOW_SZ2, HEATSHRINK_LOOKAHEAD_SZ2);
-	if(!hsd){
+CompressedFile::CompressedFile(File source) : source(source), filePath(source ? source.name() : ""){
+	if(!source){
+		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't open source file: %s", source.name());
+		return;
+	}
+
+	hsd = heatshrink_decoder_alloc(InputBufSize, HEATSHRINK_WINDOW_SZ2, HEATSHRINK_LOOKAHEAD_SZ2);
+	if(hsd == nullptr){
 		CMF_LOG(CompressedFile, LogLevel::Error, "Failed to allocate heatshrink decoder");
 		return;
 	}
 
-	uint8_t pollBuf[HEATSHRINK_POLL_BUF_SIZE];
-
-	auto pollAll = [&]() {
-		HSD_poll_res pres;
-		do{
-			size_t polled = 0;
-			pres = heatshrink_decoder_poll(hsd, pollBuf, HEATSHRINK_POLL_BUF_SIZE, &polled);
-			result.insert(result.end(), pollBuf, pollBuf + polled);
-		} while(pres == HSDR_POLL_MORE);
-	};
-
-	size_t inOffset = 0;
-	while(inOffset < compressedSize){
-		size_t sunk = 0;
-		heatshrink_decoder_sink(hsd, const_cast<uint8_t*>(compressedData + inOffset), compressedSize - inOffset, &sunk);
-		inOffset += sunk;
-		pollAll();
-	}
-
-	HSD_finish_res fres = heatshrink_decoder_finish(hsd);
-	while(fres == HSDR_FINISH_MORE){
-		pollAll();
-		fres = heatshrink_decoder_finish(hsd);
-	}
-
-	heatshrink_decoder_free(hsd);
-}
-
-CompressedFile::CompressedFile(File file, size_t reserveSize, bool use32bAligned) : filePath(file.name()){
-	if(!file){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't open file: %s", file.name());
-		return;
-	}
-	result.reserve(reserveSize);
-
-	file.seek(0);
-	const size_t compressedSize = file.size();
-
-	if(compressedSize == 0){
-		CMF_LOG(CompressedFile, LogLevel::Error, "File is empty: %s", file.name());
-		file.close();
-		return;
-	}
-
-	auto* compressedData = static_cast<uint8_t*>(malloc(compressedSize));
-	if(!compressedData){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Couldn't allocate %zu B to read compressed file: %s", compressedSize, file.name());
-		file.close();
-		return;
-	}
-
-	file.read(compressedData, compressedSize);
-	decompress(compressedData, compressedSize, use32bAligned);
-	free(compressedData);
-
-	if(result.empty()){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression failed for: %s", file.name());
-	}
-}
-
-CompressedFile::CompressedFile(const uint8_t* compressedData, size_t compressedSize, const char* name, size_t reserveSize, bool use32bAligned) : filePath(name){
-	result.reserve(reserveSize);
-	decompress(compressedData, compressedSize, use32bAligned);
-	if(result.empty()){
-		CMF_LOG(CompressedFile, LogLevel::Error, "Decompression failed for: %s", name);
-	}
+	source.seek(0, SeekMode::SeekSet);
 }
 
 CompressedFile::~CompressedFile(){
+	if(hsd != nullptr){
+		heatshrink_decoder_free(hsd);
+		hsd = nullptr;
+	}
+}
+
+File CompressedFile::open(const File& source){
+	return { std::make_shared<CompressedFile>(source) };
 }
 
 CompressedFile::operator bool(){
-	return !result.empty();
-}
-
-File CompressedFile::open(const File& file, size_t reserveSize, bool use32bAligned){
-	std::shared_ptr<CompressedFile> f = std::make_shared<CompressedFile>(file, reserveSize, use32bAligned);
-	return { f };
+	return hsd != nullptr && source;
 }
 
 void CompressedFile::close(){
-	result.clear();
+	source.close();
 	filePath = "";
 }
 
+void CompressedFile::resetStream(){
+	if(hsd != nullptr){
+		heatshrink_decoder_reset(hsd);
+	}
+	source.seek(0, SeekMode::SeekSet);
+	inPos = inLen = 0;
+	outPos = outLen = 0;
+	finished = false;
+	decodeError = false;
+	cursor = 0;
+}
+
+// Pulls the next chunk of decompressed bytes into outBuf.
+// Returns false once the stream is fully drained.
+bool CompressedFile::fillOut(){
+	if(outPos < outLen) return true;
+	outPos = outLen = 0;
+
+	if(hsd == nullptr) return false;
+
+	while(true){
+		// Drain any output the decoder already has.
+		size_t polled = 0;
+		HSD_poll_res pres = heatshrink_decoder_poll(hsd, outBuf, OutputBufSize, &polled);
+		if(pres < 0){ // HSDR_POLL_ERROR_*
+			CMF_LOG(CompressedFile, LogLevel::Error, "Decode poll error (%d): %s", pres, filePath.c_str());
+			decodeError = finished = true;
+			return false;
+		}
+		if(polled > 0){
+			outLen = polled;
+			outPos = 0;
+			return true;
+		}
+		if(pres == HSDR_POLL_MORE) continue; // more output pending; poll again
+
+		// No output: feed the decoder. Refill our input buffer from the source if drained.
+		if(inPos >= inLen){
+			const size_t got = source.read(inBuf, InputBufSize);
+			inLen = (got == (size_t)-1) ? 0 : got; // a closed/failed source reads as EOF, not a huge length
+			inPos = 0;
+		}
+
+		if(inPos < inLen){
+			size_t sunk = 0;
+			HSD_sink_res sres = heatshrink_decoder_sink(hsd, inBuf + inPos, inLen - inPos, &sunk);
+			if(sres < 0){ // HSDR_SINK_ERROR_*
+				CMF_LOG(CompressedFile, LogLevel::Error, "Decode sink error (%d): %s", sres, filePath.c_str());
+				decodeError = finished = true;
+				return false;
+			}
+			inPos += sunk;
+			continue; // loop back to poll the freshly sunk data
+		}
+
+		// Source exhausted: tell the decoder, then poll out the tail.
+		if(finished) return false;
+		HSD_finish_res fres = heatshrink_decoder_finish(hsd);
+		if(fres == HSDR_FINISH_MORE) continue; // tail output remains; poll it on next loop
+		if(fres < 0){ // HSDR_FINISH_ERROR_*
+			CMF_LOG(CompressedFile, LogLevel::Error, "Decode finish error (%d): %s", fres, filePath.c_str());
+			decodeError = true;
+		}
+		finished = true;
+		return false;
+	}
+}
+
+size_t CompressedFile::read(uint8_t* dest, size_t len){
+	size_t written = 0;
+	while(written < len){
+		if(outPos >= outLen && !fillOut()) break;
+
+		const size_t n = std::min(len - written, outLen - outPos);
+		memcpy(dest + written, outBuf + outPos, n);
+		outPos += n;
+		written += n;
+		cursor += n;
+	}
+	return written;
+}
+
+bool CompressedFile::seek(int pos, int whence){
+	int64_t target;
+	if(whence == SEEK_SET){
+		target = pos;
+	}else if(whence == SEEK_CUR){
+		target = (int64_t)cursor + pos;
+	}else{
+		CMF_LOG(CompressedFile, LogLevel::Warning, "SEEK_END unsupported on compressed stream: %s", filePath.c_str());
+		return false;
+	}
+
+	if(target < 0){
+		CMF_LOG(CompressedFile, LogLevel::Warning, "Seek before start (%lld) on %s", target, filePath.c_str());
+		return false;
+	}
+
+	const size_t tgt = (size_t)target;
+	if(tgt == cursor) return true;
+
+	if(tgt < cursor){
+		const size_t back = cursor - tgt;
+		if(back <= outPos){
+			// Within the still-resident output window: rewind without re-decoding.
+			outPos -= back;
+			cursor = tgt;
+			return true;
+		}
+		resetStream(); // beyond the buffered window — can only go back by restarting the decode
+	}
+
+	// Skip forward by decoding and discarding.
+	uint8_t scratch[InputBufSize];
+	while(cursor < tgt){
+		const size_t want = std::min(sizeof(scratch), tgt - cursor);
+		if(read(scratch, want) != want) return false; // reached end before target
+	}
+	return true;
+}
+
 size_t CompressedFile::size() const{
-	return result.size();
+	// NOTE: forward-only stream. The total decompressed size is NOT known without decoding the
+	// whole stream, so this returns bytes decoded so far not the full length.
+	return cursor;
 }
 
 const char* CompressedFile::name() const{
 	return filePath.c_str();
 }
 
-size_t IRAM_ATTR CompressedFile::read(uint8_t* dest, size_t len){
-	if(cursor >= result.size()) return 0;
-	len = std::min(len, result.size() - cursor);
-	if(len <= 0) return 0;
-
-	memcpy(dest, result.data() + cursor, len);
-	cursor += len;
-
-	return len;
+size_t CompressedFile::pos() const{
+	return cursor;
 }
 
 size_t CompressedFile::write(const uint8_t* buf, size_t size){
@@ -131,19 +184,4 @@ size_t CompressedFile::write(const uint8_t* buf, size_t size){
 }
 
 void CompressedFile::flush(){
-}
-
-bool CompressedFile::seek(int pos, int whence){
-	if(whence == SEEK_SET){
-		cursor = pos;
-	} else if(whence == SEEK_CUR){
-		cursor += pos;
-	} else if(whence == SEEK_END){
-		cursor = result.size() - pos;
-	}
-	return true;
-}
-
-size_t CompressedFile::pos() const{
-	return cursor;
 }
