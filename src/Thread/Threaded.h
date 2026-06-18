@@ -27,7 +27,7 @@ protected:
 	 * MUST set this to true, since a PSRAM stack is unreachable while the cache is disabled.
 	 */
 	explicit Threaded(const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
-		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = false) noexcept;
+		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = true) noexcept;
 
 public:
 	/**
@@ -43,7 +43,7 @@ public:
 	 * MUST set this to true, since a PSRAM stack is unreachable while the cache is disabled.
 	 */
 	Threaded(const std::function<void(void)>& fn, const std::string& threadName = "", TickType_t interval = CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS, size_t threadStackSize = CONFIG_CMF_THREADED_STACK_SIZE,
-		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = false) noexcept;
+		uint8_t threadPriority = CONFIG_CMF_THREADED_PRIORITY, int8_t cpuCore = CONFIG_CMF_THREADED_CPU_CORE, bool internalStack = true) noexcept;
 
 	/**
 	 * @brief Destructor checks if the thread is stopped and deletes all semaphores that the thread uses.
