@@ -67,6 +67,7 @@ void SyncEntity::onOwnerChanged(Object* oldOwner) noexcept{
 
 	// This is intentional, sync entities have to have an owner, otherwise their behavior will not work
 	if(getOwner() == nullptr && isValid(ApplicationStatics::getApplication())){
+		abort();
 		setOwner(ApplicationStatics::getApplication());
 	}
 }

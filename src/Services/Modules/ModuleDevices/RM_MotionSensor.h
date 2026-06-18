@@ -24,7 +24,7 @@ private:
 	gpio_num_t pin;
 	bool debouncing = false;
 
-	StrongObjectPtr<Threaded> thread;
+	std::unique_ptr<Threaded> thread;
 	SemaphoreHandle_t sem;
 };
 

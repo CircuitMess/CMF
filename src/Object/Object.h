@@ -235,7 +235,7 @@ private:
 
 	Queue<EventHandleBase*> readyEventHandles;
 
-	std::mutex accessMutex;
+	std::recursive_mutex accessMutex;
 
 private:
 	/**

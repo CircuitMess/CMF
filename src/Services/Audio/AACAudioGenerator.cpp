@@ -9,19 +9,27 @@ AACAudioGenerator::AACAudioGenerator(){
 		CMF_LOG(AACSource, LogLevel::Error, "Libhelix AAC decoder failed to initialize.");
 		return;
 	}
+
+	fillBuffer.reserve(FileReadThreshold + FileReadChunkSize);
+	dataBuffer.reserve(2 * DecodeOutBufferSize);
 }
 
 void AACAudioGenerator::open(std::unique_ptr<AudioSource> resource){
 	AACFlushCodec(decoder);
+
+	fillBuffer.clear();
+	dataBuffer.clear();
+	bytesRemaining = 0;
 
 	resource->open();
 	this->resource = std::move(resource);
 }
 
 void AACAudioGenerator::close(){
-	resource->close();
-	resource.reset();
-	resource = nullptr;
+	if(resource != nullptr){
+		resource->close();
+		resource.reset();
+	}
 
 	AACFlushCodec(decoder);
 
@@ -54,17 +62,22 @@ size_t AACAudioGenerator::getData(uint8_t* buffer, size_t bytes){
 	size_t bytesTransferred = 0;
 
 	if(!dataBuffer.empty()){
-		memcpy(buffer, dataBuffer.data(), std::min(dataBuffer.size(), bytes));
-		bytesTransferred += dataBuffer.size();
-		dataBuffer.clear();
+		const size_t toCopy = std::min(dataBuffer.size(), bytes);
+		memcpy(buffer, dataBuffer.data(), toCopy);
+		bytesTransferred += toCopy;
+		// Erase only what was copied; keep any remainder for the next call.
+		dataBuffer.erase(dataBuffer.begin(), dataBuffer.begin() + toCopy);
 	}
 
 	while(bytesTransferred < bytes){
 		CMF_LOG(AACSource, LogLevel::Debug, "bytesRemaining: %d", bytesRemaining);
 
 		if(fillBuffer.size() < FileReadThreshold && (bool)*resource){
-			fillBuffer.resize(fillBuffer.size() + FileReadChunkSize);
-			bytesRemaining += resource->getData((uint8_t*)fillBuffer.data() + fillBuffer.size() - FileReadChunkSize, FileReadChunkSize);
+			const size_t oldSize = fillBuffer.size();
+			fillBuffer.resize(oldSize + FileReadChunkSize);
+			const size_t read = resource->getData((uint8_t*)fillBuffer.data() + oldSize, FileReadChunkSize);
+			fillBuffer.resize(oldSize + read);
+			bytesRemaining += read;
 			CMF_LOG(AACSource, LogLevel::Debug, "fillBuffer resized, bytesRemaining: %d", bytesRemaining);
 		}
 

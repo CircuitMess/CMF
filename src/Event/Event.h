@@ -109,6 +109,8 @@ public:
 	 * @param object The object instance whose functions are to be removed.
 	 */
 	inline void unbind(Object* object) noexcept{
+		std::lock_guard guard(accessMutex);
+
 		std::erase_if(handles, [object](const HandleContainer& container){
 			if(container.owningObject == object){
 				delete container.handle;

@@ -108,6 +108,9 @@ private:
 			CMF_LOG(ModuleService, LogLevel::Info, "Module %d removed from bus %d", (int) removed, bus);
 			ModulesEvent.broadcast(bus, removed, Action::Remove);
 
+			if(busContexts[bus].instance.isValid()){
+				delete *busContexts[bus].instance;
+			}
 			busContexts[bus].instance = nullptr;
 
 			registerSubAddressPinsInput(bus);

@@ -23,6 +23,7 @@ Object::~Object() noexcept {
 	}
 
 	if(owner != nullptr){
+		std::lock_guard lock(owner->accessMutex);
 		owner->removeChild(this);
 	}
 }
@@ -67,21 +68,22 @@ void Object::operator delete(void* ptr) noexcept {
 
 void Object::setOwner(Object* object) noexcept{
 	Object* oldOwner = nullptr;
+	Object* newOwner = (object != nullptr && object != this) ? object : nullptr;
 
 	{
 		std::lock_guard lock(accessMutex);
+		oldOwner = owner.isValid() ? owner.get() : nullptr;
+		owner = newOwner;
+	}
 
-		oldOwner = owner.get();
+	if(oldOwner != nullptr){
+		std::lock_guard ownerLock(oldOwner->accessMutex);
+		oldOwner->removeChild(this);
+	}
 
-		if(owner.isValid()){
-			owner->removeChild(this);
-			owner = nullptr;
-		}
-
-		if(object != nullptr && object != this){
-			owner = object;
-			owner->registerChild(this);
-		}
+	if(newOwner != nullptr){
+		std::lock_guard ownerLock(newOwner->accessMutex);
+		newOwner->registerChild(this);
 	}
 
 	onOwnerChanged(oldOwner);
@@ -126,8 +128,6 @@ void Object::setInstigator(Object* object) noexcept{
 void Object::onInstigatorChanged(Object* oldInstigator) noexcept{}
 
 void Object::scanEvents(TickType_t wait) noexcept{
-	std::lock_guard guard(accessMutex);
-
 	const uint64_t begin = millis();
 
 	auto eventWaitTime = std::max(static_cast<int64_t>(0), static_cast<int64_t>(wait) - (static_cast<int64_t>(millis()) - static_cast<int64_t>(begin)));
@@ -139,6 +139,8 @@ void Object::scanEvents(TickType_t wait) noexcept{
 		handle->scan(0);
 		eventWaitTime = 0;
 	}
+
+	std::lock_guard guard(accessMutex);
 
 	// WARNING: This will not work, or will create an infinite loop if owner system is abused, this is intentional, events are dependent on their owner to scan events, outermost owner must be an async entity for this to work
 	for(const WeakObjectPtr<Object>& child : childrenObjects){
@@ -183,13 +185,13 @@ void Object::unregisterEventHandle(EventHandleBase* handle) noexcept{
 		return;
 	}
 
-	readyEventHandles.remove(handle);
-
 	if(const Application* app = getApp()){
 		if(EventScanner* scanner = app->getEventScanner()){
 			scanner->unregisterHandle(handle);
 		}
 	}
+
+	readyEventHandles.remove(handle);
 }
 
 void Object::readyEventHandle(EventHandleBase *handle) noexcept{

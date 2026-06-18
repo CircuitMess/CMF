@@ -1790,14 +1790,15 @@ public:
 	 * @brief Destructor unregisters this event handle from the owning object, stopping its scanning.
 	 */
 	inline virtual ~EventHandle() noexcept override {
-		if(!owningObject.isValid()) {
+		Object* owningObjectPtr = owningObject.get();
+		if(owningObjectPtr == nullptr) {
 			return;
 		}
 
-		if(Object* owner = owningObject->getOutermostOwner()) {
+		if(Object* owner = owningObjectPtr->getOutermostOwner()) {
 			owner->unregisterEventHandle(this);
 		}else {
-			owningObject->unregisterEventHandle(this);
+			owningObjectPtr->unregisterEventHandle(this);
 		}
 	}
 

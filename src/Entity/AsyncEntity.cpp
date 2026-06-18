@@ -16,12 +16,7 @@ AsyncEntity::AsyncEntity(TickType_t interval /*= CONFIG_CMF_ASYNCENTITY_TICK_INT
 }
 
 AsyncEntity::~AsyncEntity() noexcept {
-	if(!thread.isValid()){
-		return;
-	}
-
-	thread->stop(portMAX_DELAY);
-	// Thread will automatically get deleted as a child of this object, no need to explicitely delete it
+	thread->stop();
 }
 
 void AsyncEntity::setOwner(Object* object) noexcept{
@@ -44,7 +39,7 @@ void AsyncEntity::setEventScanningTime(TickType_t value) noexcept {
 void AsyncEntity::__postInitProperties() noexcept {
 	Super::__postInitProperties();
 
-	thread = newObject<Threaded>(this, [this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
+	thread = std::make_unique<Threaded>([this]() { this->tickHandle();}, getName().append("_Thread"), 0, threadStackSize, threadPriority, cpuCore);
 	thread->start();
 }
 

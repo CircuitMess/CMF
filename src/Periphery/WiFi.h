@@ -2,8 +2,6 @@
 #define WIFI_H
 
 #include <semaphore>
-#include <esp_event.h>
-#include <esp_netif_types.h>
 #include <esp_wifi_types_generic.h>
 #include "Object/Object.h"
 #include "Event/EventBroadcaster.h"
@@ -22,6 +20,7 @@ class WiFi : public Object{
 
 public:
     // STATION EVENTS
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
     DECLARE_EVENT(ScanDoneEvent, WiFi, uint32_t, uint8_t, uint8_t);
     ScanDoneEvent OnScanDone{this};
 
@@ -39,8 +38,10 @@ public:
 
     DECLARE_EVENT(StationAuthModeChangedEvent, WiFi, wifi_auth_mode_t, wifi_auth_mode_t);
     StationAuthModeChangedEvent OnStationAuthModeChanged{this};
+#endif
 
     // ACCESS POINT EVENTS
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
     DECLARE_EVENT(AccessPointStartEvent, WiFi);
     AccessPointStartEvent OnAccessPointStart{this};
 
@@ -52,19 +53,25 @@ public:
 
     DECLARE_EVENT(AccessPointDisconnectionEvent, WiFi, /*std::string,*/ uint8_t, bool, uint8_t);
     AccessPointDisconnectionEvent OnAccessPointDisconnection{this};
+#endif
 
 public:
     WiFi() noexcept;
-
-    void startAccessPoint(const std::string& name, const std::string& password, uint8_t channel = 1, uint8_t maxConnections = 1) noexcept;
-    void startStation() noexcept;
+	virtual ~WiFi() override;
 
     // ACCESS POINT FUNCTIONS
+#ifdef CONFIG_CMF_WIFI_AP_SUPPORT
+	void startAccessPoint(const std::string& name, const std::string& password, uint8_t channel = 1, uint8_t maxConnections = 1) noexcept;
+
     bool isHidden() const noexcept;
     void setHidden(bool hidden) const noexcept;
     void setNetworkParameters(const std::string& name, const std::string& password) const noexcept;
+#endif
 
     // STATION FUNCTIONS
+#ifdef CONFIG_CMF_WIFI_STA_SUPPORT
+	void startStation() noexcept;
+
     void resetIPInfo() const noexcept;
     void connect() const noexcept;
     void startScanning(wifi_scan_type_t scanType = WIFI_SCAN_TYPE_PASSIVE, wifi_scan_time_t scanTime = {.active = {.min = 0, .max = 1500}, .passive = 1500}) const noexcept;
@@ -73,6 +80,7 @@ public:
     int getConnectionRSSI() const noexcept;
     void setTargetParameters(const std::string& ssid, const std::string& password) const noexcept;
     std::vector<wifi_ap_record_t> getAPRecords(size_t maxScanSize) const noexcept;
+#endif
 
 private:
     WiFiType type;
