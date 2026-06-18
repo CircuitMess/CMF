@@ -10,7 +10,7 @@
 
 DEFINE_LOG(LVGL)
 
-LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : AsyncEntity(0, 8192, 5, 1), display(display){
+LVGL::LVGL(Display* display, std::function<lv_theme_t*(lv_disp_t*)> themeInit) : AsyncEntity(0, 8192, 5, 1, true), display(display){
 	lv_init();
 
 	lv_tick_set_cb(xTaskGetTickCount);
