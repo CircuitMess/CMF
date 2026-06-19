@@ -23,7 +23,7 @@ public:
 	 * @param startingState The class of the starting state.
 	 * @param interval The ticking interval of the state machine.
 	 */
-	explicit StateMachine(const SubclassOf<State>& startingState = nullptr, TickType_t interval = CONFIG_CMF_STATEMACHINE_TICK_INTERVAL / portTICK_PERIOD_MS, size_t stackSize = CONFIG_CMF_STATEMACHINE_STACK_SIZE, uint8_t threadPriority = CONFIG_CMF_STATEMACHINE_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_STATEMACHINE_CPU_CORE, bool internalStack = false) noexcept;
+	explicit StateMachine(const SubclassOf<State>& startingState = nullptr, TickType_t interval = CONFIG_CMF_STATEMACHINE_TICK_INTERVAL / portTICK_PERIOD_MS, size_t stackSize = CONFIG_CMF_STATEMACHINE_STACK_SIZE, uint8_t threadPriority = CONFIG_CMF_STATEMACHINE_THREAD_PRIORITY, int8_t cpuCore = CONFIG_CMF_STATEMACHINE_CPU_CORE, bool internalStack = true) noexcept;
 
 	/**
 	 *
