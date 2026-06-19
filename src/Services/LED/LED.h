@@ -10,15 +10,15 @@
 #include "Memory/ObjectMemory.h"
 #include "Object/SubclassOf.h"
 #include "Util/stdafx.h"
+#include <memory>
 
 DEFINE_LOG(LED)
 
 template<typename LED, typename DataT>
-class LEDFunction : public SyncEntity {
-	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDFunction, SyncEntity, void)
-
+class LEDFunction {
 public:
+	virtual ~LEDFunction() = default;
+
 	/**
 	 *
 	 * @return True when the LEDFunction is finished, false otherwise.
@@ -37,6 +37,32 @@ public:
 	 * The smallest interval of all functions is the one taken for the LED service ticking interval.
 	 */
 	virtual TickType_t getInterval() const noexcept{ return portMAX_DELAY; }
+
+	/**
+	 * @brief Advances the function state. Driven by the owning LEDBase from within its tick(), under the LEDBase access mutex.
+	 * @param deltaTime Time since the last tick call.
+	 */
+	virtual void tick(float deltaTime) noexcept{}
+
+	/**
+	 * @brief Runs begin() exactly once before the first tick.
+	 */
+	void ensureBegun() noexcept{
+		if(begun){
+			return;
+		}
+
+		begin();
+		begun = true;
+	}
+
+protected:
+	virtual void begin() noexcept{}
+
+	bool hasBegun() const noexcept{ return begun; }
+
+private:
+	bool begun = false;
 };
 
 template<typename LED, typename DataT> requires (std::same_as<DataT, glm::vec3> || std::same_as<DataT, float>)
@@ -72,7 +98,7 @@ public:
 
 			// Should not check if the function is done and disregard it. If it does, and it is the only function,
 			// it will block the service tick for portMAX_DELAY and the wairFor function will remain blocked forever in certain cases
-			if(!func.function.isValid()){
+			if(func.function == nullptr){
 				continue;
 			}
 
@@ -164,14 +190,12 @@ public:
 	 * @param function LED function for the LED
 	 * @param temp If the function is temporary or not
 	 */
-	void set(LED led, StrongObjectPtr<LEDFunction<LED, DataT>> function, bool temp = false) noexcept{
+	void set(LED led, std::unique_ptr<LEDFunction<LED, DataT>> function, bool temp = false) noexcept{
 		std::lock_guard guard(accessMutex);
 		if(!outputs.contains(led)){
 			CMF_LOG(CMF, Error, "LED %d not registered", (int) led);
 			return;
 		}
-
-		function->setOwner(this);
 
 		RegisteredFunction regFunc = { std::move(function), temp };
 
@@ -243,6 +267,19 @@ public:
 		Super::tick(deltaTime);
 
 		std::lock_guard guard(accessMutex);
+
+		if(currentFunctions.empty() && prevFunctions.empty()) return;
+
+		for(auto& pair : currentFunctions){
+			if(pair.second.function == nullptr) continue;
+			pair.second.function->ensureBegun();
+			pair.second.function->tick(deltaTime);
+		}
+		for(auto& pair : prevFunctions){
+			if(pair.second.function == nullptr) continue;
+			pair.second.function->ensureBegun();
+			pair.second.function->tick(deltaTime);
+		}
 
 		if(currentFunctions.empty()) return;
 
@@ -335,14 +372,12 @@ private:
 		}
 	}
 
-	void destroyFunction(StrongObjectPtr<LEDFunction<LED, DataT>>& function) noexcept{
-		if(function.isValid()){
-			delete *function;
-		}
+	void destroyFunction(std::unique_ptr<LEDFunction<LED, DataT>>& function) noexcept{
+		function.reset();
 	}
 
 	struct RegisteredFunction {
-		StrongObjectPtr<LEDFunction<LED, DataT>> function;
+		std::unique_ptr<LEDFunction<LED, DataT>> function;
 		bool isTemporary = false;
 		uint64_t lastActivation = 0;
 	};
@@ -422,12 +457,12 @@ public:
 		rgbs->on(led, level);
 	}
 
-	void set(Monos led, StrongObjectPtr<LEDFunction<Monos, float>> function, bool temp = false) noexcept{
+	void set(Monos led, std::unique_ptr<LEDFunction<Monos, float>> function, bool temp = false) noexcept{
 		monos->set(led, std::move(function), temp);
 		OnFunctionStart.broadcast();
 	}
 
-	void set(RGBs led, StrongObjectPtr<LEDFunction<RGBs, glm::vec3>> function, bool temp = false) noexcept{
+	void set(RGBs led, std::unique_ptr<LEDFunction<RGBs, glm::vec3>> function, bool temp = false) noexcept{
 		rgbs->set(led, std::move(function), temp);
 		OnFunctionStart.broadcast();
 	}

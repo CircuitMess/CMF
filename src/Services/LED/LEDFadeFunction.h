@@ -5,8 +5,7 @@
 
 template<typename LED, typename DataT>
 class LEDFadeFunction : public LEDFunction<LED, DataT> {
-	TEMPLATE_ATTRIBUTES(LED, DataT)
-	GENERATED_BODY(LEDFadeFunction, TEMPLATED_TYPE(LEDFunction<LED, DataT>), CONSTRUCTOR_PACK(DataT, DataT, float, uint32_t, float))
+	using Super = LEDFunction<LED, DataT>;
 public:
 	LEDFadeFunction(DataT start, DataT end, float period, uint32_t loopsCount, float startDelay = 0.0f) :
 			start(start), end(end), period(period), count(loopsCount), startDelay(startDelay){}
