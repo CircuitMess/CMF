@@ -402,7 +402,7 @@ private:
 	LEDFunctionStartEvent OnFunctionStart{this};
 
 public:
-	LED() noexcept : Super(CONFIG_CMF_LED_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_LED_STACK_SIZE, CONFIG_CMF_LED_THREAD_PRIORITY, CONFIG_CMF_LED_CPU_CORE){
+	explicit LED(bool internalStack = true) noexcept : Super(CONFIG_CMF_LED_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_LED_STACK_SIZE, CONFIG_CMF_LED_THREAD_PRIORITY, CONFIG_CMF_LED_CPU_CORE, internalStack){
 		monos = newObject<LEDBase<Monos, float>>(this);
 		rgbs = newObject<LEDBase<RGBs, glm::vec3>>(this);
 

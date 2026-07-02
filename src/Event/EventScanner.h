@@ -10,7 +10,7 @@ class EventScanner : public AsyncEntity {
     GENERATED_BODY(EventScanner, AsyncEntity, void)
 
 public:
-    EventScanner();
+    explicit EventScanner(bool internalStack = true);
     virtual ~EventScanner() override;
 
     void unlock() const noexcept;

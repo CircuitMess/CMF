@@ -23,7 +23,23 @@ WiFi::WiFi() noexcept : Super() {
 }
 
 WiFi::~WiFi(){
+	if(type != WiFiType::None){
+		esp_wifi_stop();
+		esp_wifi_deinit();
+	}
+
+	esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, nativeEventHandler);
+
+	if(netif != nullptr){
+		esp_wifi_clear_default_wifi_driver_and_handlers(netif);
+		esp_netif_destroy(netif);
+		netif = nullptr;
+	}
+
+	esp_netif_deinit();
 	esp_event_loop_delete_default();
+
+	type = WiFiType::None;
 }
 
 #ifdef CONFIG_CMF_WIFI_AP_SUPPORT
@@ -373,7 +389,7 @@ void WiFi::onNativeEvent(uint32_t id, void *data) noexcept {
     }
 }
 
-void WiFi::createNetif() const noexcept {
+void WiFi::createNetif() noexcept {
     if(type != WiFiType::AccessPoint && type != WiFiType::Station) {
         CMF_LOG(WiFi, LogLevel::Warning, "Attempted to create a netif for a WiFi type that is not yet supported.");
         return;
@@ -425,7 +441,7 @@ void WiFi::createNetif() const noexcept {
         esp_netif_config_t cfg = ESP_NETIF_DEFAULT_WIFI_STA();
         cfg.base = &base;
 
-        esp_netif_t* netif = esp_netif_new(&cfg);
+    	netif = esp_netif_new(&cfg);
         if(netif == nullptr){
             CMF_LOG(WiFi, LogLevel::Error, "esp_netif_new returned nullptr for WiFi station");
         }

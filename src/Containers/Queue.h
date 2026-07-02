@@ -256,7 +256,7 @@ public:
 		}
 
 		if(begin > end){
-			for(size_t i = 0; i <= end; i = ++i){
+			for(size_t i = 0; i <= end; ++i){
 				if(buffer[i] == value){
 					return true;
 				}
@@ -390,28 +390,18 @@ private:
 			return true;
 		}
 
-		if(begin > end){
-			for(size_t i = begin; i < bufferSize; ++i){
-				new(&newBuffer[newSize - bufferSize + i]) T(std::move_if_noexcept(buffer[i]));
-				buffer[i].~T();
-			}
-
-			for(size_t i = 0; i <= end; ++i){
-				new(&newBuffer[i]) T(std::move_if_noexcept(buffer[i]));
-				buffer[i].~T();
-			}
-
-			begin = newSize - bufferSize + begin;
-		}else{
-			for(size_t i = begin; i <= end; ++i){
-				new(&newBuffer[newSize - bufferSize + i]) T(std::move_if_noexcept(buffer[i]));
-				buffer[i].~T();
-			}
+		const size_t count = qSize;
+		for(size_t i = 0; i < count; ++i){
+			const size_t src = (begin + i) % bufferSize;
+			new(&newBuffer[i]) T(std::move_if_noexcept(buffer[src]));
+			buffer[src].~T();
 		}
 
 		allocator.deallocate(buffer, bufferSize);
 		buffer = newBuffer;
 		bufferSize = newSize;
+		begin = 0;
+		end = count > 0 ? count - 1 : 0;
 
 		return true;
 	}

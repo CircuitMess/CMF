@@ -5,7 +5,7 @@
 #include <freertos/idf_additions.h>
 
 Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
-	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= false*/) noexcept :
+	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= true*/) noexcept :
 						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), internalStack(internalStack) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();
@@ -13,7 +13,7 @@ Threaded::Threaded(const std::string& threadName, TickType_t interval /*= CONFIG
 }
 
 Threaded::Threaded(const std::function<void(void)>& fn, const std::string& threadName, TickType_t interval /*= CONFIG_CMF_THREADED_INTERVAL / portTICK_PERIOD_MS*/,
-	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= false*/) noexcept :
+	size_t threadStackSize /*= CONFIG_CMF_THREADED_STACK_SIZE*/, uint8_t threadPriority /*= CONFIG_CMF_THREADED_PRIORITY*/, int8_t cpuCore /*= CONFIG_CMF_THREADED_CPU_CORE*/, bool internalStack /*= true*/) noexcept :
 						name(threadName), loopInterval(interval), stackSize(threadStackSize), priority(threadPriority), core(cpuCore), internalStack(internalStack), lambdaLoop(fn) {
 	stopSemaphore = xSemaphoreCreateBinary();
 	stopMutex = xSemaphoreCreateMutex();

@@ -34,7 +34,7 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 		}
 
 		parent->OnRM_Motion.broadcast(active.load());
-	}, "RM_MotionSensor", 0, 3 * 1024);
+	}, "RM_MotionSensor", 0, 3 * 1024, CONFIG_CMF_THREADED_PRIORITY, CONFIG_CMF_THREADED_CPU_CORE, false);
 
 
 	const gpio_config_t io_conf = {

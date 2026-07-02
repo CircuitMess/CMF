@@ -1,6 +1,7 @@
 #ifndef WIFI_H
 #define WIFI_H
 
+#include <esp_netif_types.h>
 #include <semaphore>
 #include <esp_wifi_types_generic.h>
 #include "Object/Object.h"
@@ -83,13 +84,14 @@ public:
 #endif
 
 private:
-    WiFiType type;
+    WiFiType type = WiFiType::None;
     esp_event_handler_instance_t nativeEventHandler;
     std::binary_semaphore initSemaphore { 0 };
+	esp_netif_t* netif = nullptr;
 
 private:
     void onNativeEvent(uint32_t id, void* data) noexcept;
-    void createNetif() const noexcept;
+    void createNetif() noexcept;
 };
 
 #endif //WIFI_H

@@ -4,7 +4,7 @@
 DEFINE_LOG(LIS2DW12)
 
 LIS2DW12::LIS2DW12(std::unique_ptr<I2CDevice> i2cDevice, PinConfig pinConfig, Config config, uint8_t addr) : i2c(std::move(i2cDevice)), Addr(addr), config(config), pins(pinConfig){
-	dispatcherThread = std::make_unique<Threaded>([this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8);
+	dispatcherThread = std::make_unique<Threaded>([this](){ dispatcherFunc(); }, "LIS2_dispatcher", 0, 2 * 1024, 8, CONFIG_CMF_THREADED_CPU_CORE, false);
 
 	if(!i2c){
 		CMF_LOG(LIS2DW12, LogLevel::Error, "No I2C peripheral provided");

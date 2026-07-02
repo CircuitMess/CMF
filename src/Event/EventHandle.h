@@ -10,6 +10,9 @@
 #include "Containers/Queue.h"
 #include "Util/stdafx.h"
 #include "Log/Log.h"
+#include "Statics/ApplicationStatics.h"
+#include "EventScanner.h"
+#include "Core/Application.h"
 
 /**
  * @brief A static helper function used to simplify binding of object member functions to events as callbacks.
@@ -1790,6 +1793,12 @@ public:
 	 * @brief Destructor unregisters this event handle from the owning object, stopping its scanning.
 	 */
 	inline virtual ~EventHandle() noexcept override {
+		if(const Application* app = ApplicationStatics::getApplication()){
+			if(EventScanner* scanner = app->getEventScanner()){
+				scanner->unregisterHandle(this);
+			}
+		}
+
 		Object* owningObjectPtr = owningObject.get();
 		if(owningObjectPtr == nullptr) {
 			return;

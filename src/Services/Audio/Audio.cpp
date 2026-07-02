@@ -3,12 +3,12 @@
 
 DEFINE_LOG(Audio)
 
-Audio::Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin) : Audio(std::move(i2s)){
+Audio::Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin, bool internalStack) : Audio(std::move(i2s), internalStack){
 	this->enablePin = enablePin;
 }
 
-Audio::Audio(StrongObjectPtr<I2S> i2s) :
-		Super(CONFIG_CMF_AUDIO_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_AUDIO_STACK_SIZE, CONFIG_CMF_AUDIO_THREAD_PRIORITY, CONFIG_CMF_AUDIO_CPU_CORE, true), i2s(std::move(i2s)){
+Audio::Audio(StrongObjectPtr<I2S> i2s, bool internalStack) :
+		Super(CONFIG_CMF_AUDIO_TICK_INTERVAL / portTICK_PERIOD_MS, CONFIG_CMF_AUDIO_STACK_SIZE, CONFIG_CMF_AUDIO_THREAD_PRIORITY, CONFIG_CMF_AUDIO_CPU_CORE, internalStack), i2s(std::move(i2s)){
 	tickSemaphore = xSemaphoreCreateBinary();
 	xSemaphoreTake(tickSemaphore, 0);
 

@@ -7,7 +7,7 @@ Application::Application(TickType_t interval /*= CONFIG_CMF_APPLICATION_TICK_INT
 		ApplicationInstance = this;
 	}
 
-	eventScanner = newObject<EventScanner>();
+	eventScanner = newObject<EventScanner>(static_cast<Object*>(nullptr), false);
 }
 
 Application::~Application() noexcept {

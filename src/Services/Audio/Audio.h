@@ -15,9 +15,9 @@ class Audio : public AsyncEntity {
 public:
 	typedef std::pair<AudioGenerator*, std::unique_ptr<AudioSource>> GenSourcePair;
 
-	Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin);
+	Audio(StrongObjectPtr<I2S> i2s, OutputPin enablePin, bool internalStack = true);
 
-	Audio(StrongObjectPtr<I2S> i2s);
+	Audio(StrongObjectPtr<I2S> i2s, bool internalStack = true);
 
 	~Audio() override;
 
