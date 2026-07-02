@@ -23,6 +23,10 @@ WiFi::WiFi() noexcept : Super() {
 }
 
 WiFi::~WiFi(){
+	if(type == WiFiType::Station){
+		esp_wifi_disconnect();
+	}
+
 	if(type != WiFiType::None){
 		esp_wifi_stop();
 		esp_wifi_deinit();
