@@ -33,6 +33,8 @@ public:
 
 	void setEnabled(bool enabled);
 
+	bool isEnabled() const;
+
 	void setGain(float gain);
 
 	bool isPlaying() const;

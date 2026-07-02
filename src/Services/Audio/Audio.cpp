@@ -232,6 +232,10 @@ void Audio::setEnabled(bool enabled){
 	stop();
 }
 
+bool Audio::isEnabled() const{
+	return enabled;
+}
+
 void Audio::setGain(float gain){
 	this->gain = gain;
 }
