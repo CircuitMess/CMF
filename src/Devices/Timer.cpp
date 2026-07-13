@@ -3,14 +3,13 @@
 
 DEFINE_LOG(Timer)
 
-Timer::Timer(uint32_t period, Callback callback, void* arg, const char* name) : period(period * 1000){
-	char timerName[32];
-	sprintf(timerName, "Tmr-%s", name);
+Timer::Timer(uint32_t period, Callback callback, void* arg, const char* name, esp_timer_dispatch_t dispatch) : period(period * 1000){
+	snprintf(timerName, sizeof(timerName), "Tmr-%s", name);
 
 	esp_timer_create_args_t args = {
 			.callback = callback,
 			.arg = arg,
-			.dispatch_method = ESP_TIMER_ISR,
+			.dispatch_method = dispatch,
 			.name = timerName,
 			.skip_unhandled_events = true
 	};
