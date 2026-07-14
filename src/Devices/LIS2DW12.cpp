@@ -176,12 +176,13 @@ void LIS2DW12::clearSources() const {
 
 void IRAM_ATTR LIS2DW12::isr(void* arg){
 	auto lis2 = static_cast<LIS2DW12*>(arg);
+
 	if(lis2->pins.int1 != GPIO_NUM_NC){
-		gpio_set_intr_type(lis2->pins.int1, GPIO_INTR_POSEDGE);
+		gpio_intr_disable(lis2->pins.int1);
 	}
 
 	if(lis2->pins.int2 != GPIO_NUM_NC){
-		gpio_set_intr_type(lis2->pins.int2, GPIO_INTR_POSEDGE);
+		gpio_intr_disable(lis2->pins.int2);
 	}
 
 	auto wake = pdTRUE;
@@ -201,10 +202,10 @@ void LIS2DW12::dispatcherFunc(){
 	}
 
 	if(pins.int1 != GPIO_NUM_NC){
-		gpio_set_intr_type(pins.int1, GPIO_INTR_HIGH_LEVEL);
+		gpio_intr_enable(pins.int1);
 	}
 	if(pins.int2 != GPIO_NUM_NC){
-		gpio_set_intr_type(pins.int2, GPIO_INTR_HIGH_LEVEL);
+		gpio_intr_enable(pins.int2);
 	}
 
 }
