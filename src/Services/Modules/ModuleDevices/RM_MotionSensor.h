@@ -18,6 +18,7 @@ public:
 private:
 	IRAM_ATTR static void isr(void* arg);
 
+	static constexpr uint32_t IdleWaitMs = 100;
 	static constexpr uint32_t DebounceMs = 200;
 
 	std::atomic_bool active = false;
