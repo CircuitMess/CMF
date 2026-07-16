@@ -11,7 +11,9 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 	sem = xSemaphoreCreateBinary();
 	thread = std::make_unique<Threaded>([this]() {
 		if(!debouncing){
-			xSemaphoreTake(sem, portMAX_DELAY);
+			if(xSemaphoreTake(sem, pdMS_TO_TICKS(IdleWaitMs)) != pdTRUE){
+				return; // periodic wake so a pending stop() can join
+			}
 			debouncing = true;
 			return;
 		}
@@ -45,9 +47,9 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 		.intr_type = GPIO_INTR_ANYEDGE
 	};
 
-	gpio_intr_enable(pin);
-	gpio_isr_handler_add(pin, isr, this);
 	gpio_config(&io_conf);
+	gpio_isr_handler_add(pin, isr, this);
+	gpio_intr_enable(pin);
 
 	setLEDs(false);
 
@@ -55,10 +57,9 @@ RM_MotionSensor::RM_MotionSensor(const Modules::BusPins& busPins) : Super(Module
 }
 
 RM_MotionSensor::~RM_MotionSensor() noexcept{
+	gpio_intr_disable(pin);
 	gpio_isr_handler_remove(pin);
 
-	thread->stop(0);
-	xSemaphoreGive(sem);
 	thread->stop();
 	vSemaphoreDelete(sem);
 }
