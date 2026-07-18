@@ -49,6 +49,7 @@ const std::map<Address, Type>& GetAddressMap(){
 #endif
 #ifdef CONFIG_RM_CO2
 			{{ 16, { .type=SubAddress::Type::RM, .RMAddress=1 }}, Type::RM_CO2 },
+			{{ 16, { .type=SubAddress::Type::RM, .RMAddress=5 }}, Type::RM_CO2 }, // Gas module alias
 #endif
 #ifdef CONFIG_RM_IR
 			{{ 16, { .type=SubAddress::Type::RM, .RMAddress=2 }}, Type::RM_IR },
