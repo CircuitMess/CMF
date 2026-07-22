@@ -20,7 +20,7 @@ ADCUnit* ADCUnit::getADCUnit(gpio_num_t gpio){
 	auto err = adc_oneshot_io_to_channel(gpio, &unit, &chan);
 	if(err == ESP_ERR_NOT_FOUND){
 		CMF_LOG(ADCUnit, Error, "GPIO %d is not a valid ADC pin", gpio);
-	}else if(err == ESP_ERR_NOT_FOUND){
+	} else if(err != ESP_OK){
 		CMF_LOG(ADCUnit, Error, "Invalid getADCUnit argument");
 	}
 	return getADCUnit(unit);
@@ -29,14 +29,14 @@ ADCUnit* ADCUnit::getADCUnit(gpio_num_t gpio){
 ADCUnit::ADCUnit(adc_unit_t unit) : Super(), unit(unit){
 	if(units[unit].isValid()){
 		CMF_LOG(CMF, LogLevel::Error, "Attempted to create an ADC unit %d that has already been initialized in the past. "
-								"'getADCUnit' function should be used instead of creating ones own ADCUnit.", (int)unit);
+		        "'getADCUnit' function should be used instead of creating ones own ADCUnit.", (int)unit);
 		return;
 	}
 
 	const adc_oneshot_unit_init_cfg_t config = {
-			.unit_id = unit,
-			.clk_src = ADC_RTC_CLK_SRC_DEFAULT,
-			.ulp_mode = ADC_ULP_MODE_DISABLE
+		.unit_id = unit,
+		.clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+		.ulp_mode = ADC_ULP_MODE_DISABLE
 	};
 
 	ESP_ERROR_CHECK(adc_oneshot_new_unit(&config, &hndl));
@@ -59,7 +59,7 @@ esp_err_t ADCUnit::read(adc_channel_t chan, int& valueOut, const adc_cali_handle
 	std::lock_guard lock(mutex);
 	if(cali != nullptr){
 		return adc_oneshot_get_calibrated_result(hndl, cali, chan, &valueOut);
-	}else{
+	} else{
 		return adc_oneshot_read(hndl, chan, &valueOut);
 	}
 }
@@ -71,6 +71,6 @@ void ADCUnit::reinit(){
 		.unit_id = unit,
 		.clk_src = ADC_RTC_CLK_SRC_DEFAULT,
 		.ulp_mode = ADC_ULP_MODE_DISABLE
-};
+	};
 	ESP_ERROR_CHECK(adc_oneshot_new_unit(&config, &hndl));
 }
