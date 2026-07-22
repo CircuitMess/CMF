@@ -5,6 +5,7 @@
 #include "Object/Object.h"
 #include <esp_adc/adc_oneshot.h>
 #include <soc/gpio_num.h>
+#include <mutex>
 
 class ADCUnit : public Object {
 	GENERATED_BODY(ADCUnit, Object, CONSTRUCTOR_PACK(adc_unit_t))
@@ -38,6 +39,8 @@ public:
 private:
 	adc_oneshot_unit_handle_t hndl;
 	const adc_unit_t unit;
+
+	mutable std::mutex mutex;
 
 	static StrongObjectPtr<ADCUnit> units[SOC_ADC_PERIPH_NUM];
 };

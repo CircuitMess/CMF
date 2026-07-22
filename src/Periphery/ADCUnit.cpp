@@ -47,6 +47,7 @@ ADCUnit::~ADCUnit(){
 }
 
 void ADCUnit::config(adc_channel_t chan, const adc_oneshot_chan_cfg_t& cfg){
+	std::lock_guard lock(mutex);
 	ESP_ERROR_CHECK(adc_oneshot_config_channel(hndl, chan, &cfg));
 }
 
@@ -55,6 +56,7 @@ adc_unit_t ADCUnit::getUnitID() const{
 }
 
 esp_err_t ADCUnit::read(adc_channel_t chan, int& valueOut, const adc_cali_handle_t cali) const{
+	std::lock_guard lock(mutex);
 	if(cali != nullptr){
 		return adc_oneshot_get_calibrated_result(hndl, cali, chan, &valueOut);
 	}else{
@@ -63,6 +65,7 @@ esp_err_t ADCUnit::read(adc_channel_t chan, int& valueOut, const adc_cali_handle
 }
 
 void ADCUnit::reinit(){
+	std::lock_guard lock(mutex);
 	ESP_ERROR_CHECK(adc_oneshot_del_unit(hndl));
 	const adc_oneshot_unit_init_cfg_t config = {
 		.unit_id = unit,
